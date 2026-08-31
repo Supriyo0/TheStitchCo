@@ -177,13 +177,142 @@ require_once __DIR__ . '/includes/header.php';
                             </div>
                             <div style="font-weight: 800; font-size: 0.9rem;">
                                 <?= format_price($it['total']) ?>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
+            <!-- Cancellation Banner / Store Notes -->
+            <?php if (!empty($order['cancel_requested']) && (int)$order['cancel_requested'] === 1 && $order['status'] !== 'Cancelled'): ?>
+                <div style="background: #FFFBEB; border: 1.5px solid #FCD34D; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.6rem;">
+                    <div>
+                        <strong style="color: #B45309; font-size: 0.88rem;">⏳ Cancellation Request Submitted (Under Review)</strong>
+                        <div style="font-size: 0.78rem; color: #92400E; margin-top: 2px;">Reason: <?= e($order['cancel_reason']) ?></div>
+                    </div>
+                    <span style="font-size: 0.75rem; background: #FEF3C7; color: #92400E; padding: 0.25rem 0.6rem; border-radius: 4px; font-weight: 800;">Pending Admin Review</span>
                 </div>
+            <?php endif; ?>
+
+            <?php if (!empty($order['admin_note'])): ?>
+                <div style="background: #EFF6FF; border: 1.5px solid #BFDBFE; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; font-size: 0.84rem; color: #1E40AF;">
+                    <strong>📝 Store Cancellation / Status Note:</strong> <?= e($order['admin_note']) ?>
+                </div>
+            <?php endif; ?>
+
+            <!-- Order Action Buttons -->
+            <div style="display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1.2rem; flex-wrap: wrap;">
+                <?php if (!in_array($order['status'], ['Shipped', 'Out for Delivery', 'Delivered', 'Cancelled']) && empty($order['cancel_requested'])): ?>
+                    <button type="button" onclick="openCancelModal(<?= $order['id'] ?>, '<?= e($order['order_number']) ?>')" style="background: #FEF2F2; color: #DC2626; border: 1.5px solid #FECACA; font-size: 0.82rem; font-weight: 800; padding: 0.6rem 1.2rem; border-radius: var(--radius-sm); cursor: pointer;">
+                        🚫 Request Cancellation
+                    </button>
+                <?php endif; ?>
+                <a href="invoice.php?order_number=<?= urlencode($order['order_number']) ?>" target="_blank" class="hero-btn" style="background: #fff; color: #000; border: 1.5px solid var(--border); font-size: 0.82rem; padding: 0.6rem 1.2rem; text-decoration: none;">
+                    Download Invoice 📄
+                </a>
             </div>
         </div>
     <?php endif; ?>
 </div>
+
+<!-- Cancellation Request Modal -->
+<div id="cancel-modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 99999; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(4px);">
+    <div style="background: #FFFFFF; border-radius: 16px; max-width: 480px; width: 100%; padding: 2rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); position: relative;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem;">
+            <h3 style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 900; color: #DC2626; margin: 0;">
+                🚫 Request Order Cancellation
+            </h3>
+            <button onclick="closeCancelModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+        </div>
+
+        <p style="font-size: 0.84rem; color: var(--text-muted); margin-bottom: 1.2rem; line-height: 1.4;">
+            Order #<strong id="modal-order-number" style="color: var(--primary);"></strong> is eligible for cancellation because it has not shipped yet. Please select your reason for our store team:
+        </p>
+
+        <form id="cancel-request-form" onsubmit="submitCancelRequest(event)">
+            <input type="hidden" id="cancel-order-id" name="order_id" value="">
+
+            <div style="display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.2rem;">
+                <label style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.86rem; font-weight: 600; cursor: pointer;">
+                    <input type="radio" name="cancel_reason" value="Ordered wrong size or color variant" required checked>
+                    <span>Ordered wrong size or color variant</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.86rem; font-weight: 600; cursor: pointer;">
+                    <input type="radio" name="cancel_reason" value="Need to change delivery address or phone">
+                    <span>Need to change delivery address or phone</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.86rem; font-weight: 600; cursor: pointer;">
+                    <input type="radio" name="cancel_reason" value="Placed duplicate order by mistake">
+                    <span>Placed duplicate order by mistake</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.86rem; font-weight: 600; cursor: pointer;">
+                    <input type="radio" name="cancel_reason" value="Delivery time is longer than expected">
+                    <span>Delivery time is longer than expected</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.86rem; font-weight: 600; cursor: pointer;">
+                    <input type="radio" name="cancel_reason" value="Other reason">
+                    <span>Other reason</span>
+                </label>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.3rem;">Additional Notes (Optional):</label>
+                <textarea id="cancel-notes" placeholder="Explain details for support team..." rows="2" style="width: 100%; padding: 0.6rem; border: 1.5px solid var(--border); border-radius: 6px; font-size: 0.85rem;"></textarea>
+            </div>
+
+            <div style="display: flex; gap: 0.8rem; justify-content: flex-end;">
+                <button type="button" onclick="closeCancelModal()" style="padding: 0.65rem 1.2rem; background: #F1F5F9; color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; font-weight: 700; font-size: 0.85rem; cursor: pointer;">
+                    Keep Order
+                </button>
+                <button type="submit" id="btn-submit-cancel" style="padding: 0.65rem 1.4rem; background: #DC2626; color: #FFFFFF; border: none; border-radius: 6px; font-weight: 800; font-size: 0.85rem; cursor: pointer;">
+                    SUBMIT CANCELLATION REQUEST
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openCancelModal(orderId, orderNo) {
+    document.getElementById('cancel-order-id').value = orderId;
+    document.getElementById('modal-order-number').textContent = orderNo;
+    document.getElementById('cancel-notes').value = '';
+    const overlay = document.getElementById('cancel-modal-overlay');
+    overlay.style.display = 'flex';
+}
+
+function closeCancelModal() {
+    document.getElementById('cancel-modal-overlay').style.display = 'none';
+}
+
+function submitCancelRequest(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btn-submit-cancel');
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    const orderId = document.getElementById('cancel-order-id').value;
+    const reasonEl = document.querySelector('input[name="cancel_reason"]:checked');
+    const reason = reasonEl ? reasonEl.value : 'Customer requested cancellation';
+    const notes = document.getElementById('cancel-notes').value;
+
+    const formData = new FormData();
+    formData.append('action', 'request_cancellation');
+    formData.append('order_id', orderId);
+    formData.append('cancel_reason', reason);
+    formData.append('additional_notes', notes);
+
+    fetch('api/customer_actions.php', { method: 'POST', body: formData })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            if (data.success) {
+                location.reload();
+            } else {
+                btn.disabled = false;
+                btn.textContent = 'SUBMIT CANCELLATION REQUEST';
+            }
+        })
+        .catch(() => {
+            alert('Failed to connect to server. Please try again.');
+            btn.disabled = false;
+            btn.textContent = 'SUBMIT CANCELLATION REQUEST';
+        });
+}
+</script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

@@ -149,4 +149,131 @@ if ($action === 'update_shipping') {
     exit;
 }
 
+// 4. Approve Order Cancellation (Restock inventory + refund note)
+if ($action === 'approve_cancellation') {
+    $orderId = (int)($_POST['order_id'] ?? 0);
+    $adminNote = trim($_POST['admin_note'] ?? 'Order cancellation approved by store support.');
+
+    if ($orderId <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid order ID.']);
+        exit;
+    }
+
+    try {
+        $db->beginTransaction();
+
+        $stmt = $db->prepare("SELECT * FROM orders WHERE id = ?");
+        $stmt->execute([$orderId]);
+        $order = $stmt->fetch();
+
+        if (!$order) {
+            $db->rollBack();
+            echo json_encode(['success' => false, 'message' => 'Order not found.']);
+            exit;
+        }
+
+        // Restock inventory for all order items
+        $itemStmt = $db->prepare("SELECT product_id, quantity FROM order_items WHERE order_id = ?");
+        $itemStmt->execute([$orderId]);
+        $items = $itemStmt->fetchAll();
+
+        $restockStmt = $db->prepare("UPDATE products SET stock = stock + ? WHERE id = ?");
+        foreach ($items as $it) {
+            $restockStmt->execute([$it['quantity'], $it['product_id']]);
+        }
+
+        // Determine payment status
+        $newPaymentStatus = ($order['payment_status'] === 'Paid') ? 'Refunded' : $order['payment_status'];
+
+        $upStmt = $db->prepare("
+            UPDATE orders 
+            SET status = 'Cancelled', 
+                cancel_requested = 0,
+                admin_note = ?,
+                payment_status = ?
+            WHERE id = ?
+        ");
+        $upStmt->execute([$adminNote, $newPaymentStatus, $orderId]);
+
+        log_order_status_transition($orderId, $order['status'], 'Cancelled', 'Cancellation approved by admin (' . $admin['fullname'] . '). Note: ' . $adminNote, $admin['fullname']);
+
+        create_notification(
+            $order['customer_id'], 
+            'Order Cancelled #' . $order['order_number'], 
+            'Your order has been cancelled as requested. ' . $adminNote, 
+            'order', 
+            'account.php?tab=orders'
+        );
+
+        // Send Email
+        require_once __DIR__ . '/../includes/mailer.php';
+        try {
+            send_order_cancellation_email($order, $adminNote);
+        } catch (Exception $e) {
+            error_log("Cancellation email error: " . $e->getMessage());
+        }
+
+        log_admin_activity($admin['id'], $admin['fullname'], 'approve_cancellation', 'Cancelled Order #' . $order['order_number'] . ' & restocked items.');
+
+        $db->commit();
+        echo json_encode(['success' => true, 'message' => 'Order cancelled successfully and inventory restored to catalog!']);
+    } catch (Exception $e) {
+        $db->rollBack();
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
+    exit;
+}
+
+// 5. Reject Order Cancellation (Send cancellation explanation note to customer)
+if ($action === 'reject_cancellation') {
+    $orderId = (int)($_POST['order_id'] ?? 0);
+    $adminNote = trim($_POST['admin_note'] ?? '');
+
+    if ($orderId <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid order ID.']);
+        exit;
+    }
+
+    if (empty($adminNote)) {
+        echo json_encode(['success' => false, 'message' => 'Please provide an explanation note for the customer.']);
+        exit;
+    }
+
+    try {
+        $stmt = $db->prepare("SELECT * FROM orders WHERE id = ?");
+        $stmt->execute([$orderId]);
+        $order = $stmt->fetch();
+
+        if (!$order) {
+            echo json_encode(['success' => false, 'message' => 'Order not found.']);
+            exit;
+        }
+
+        $upStmt = $db->prepare("
+            UPDATE orders 
+            SET cancel_requested = 0,
+                admin_note = ?
+            WHERE id = ?
+        ");
+        $upStmt->execute([$adminNote, $orderId]);
+
+        log_order_status_transition($orderId, $order['status'], $order['status'], 'Admin rejected cancellation request. Note: ' . $adminNote, $admin['fullname']);
+
+        create_notification(
+            $order['customer_id'], 
+            'Cancellation Update for #' . $order['order_number'], 
+            'Your cancellation request could not be processed: ' . $adminNote, 
+            'order', 
+            'account.php?tab=orders'
+        );
+
+        log_admin_activity($admin['id'], $admin['fullname'], 'reject_cancellation', 'Rejected cancellation for Order #' . $order['order_number'] . ' with note: ' . $adminNote);
+
+        echo json_encode(['success' => true, 'message' => 'Cancellation request dismissed and note sent to customer.']);
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
+    exit;
+}
+
 echo json_encode(['success' => false, 'message' => 'Unknown admin action.']);

@@ -18,10 +18,12 @@ $sql = "
     LEFT JOIN shipping_details s ON o.id = s.order_id
     WHERE 1=1
 ";
-$params = [];
+$cancelCount = (int)$db->query("SELECT COUNT(*) FROM orders WHERE cancel_requested = 1 AND status != 'Cancelled'")->fetchColumn();
 
 if ($filterStatus === 'pending_upi') {
     $sql .= " AND o.payment_status = 'Pending' AND o.status != 'Cancelled'";
+} elseif ($filterStatus === 'cancel_requests') {
+    $sql .= " AND o.cancel_requested = 1 AND o.status != 'Cancelled'";
 } elseif ($filterStatus !== 'all' && !empty($filterStatus)) {
     $sql .= " AND o.status = ?";
     $params[] = $filterStatus;
@@ -57,6 +59,7 @@ $orders = $stmt->fetchAll();
         <div class="filter-tabs">
             <a href="orders.php?status=all" class="filter-tab-btn <?= $filterStatus === 'all' ? 'active' : '' ?>">All Orders</a>
             <a href="orders.php?status=pending_upi" class="filter-tab-btn <?= $filterStatus === 'pending_upi' ? 'active' : '' ?>">Pending UPI Approval</a>
+            <a href="orders.php?status=cancel_requests" class="filter-tab-btn <?= $filterStatus === 'cancel_requests' ? 'active' : '' ?>" style="<?= $cancelCount > 0 ? 'background: #FEF2F2; color: #DC2626; border-color: #F87171; font-weight: 800;' : '' ?>">⚠️ Cancel Requests <?= $cancelCount > 0 ? "({$cancelCount})" : '' ?></a>
             <a href="orders.php?status=Confirmed" class="filter-tab-btn <?= $filterStatus === 'Confirmed' ? 'active' : '' ?>">Confirmed</a>
             <a href="orders.php?status=Processing" class="filter-tab-btn <?= $filterStatus === 'Processing' ? 'active' : '' ?>">Processing</a>
             <a href="orders.php?status=Shipped" class="filter-tab-btn <?= $filterStatus === 'Shipped' ? 'active' : '' ?>">Shipped</a>
@@ -99,6 +102,30 @@ $orders = $stmt->fetchAll();
                             <td>
                                 <strong style="font-weight: 800;"><?= e($ord['order_number']) ?></strong><br>
                                 <span style="font-size: 0.72rem; color: var(--admin-text-muted);">🕒 <?= date('d M, h:i a', strtotime($ord['created_at'])) ?></span>
+                                
+                                <?php if (!empty($ord['cancel_requested']) && (int)$ord['cancel_requested'] === 1 && $ord['status'] !== 'Cancelled'): ?>
+                                    <div style="background: #FEF2F2; border: 1.5px solid #F87171; border-radius: 6px; padding: 0.6rem 0.8rem; margin-top: 0.5rem; font-size: 0.78rem;">
+                                        <strong style="color: #DC2626;">⚠️ CANCELLATION REQUESTED:</strong><br>
+                                        <span style="color: #991B1B; font-weight: 600;"><?= e($ord['cancel_reason'] ?: 'Customer requested cancellation') ?></span>
+                                        <?php if (!empty($ord['cancel_requested_at'])): ?>
+                                            <div style="font-size: 0.7rem; color: #7F1D1D; margin-top: 2px;">🕒 <?= date('d M, h:i A', strtotime($ord['cancel_requested_at'])) ?></div>
+                                        <?php endif; ?>
+                                        <div style="display: flex; gap: 0.4rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                                            <button onclick="approveCancellation(<?= $ord['id'] ?>, '<?= e($ord['order_number']) ?>')" style="padding: 0.35rem 0.65rem; background: #DC2626; color: #fff; border: none; border-radius: 4px; font-weight: 800; font-size: 0.75rem; cursor: pointer;">
+                                                ✓ Approve & Cancel
+                                            </button>
+                                            <button onclick="rejectCancellation(<?= $ord['id'] ?>, '<?= e($ord['order_number']) ?>')" style="padding: 0.35rem 0.65rem; background: #374151; color: #fff; border: none; border-radius: 4px; font-weight: 800; font-size: 0.75rem; cursor: pointer;">
+                                                ✕ Reject with Note
+                                            </button>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+
+                                <?php if (!empty($ord['admin_note'])): ?>
+                                    <div style="margin-top: 0.4rem; font-size: 0.74rem; background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E40AF; padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 700;">
+                                        📝 Note: <?= e($ord['admin_note']) ?>
+                                    </div>
+                                <?php endif; ?>
                             </td>
                             <td>
                                 <strong style="font-weight: 700;"><?= e($ord['customer_name']) ?></strong><br>
@@ -297,6 +324,44 @@ function rejectPayment(paymentId) {
             } else {
                 alert(data.message || 'Error updating payment');
             }
+        });
+}
+
+function approveCancellation(orderId, orderNo) {
+    const note = prompt('Enter cancellation note for customer (e.g. "Cancellation approved. Full refund initiated."):', 'Order cancellation approved by store support.');
+    if (note === null) return;
+
+    const formData = new FormData();
+    formData.append('action', 'approve_cancellation');
+    formData.append('order_id', orderId);
+    formData.append('admin_note', note);
+
+    fetch('../api/admin_actions.php', { method: 'POST', body: formData })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            if (data.success) location.reload();
+        });
+}
+
+function rejectCancellation(orderId, orderNo) {
+    const note = prompt('Enter reason for rejection / explanation note to customer (Required):', 'Your order is already packed & handed over to our courier partner.');
+    if (note === null) return;
+    if (!note.trim()) {
+        alert('Please provide a reason / explanation note.');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('action', 'reject_cancellation');
+    formData.append('order_id', orderId);
+    formData.append('admin_note', note);
+
+    fetch('../api/admin_actions.php', { method: 'POST', body: formData })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            if (data.success) location.reload();
         });
 }
 </script>
