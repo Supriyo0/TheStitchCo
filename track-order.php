@@ -15,9 +15,21 @@ $order = null;
 $orderItems = [];
 $shipping = null;
 $statusHistory = [];
+$orderReturn = null;
+$db = get_db();
+
+// Safe self-healing schema checks
+try {
+    $chkCol = $db->query("SHOW COLUMNS FROM `orders` LIKE 'cancel_requested'")->fetch();
+    if (!$chkCol) {
+        $db->exec("ALTER TABLE `orders` ADD COLUMN `cancel_requested` TINYINT(1) DEFAULT 0");
+        $db->exec("ALTER TABLE `orders` ADD COLUMN `cancel_requested_at` DATETIME NULL DEFAULT NULL");
+        $db->exec("ALTER TABLE `orders` ADD COLUMN `cancel_reason` TEXT DEFAULT NULL");
+        $db->exec("ALTER TABLE `orders` ADD COLUMN `cancel_admin_note` TEXT DEFAULT NULL");
+    }
+} catch (Exception $e) {}
 
 if (!empty($orderNumber)) {
-    $db = get_db();
     $stmt = $db->prepare("SELECT * FROM orders WHERE order_number = ? LIMIT 1");
     $stmt->execute([$orderNumber]);
     $order = $stmt->fetch();
@@ -31,13 +43,17 @@ if (!empty($orderNumber)) {
         $shipStmt->execute([$order['id']]);
         $shipping = $shipStmt->fetch();
 
-        $histStmt = $db->prepare("SELECT * FROM order_status_history WHERE order_id = ? ORDER BY id ASC");
-        $histStmt->execute([$order['id']]);
-        $statusHistory = $histStmt->fetchAll();
+        try {
+            $histStmt = $db->prepare("SELECT * FROM order_status_history WHERE order_id = ? ORDER BY id ASC");
+            $histStmt->execute([$order['id']]);
+            $statusHistory = $histStmt->fetchAll();
+        } catch (Exception $e) {}
 
-        $retStmt = $db->prepare("SELECT * FROM order_returns WHERE order_id = ? LIMIT 1");
-        $retStmt->execute([$order['id']]);
-        $orderReturn = $retStmt->fetch();
+        try {
+            $retStmt = $db->prepare("SELECT * FROM order_returns WHERE order_id = ? LIMIT 1");
+            $retStmt->execute([$order['id']]);
+            $orderReturn = $retStmt->fetch();
+        } catch (Exception $e) {}
     }
 }
 
@@ -167,13 +183,15 @@ require_once __DIR__ . '/includes/header.php';
             </div>
 
             <!-- Order Items -->
-            <div style="border-top: 1px solid var(--border); padding-top: 1.2rem;">
+            <div style="border-top: 1px solid var(--border); padding-top: 1.2rem; margin-bottom: 1.5rem;">
                 <h4 style="font-size: 0.85rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.8rem;">Ordered Items (<?= count($orderItems) ?>)</h4>
                 <div style="display: flex; flex-direction: column; gap: 0.8rem;">
-                    <?php foreach ($orderItems as $it): ?>
+                    <?php foreach ($orderItems as $it): 
+                        $itThumb = get_media_url($it['image'] ?? '');
+                    ?>
                         <div style="display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; padding: 0.8rem 1rem; border-radius: var(--radius-sm);">
                             <div style="display: flex; gap: 0.8rem; align-items: center;">
-                                <img src="<?= e($it['image']) ?>" alt="<?= e($it['product_name']) ?>" style="width: 44px; height: 52px; object-fit: cover; border-radius: 4px;">
+                                <img src="<?= e($itThumb) ?>" alt="<?= e($it['product_name']) ?>" onerror="this.onerror=null; this.src='assets/images/placeholder.svg';" style="width: 44px; height: 52px; object-fit: cover; border-radius: 4px;">
                                 <div>
                                     <div style="font-weight: 800; font-size: 0.85rem;"><?= e($it['product_name']) ?></div>
                                     <div style="font-size: 0.75rem; color: var(--text-muted);">Size: <?= e($it['size']) ?> | Color: <?= e($it['color']) ?> | Qty: <?= $it['quantity'] ?></div>
@@ -181,6 +199,11 @@ require_once __DIR__ . '/includes/header.php';
                             </div>
                             <div style="font-weight: 800; font-size: 0.9rem;">
                                 <?= format_price($it['total']) ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
             <!-- Post-Delivery Return & Refund Status Banner -->
             <?php if (!empty($orderReturn)): ?>
                 <div style="background: #F0FDF4; border: 1.5px solid #86EFAC; border-radius: 8px; padding: 1.2rem; margin-bottom: 1.5rem;">
