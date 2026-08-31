@@ -32,6 +32,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_media'])) {
     }
 }
 
+// Handle File Delete
+if (isset($_GET['del_file'])) {
+    $filePath = trim($_GET['del_file']);
+    $realFullPath = realpath(__DIR__ . '/../' . $filePath);
+    $allowedBase = realpath(__DIR__ . '/../');
+    if ($realFullPath && strpos($realFullPath, $allowedBase) === 0 && file_exists($realFullPath) && is_file($realFullPath)) {
+        @unlink($realFullPath);
+        $msg = 'File deleted successfully!';
+    } else {
+        $err = 'Unable to delete file (file does not exist or invalid path).';
+    }
+}
+
 // Scan storage directories for media files
 $mediaFiles = [];
 $dirsToScan = [
@@ -50,7 +63,7 @@ foreach ($dirsToScan as $label => $dir) {
         foreach ($files as $f) {
             if ($f !== '.' && $f !== '..' && !is_dir($dir . '/' . $f)) {
                 $ext = strtolower(pathinfo($f, PATHINFO_EXTENSION));
-                if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'svg', 'gif'])) {
+                if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'svg', 'gif', 'avif'])) {
                     $mediaFiles[] = [
                         'name' => $f,
                         'folder' => $label,
@@ -120,13 +133,13 @@ usort($mediaFiles, function($a, $b) {
     <div style="padding: 1.8rem;">
         <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 800; margin-bottom: 1.2rem;">All Stored Media Assets (<?= count($mediaFiles) ?>)</h3>
         
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1.2rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 1.2rem;">
             <?php foreach ($mediaFiles as $m): ?>
                 <div style="background: #FFFFFF; border: 1.5px solid var(--admin-border); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s;">
                     <div style="height: 140px; background: #F3F4F6; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 6px;">
                         <img src="../<?= e($m['path']) ?>" alt="" style="max-height: 100%; max-width: 100%; object-fit: contain;">
                     </div>
-                    <div style="padding: 0.8rem; display: flex; flex-direction: column; gap: 0.4rem; flex: 1; justify-content: space-between;">
+                    <div style="padding: 0.8rem; display: flex; flex-direction: column; gap: 0.5rem; flex: 1; justify-content: space-between;">
                         <div>
                             <div style="font-size: 0.75rem; font-weight: 800; word-break: break-all; color: var(--admin-text-main); line-height: 1.3;" title="<?= e($m['name']) ?>">
                                 <?= e(mb_strimwidth($m['name'], 0, 22, '...')) ?>
@@ -135,9 +148,14 @@ usort($mediaFiles, function($a, $b) {
                                 <?= e($m['folder']) ?> • <?= $m['size'] ?>
                             </div>
                         </div>
-                        <button onclick="copyToClipboard('<?= e($m['path']) ?>')" style="width: 100%; padding: 0.4rem; background: #EEF2FF; color: #1E3A8A; border: 1px solid #C7D2FE; border-radius: 4px; font-size: 0.72rem; font-weight: 800; cursor: pointer; text-align: center;">
-                            📋 Copy Path
-                        </button>
+                        <div style="display: flex; gap: 0.4rem;">
+                            <button type="button" onclick="copyToClipboard('<?= e($m['path']) ?>')" style="flex: 1; padding: 0.4rem; background: #EEF2FF; color: #1E3A8A; border: 1px solid #C7D2FE; border-radius: 4px; font-size: 0.72rem; font-weight: 800; cursor: pointer; text-align: center;">
+                                📋 Copy
+                            </button>
+                            <a href="media.php?del_file=<?= urlencode($m['path']) ?>" onclick="return confirm('Delete file <?= e($m['name']) ?> permanently?')" style="padding: 0.4rem 0.6rem; background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; border-radius: 4px; font-size: 0.72rem; font-weight: 800; text-decoration: none; text-align: center;" title="Delete file">
+                                🗑️
+                            </a>
+                        </div>
                     </div>
                 </div>
             <?php endforeach; ?>

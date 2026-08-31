@@ -47,9 +47,10 @@ $basePath = rtrim($basePath, '/');
 
 define('BASE_URL', $protocol . $host . ($basePath ? $basePath : '') . '/');
 define('ADMIN_URL', BASE_URL . 'admin/');
-define('ROOT_PATH', dirname(__DIR__) . '/');
-define('UPLOAD_PATH', ROOT_PATH . 'uploads/');
-define('ASSETS_PATH', ROOT_PATH . 'assets/');
+if (!defined('ROOT_PATH')) define('ROOT_PATH', dirname(__DIR__) . '/');
+if (!defined('UPLOAD_PATH')) define('UPLOAD_PATH', ROOT_PATH . 'uploads/');
+if (!defined('UPLOAD_DIR')) define('UPLOAD_DIR', ROOT_PATH . 'uploads');
+if (!defined('ASSETS_PATH')) define('ASSETS_PATH', ROOT_PATH . 'assets/');
 
 // Upload Limits & Allowed Types
 define('MAX_UPLOAD_SIZE', 5 * 1024 * 1024); // 5 MB

@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_category'])) {
     $editId = (int)($_POST['category_id'] ?? 0);
     $catName = trim($_POST['cat_name'] ?? '');
     $catKey = strtolower(trim($_POST['cat_key'] ?? preg_replace('/[^A-Za-z0-9_]+/', '_', $catName)));
-    $subtext = trim($_POST['subtext'] ?? '');
+    $desc = trim($_POST['description'] ?? $_POST['subtext'] ?? '');
     $icon = trim($_POST['icon'] ?? 'tshirt');
     $displayOrder = (int)($_POST['display_order'] ?? 1);
     $imagePath = trim($_POST['image_url'] ?? '');
@@ -31,8 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_category'])) {
     if (!empty($catName)) {
         try {
             if ($editId > 0) {
-                $sql = "UPDATE categories SET cat_name = ?, cat_key = ?, subtext = ?, icon = ?, display_order = ?" . (!empty($imagePath) ? ", image = ?" : "") . " WHERE id = ?";
-                $params = !empty($imagePath) ? [$catName, $catKey, $subtext, $icon, $displayOrder, $imagePath, $editId] : [$catName, $catKey, $subtext, $icon, $displayOrder, $editId];
+                $sql = "UPDATE categories SET cat_name = ?, cat_key = ?, description = ?, icon = ?, display_order = ?" . (!empty($imagePath) ? ", image = ?" : "") . " WHERE id = ?";
+                $params = !empty($imagePath) ? [$catName, $catKey, $desc, $icon, $displayOrder, $imagePath, $editId] : [$catName, $catKey, $desc, $icon, $displayOrder, $editId];
                 $stmt = $db->prepare($sql);
                 $stmt->execute($params);
                 $msg = 'Category updated successfully!';
@@ -40,8 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_category'])) {
                 if (empty($imagePath)) {
                     $imagePath = 'assets/images/products/good_vibes_white.svg';
                 }
-                $stmt = $db->prepare("INSERT INTO categories (cat_name, cat_key, subtext, icon, image, display_order) VALUES (?, ?, ?, ?, ?, ?)");
-                $stmt->execute([$catName, $catKey, $subtext, $icon, $imagePath, $displayOrder]);
+                $stmt = $db->prepare("INSERT INTO categories (cat_name, cat_key, description, icon, image, display_order) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$catName, $catKey, $desc, $icon, $imagePath, $displayOrder]);
                 $msg = 'Category created successfully!';
             }
         } catch (Exception $e) {
@@ -53,8 +53,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_category'])) {
 // Handle Delete
 if (isset($_GET['del'])) {
     $delId = (int)$_GET['del'];
-    $db->prepare("DELETE FROM categories WHERE id = ?")->execute([$delId]);
-    $msg = 'Category deleted successfully.';
+    try {
+        $db->prepare("DELETE FROM categories WHERE id = ?")->execute([$delId]);
+        $msg = 'Category deleted successfully.';
+    } catch (Exception $e) {
+        $err = 'Error deleting category: ' . $e->getMessage();
+    }
 }
 
 $editCat = null;

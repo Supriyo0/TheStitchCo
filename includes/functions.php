@@ -61,41 +61,44 @@ function upload_to_imgbb($fileArray, $customApiKey = null) {
     $apiKey = !empty($customApiKey) ? $customApiKey : get_setting('imgbb_api_key', 'e3a1f81d1ef8fca02d1373e34b171bf7');
 
     if (!empty($apiKey)) {
-        $fileData = file_get_contents($fileArray['tmp_name']);
-        $base64 = base64_encode($fileData);
+        $fileData = @file_get_contents($fileArray['tmp_name']);
+        if ($fileData !== false) {
+            $base64 = base64_encode($fileData);
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://api.imgbb.com/1/upload?key=' . urlencode($apiKey));
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, ['image' => $base64]);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, 'https://api.imgbb.com/1/upload?key=' . urlencode($apiKey));
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, ['image' => $base64]);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 12);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
 
-        if ($httpCode === 200 && !empty($response)) {
-            $json = json_decode($response, true);
-            if (!empty($json['data']['url'])) {
-                return [
-                    'success' => true,
-                    'url' => $json['data']['url'],
-                    'display_url' => $json['data']['display_url'] ?? $json['data']['url'],
-                    'thumb_url' => $json['data']['thumb']['url'] ?? $json['data']['url'],
-                    'is_cloud' => true
-                ];
+            if ($httpCode === 200 && !empty($response)) {
+                $json = json_decode($response, true);
+                if (!empty($json['data']['url'])) {
+                    return [
+                        'success' => true,
+                        'url' => $json['data']['url'],
+                        'display_url' => $json['data']['display_url'] ?? $json['data']['url'],
+                        'thumb_url' => $json['data']['thumb']['url'] ?? $json['data']['url'],
+                        'relative_url' => $json['data']['url'],
+                        'is_cloud' => true
+                    ];
+                }
             }
         }
     }
 
     // Fallback to local upload
-    return handle_image_upload($fileArray, 'media', 'imgbb');
+    return handle_image_upload($fileArray, 'products', 'img');
 }
 
 /**
- * Handle Image Upload (Local + ImgBB Cloud Hybrid)
+ * Handle Image Upload (Local Storage with full fallback & path safety)
  */
 function handle_image_upload($fileArray, $targetSubfolder = 'products', $prefix = 'img') {
     if (!isset($fileArray['error']) || is_array($fileArray['error'])) {
@@ -106,35 +109,31 @@ function handle_image_upload($fileArray, $targetSubfolder = 'products', $prefix 
         return ['success' => false, 'message' => 'Upload error code: ' . $fileArray['error']];
     }
 
-    if ($fileArray['size'] > 10 * 1024 * 1024) { // 10 MB limit
-        return ['success' => false, 'message' => 'File size exceeds 10MB limit.'];
+    if ($fileArray['size'] > 15 * 1024 * 1024) { // 15 MB limit
+        return ['success' => false, 'message' => 'File size exceeds 15MB limit.'];
     }
 
-    $finfo = new finfo(FILEINFO_MIME_TYPE);
-    $mimeType = $finfo->file($fileArray['tmp_name']);
-    $allowedMimes = [
-        'image/jpeg' => 'jpg',
-        'image/png' => 'png',
-        'image/webp' => 'webp',
-        'image/svg+xml' => 'svg',
-        'image/gif' => 'gif'
-    ];
-
-    if (!array_key_exists($mimeType, $allowedMimes)) {
+    // Safe extension detection
+    $origExt = strtolower(pathinfo($fileArray['name'] ?? '', PATHINFO_EXTENSION));
+    $allowedExts = ['jpg', 'jpeg', 'png', 'webp', 'svg', 'gif', 'avif'];
+    
+    if (!in_array($origExt, $allowedExts)) {
         return ['success' => false, 'message' => 'Invalid file type. Allowed: JPG, PNG, WEBP, SVG, GIF.'];
     }
 
-    $ext = $allowedMimes[$mimeType];
-    $uploadDir = UPLOAD_DIR . '/' . $targetSubfolder;
+    $baseUploadDir = defined('UPLOAD_DIR') ? UPLOAD_DIR : (defined('UPLOAD_PATH') ? rtrim(UPLOAD_PATH, '/') : dirname(__DIR__) . '/uploads');
+    $uploadDir = $baseUploadDir . '/' . trim($targetSubfolder, '/');
+    
     if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0755, true);
+        @mkdir($uploadDir, 0777, true);
     }
 
-    $filename = $prefix . '_' . date('Ymd_His') . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+    $filename = $prefix . '_' . date('Ymd_His') . '_' . bin2hex(random_bytes(4)) . '.' . $origExt;
     $targetPath = $uploadDir . '/' . $filename;
 
-    if (move_uploaded_file($fileArray['tmp_name'], $targetPath)) {
-        $relPath = 'uploads/' . $targetSubfolder . '/' . $filename;
+    if (@move_uploaded_file($fileArray['tmp_name'], $targetPath)) {
+        @chmod($targetPath, 0644);
+        $relPath = 'uploads/' . trim($targetSubfolder, '/') . '/' . $filename;
         return [
             'success' => true,
             'filename' => $filename,
@@ -144,7 +143,7 @@ function handle_image_upload($fileArray, $targetSubfolder = 'products', $prefix 
         ];
     }
 
-    return ['success' => false, 'message' => 'Failed to save file to server destination.'];
+    return ['success' => false, 'message' => 'Failed to write file to ' . $targetPath];
 }
 
 // Generate UPI Deep Link for Intent Payments

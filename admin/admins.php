@@ -34,6 +34,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_admin'])) {
                 $msg = 'Administrator account created successfully.';
             }
         }
+// Handle Delete Admin
+if (isset($_GET['del'])) {
+    if (!is_super_admin()) {
+        $err = 'Only Super Admins can delete administrator accounts.';
+    } else {
+        $delId = (int)$_GET['del'];
+        if ($delId === (int)$_SESSION['user_id']) {
+            $err = 'You cannot delete your own active administrator account.';
+        } else {
+            try {
+                $db->prepare("DELETE FROM users WHERE id = ? AND role IN ('admin', 'super_admin')")->execute([$delId]);
+                $msg = 'Administrator account removed successfully.';
+            } catch (Exception $e) {
+                $err = 'Error removing admin: ' . $e->getMessage();
+            }
+        }
     }
 }
 
@@ -99,6 +115,7 @@ $admins = $db->query("SELECT * FROM users WHERE role IN ('admin', 'super_admin')
                         <th>Email</th>
                         <th>Role</th>
                         <th>Status</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -112,6 +129,15 @@ $admins = $db->query("SELECT * FROM users WHERE role IN ('admin', 'super_admin')
                                 </span>
                             </td>
                             <td><span class="status-pill status-delivered">Active</span></td>
+                            <td>
+                                <?php if ($ad['id'] !== (int)$_SESSION['user_id']): ?>
+                                    <a href="admins.php?del=<?= $ad['id'] ?>" onclick="return confirm('Remove admin access for <?= e($ad['fullname']) ?>?')" style="padding: 0.35rem 0.65rem; background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; border-radius: 4px; font-weight: 700; font-size: 0.75rem; text-decoration: none;">
+                                        🗑️ Remove
+                                    </a>
+                                <?php else: ?>
+                                    <span style="font-size: 0.75rem; color: var(--admin-text-muted); font-weight: 700;">(You)</span>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
