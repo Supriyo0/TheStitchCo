@@ -91,11 +91,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
             // 1. Insert Order Record
             $orderStmt = $db->prepare("
                 INSERT INTO orders (
-                    order_number, user_id, customer_name, customer_email, customer_phone,
+                    order_number, customer_id, customer_name, customer_email, customer_phone,
                     shipping_address, shipping_method, payment_method, subtotal,
                     discount_amount, coupon_code, shipping_fee, total_price,
-                    status, payment_status, customer_note
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending', 'Pending', ?)
+                    status, payment_status, notes
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Order Placed', 'Pending', ?)
             ");
             $orderStmt->execute([
                 $orderNumber,
@@ -117,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
 
             // 2. Insert Order Items & Decrement Inventory
             $itemStmt = $db->prepare("
-                INSERT INTO order_items (order_id, product_id, product_name, size, quantity, unit_price, total_price, thumbnail)
+                INSERT INTO order_items (order_id, product_id, product_name, size, quantity, price, total, image)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stockStmt = $db->prepare("UPDATE products SET stock = GREATEST(0, stock - ?) WHERE id = ?");
