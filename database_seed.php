@@ -263,4 +263,13 @@ $bannerStmt->execute([
     1
 ]);
 
-echo "Database seeded successfully with " . count($products) . " products and hero banner.\n";
+// Ensure Super Admin exists with verified bcrypt hash for '123456'
+$adminHash = password_hash('123456', PASSWORD_DEFAULT);
+$adminStmt = $db->prepare("
+    INSERT INTO users (fullname, email, phone, password_hash, role, status)
+    VALUES ('Super Administrator', 'sd029900@gmail.com', '7063179581', ?, 'super_admin', 'active')
+    ON DUPLICATE KEY UPDATE password_hash = ?, role = 'super_admin', status = 'active'
+");
+$adminStmt->execute([$adminHash, $adminHash]);
+
+echo "Database seeded successfully with " . count($products) . " products, hero banner, and admin account.\n";
