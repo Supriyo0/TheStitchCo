@@ -99,11 +99,11 @@ $announcementText = get_setting('announcement_bar_text', 'FREE SHIPPING ON PREPA
 
             <!-- User / Account -->
             <?php if ($currentUser): ?>
-                <a href="account.php" class="nav-icon-btn" title="My Account" style="background: var(--surface-alt); padding: 0; overflow: hidden; border: 1.5px solid #000;">
+                <a href="account.php" class="nav-icon-btn" title="My Account" style="width: 36px; height: 36px; border-radius: 50%; padding: 0; overflow: hidden; border: none; background: transparent; display: flex; align-items: center; justify-content: center;">
                     <?php if (!empty($currentUser['avatar'])): ?>
                         <img src="<?= e($currentUser['avatar']) ?>" alt="<?= e($currentUser['fullname']) ?>" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                     <?php else: ?>
-                        <span style="font-size: 0.95rem; font-weight: 800; color: #000;"><?= strtoupper(substr($currentUser['fullname'], 0, 1)) ?></span>
+                        <span style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: #111827; color: #FFFFFF; font-size: 0.85rem; font-weight: 800; border-radius: 50%;"><?= strtoupper(substr($currentUser['fullname'], 0, 1)) ?></span>
                     <?php endif; ?>
                 </a>
             <?php else: ?>
