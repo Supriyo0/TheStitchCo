@@ -12,15 +12,13 @@ function e(?string $string): string {
     return htmlspecialchars($string ?? '', ENT_QUOTES, 'UTF-8');
 }
 
-// Currency Formatter
+// Currency Formatter (Safe Unicode & HTML Entity)
 function format_price($amount): string {
-    $sym = defined('CURRENCY_SYMBOL') ? CURRENCY_SYMBOL : "\xE2\x82\xB9";
-    return $sym . number_format((float)$amount, 2);
+    return '&#8377;' . number_format((float)$amount, 2);
 }
 
 function format_price_no_decimals($amount): string {
-    $sym = defined('CURRENCY_SYMBOL') ? CURRENCY_SYMBOL : "\xE2\x82\xB9";
-    return $sym . number_format((float)$amount, 0);
+    return '&#8377;' . number_format((float)$amount, 0);
 }
 
 // Fetch dynamic store setting from DB with caching
