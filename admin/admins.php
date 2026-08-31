@@ -33,14 +33,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_admin'])) {
                 $ins->execute([$name, $email, $phone, $hash, $role]);
                 $msg = 'Administrator account created successfully.';
             }
+        } else {
+            $err = 'Please fill all required fields.';
         }
+    }
+}
+
 // Handle Delete Admin
 if (isset($_GET['del'])) {
     if (!is_super_admin()) {
         $err = 'Only Super Admins can delete administrator accounts.';
     } else {
         $delId = (int)$_GET['del'];
-        if ($delId === (int)$_SESSION['user_id']) {
+        if ($delId === (int)($_SESSION['user_id'] ?? 0)) {
             $err = 'You cannot delete your own active administrator account.';
         } else {
             try {
