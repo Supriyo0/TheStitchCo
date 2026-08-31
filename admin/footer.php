@@ -25,6 +25,44 @@
 </div>
 
 <script>
+// Mobile Off-Canvas Sidebar
+const mobileToggle = document.getElementById('admin-mobile-toggle');
+const sidebar = document.getElementById('admin-sidebar');
+const sidebarOverlay = document.getElementById('admin-sidebar-overlay');
+const sidebarClose = document.getElementById('admin-sidebar-close');
+
+function openAdminSidebar() {
+    if (sidebar && sidebarOverlay) {
+        sidebar.classList.add('open');
+        sidebarOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeAdminSidebar() {
+    if (sidebar && sidebarOverlay) {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+if (mobileToggle) mobileToggle.addEventListener('click', openAdminSidebar);
+if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeAdminSidebar);
+if (sidebarClose) sidebarClose.addEventListener('click', closeAdminSidebar);
+
+function copyToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Copied to clipboard: ' + text);
+        }).catch(() => {
+            prompt('Copy path:', text);
+        });
+    } else {
+        prompt('Copy path:', text);
+    }
+}
+
 function viewProofModal(imgSrc) {
     const modal = document.getElementById('proof-modal-overlay');
     const img = document.getElementById('proof-modal-img');

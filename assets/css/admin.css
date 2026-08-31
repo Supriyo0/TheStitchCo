@@ -1,6 +1,6 @@
 /* ==========================================================================
    THE STITCH CO. - ADMIN DASHBOARD DESIGN SYSTEM & CSS
-   Matches localhost:3001 Screenshot System • Light Card / Dark Sidebar Theme
+   Full Responsive Desktop & Mobile Off-Canvas Navigation System
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap');
@@ -36,11 +36,29 @@ body.admin-body {
   color: var(--admin-text-main);
   display: flex;
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
 }
 
 /* ==========================================================================
-   ADMIN SIDEBAR
+   ADMIN SIDEBAR & OFF-CANVAS
    ========================================================================== */
+.admin-sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 998;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.admin-sidebar-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
 .admin-sidebar {
   width: 250px;
   background: var(--admin-sidebar-bg);
@@ -48,16 +66,32 @@ body.admin-body {
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  transition: width 0.3s ease;
-  z-index: 100;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 999;
+  min-height: 100vh;
 }
 
 .sidebar-brand {
-  padding: 1.5rem 1.25rem;
+  padding: 1.25rem;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  justify-content: space-between;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-close-btn {
+  display: none;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #FFFFFF;
+  font-size: 1.5rem;
+  line-height: 1;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
 }
 
 .sidebar-logo-box {
@@ -152,7 +186,7 @@ body.admin-body {
 }
 
 /* ==========================================================================
-   ADMIN MAIN CONTENT & HEADER
+   ADMIN MAIN CONTENT & TOPBAR
    ========================================================================== */
 .admin-main {
   flex: 1;
@@ -160,50 +194,71 @@ body.admin-body {
   flex-direction: column;
   min-width: 0;
   overflow-x: hidden;
+  background-color: var(--admin-bg);
 }
 
 .admin-topbar {
-  height: 68px;
+  height: 64px;
   background: #FFFFFF;
   border-bottom: 1px solid var(--admin-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1.8rem;
+  padding: 0 1.5rem;
   position: sticky;
   top: 0;
   z-index: 90;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
 }
 
 .topbar-left {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.8rem;
+}
+
+.admin-mobile-hamburger {
+  display: none;
+  background: #F3F4F6;
+  border: 1px solid #E5E7EB;
+  color: #111827;
+  padding: 0.4rem;
+  border-radius: 6px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-mobile-hamburger:hover {
+  background: #E5E7EB;
 }
 
 .page-title {
   font-family: 'Outfit', sans-serif;
   font-size: 1.25rem;
   font-weight: 800;
+  color: var(--admin-text-main);
 }
 
 .topbar-right {
   display: flex;
   align-items: center;
-  gap: 1.2rem;
+  gap: 0.85rem;
 }
 
 .view-store-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.85rem;
-  font-weight: 600;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 700;
   color: var(--admin-text-muted);
-  padding: 0.45rem 0.85rem;
+  padding: 0.4rem 0.75rem;
   border: 1px solid var(--admin-border);
-  border-radius: 8px;
+  border-radius: 6px;
   text-decoration: none;
+  background: #FFFFFF;
+  white-space: nowrap;
 }
 
 .view-store-btn:hover {
@@ -218,70 +273,75 @@ body.admin-body {
 }
 
 .admin-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #6366F1;
+  width: 34px;
+  height: 34px;
+  background: #111827;
   color: #FFFFFF;
-  font-weight: 800;
-  font-size: 0.85rem;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: 800;
+  font-size: 0.82rem;
 }
 
 .admin-info h4 {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.1;
+  color: var(--admin-text-main);
 }
 
 .admin-info span {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: var(--admin-text-muted);
+  font-weight: 600;
+}
+
+.admin-container {
+  padding: 1.5rem;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 /* ==========================================================================
-   ADMIN DASHBOARD KPI CARDS
+   KPI SUMMARY GRID
    ========================================================================== */
-.admin-container {
-  padding: 1.8rem;
-  flex: 1;
-}
-
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.25rem;
-  margin-bottom: 1.8rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.2rem;
+  margin-bottom: 1.5rem;
 }
 
 .kpi-card {
-  background: #FFFFFF;
+  background: var(--admin-card);
   border-radius: var(--admin-radius);
   border: 1px solid var(--admin-border);
-  padding: 1.4rem;
-  box-shadow: var(--admin-shadow);
+  padding: 1.25rem;
   display: flex;
   align-items: center;
-  gap: 1.1rem;
+  gap: 1rem;
+  box-shadow: var(--admin-shadow);
 }
 
 .kpi-icon-wrap {
   width: 48px;
   height: 48px;
-  border-radius: 12px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.3rem;
+  font-weight: 800;
+  flex-shrink: 0;
 }
 
-.kpi-icon-purple { background: #EEF2FF; color: #6366F1; }
-.kpi-icon-green { background: #ECFDF5; color: #10B981; }
+.kpi-icon-purple { background: #EEF2FF; color: #4F46E5; }
+.kpi-icon-green  { background: #ECFDF5; color: #10B981; }
 .kpi-icon-orange { background: #FFFBEB; color: #F59E0B; }
-.kpi-icon-blue { background: #EFF6FF; color: #3B82F6; }
-.kpi-icon-pink { background: #FDF2F8; color: #EC4899; }
+.kpi-icon-blue   { background: #EFF6FF; color: #2563EB; }
 
 .kpi-details h3 {
   font-size: 0.78rem;
@@ -289,54 +349,57 @@ body.admin-body {
   color: var(--admin-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.2rem;
 }
 
 .kpi-value {
   font-family: 'Outfit', sans-serif;
   font-size: 1.45rem;
-  font-weight: 800;
+  font-weight: 900;
   color: var(--admin-text-main);
-  line-height: 1.1;
+  line-height: 1.2;
 }
 
 .kpi-trend {
   font-size: 0.72rem;
-  font-weight: 700;
-  color: #10B981;
-  margin-top: 0.3rem;
+  font-weight: 600;
+  margin-top: 0.2rem;
 }
 
 /* ==========================================================================
-   ADMIN TABLES & CARDS
+   ADMIN CARDS & TABLES
    ========================================================================== */
 .admin-card {
-  background: #FFFFFF;
+  background: var(--admin-card);
   border-radius: var(--admin-radius);
   border: 1px solid var(--admin-border);
-  box-shadow: var(--admin-shadow);
-  margin-bottom: 1.8rem;
+  margin-bottom: 1.5rem;
   overflow: hidden;
+  box-shadow: var(--admin-shadow);
 }
 
 .admin-card-header {
-  padding: 1.25rem 1.5rem;
+  padding: 1.1rem 1.4rem;
   border-bottom: 1px solid var(--admin-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background: #FFFFFF;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 .admin-card-title {
+  font-family: 'Outfit', sans-serif;
   font-size: 1.05rem;
-  font-weight: 700;
+  font-weight: 800;
+  color: var(--admin-text-main);
 }
 
 .table-responsive {
   width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .admin-table {
@@ -344,6 +407,7 @@ body.admin-body {
   border-collapse: collapse;
   text-align: left;
   font-size: 0.85rem;
+  white-space: nowrap;
 }
 
 .admin-table th {
@@ -358,7 +422,7 @@ body.admin-body {
 }
 
 .admin-table td {
-  padding: 1rem 1.2rem;
+  padding: 0.95rem 1.2rem;
   border-bottom: 1px solid var(--admin-border);
   vertical-align: middle;
 }
@@ -403,6 +467,7 @@ body.admin-body {
   cursor: pointer;
   text-decoration: none;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .filter-tab-btn:hover, .filter-tab-btn.active {
@@ -433,6 +498,125 @@ body.admin-body {
   border-radius: var(--admin-radius);
   max-width: 540px;
   width: 100%;
-  padding: 1.8rem;
+  padding: 1.5rem;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+}
+
+/* ==========================================================================
+   RESPONSIVE MEDIA QUERIES
+   ========================================================================== */
+
+/* Tablet & Mobile Landscape (< 992px) */
+@media (max-width: 992px) {
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    transform: translateX(-100%);
+    box-shadow: 10px 0 25px rgba(0,0,0,0.3);
+  }
+
+  .admin-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-close-btn {
+    display: flex;
+  }
+
+  .admin-mobile-hamburger {
+    display: flex;
+  }
+
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  /* Stack any 2-column grid containers across admin views */
+  div[style*="grid-template-columns: 1fr 2fr"],
+  div[style*="grid-template-columns: 1fr 1fr"],
+  div[style*="grid-template-columns: 2fr 1fr"],
+  div[style*="grid-template-columns: repeat(2, 1fr)"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-container {
+    padding: 1.2rem 1rem;
+  }
+}
+
+/* Mobile Phone (< 768px) */
+@media (max-width: 768px) {
+  .admin-topbar {
+    padding: 0 1rem;
+    height: 58px;
+  }
+
+  .page-title {
+    font-size: 1.05rem;
+  }
+
+  .admin-info {
+    display: none;
+  }
+
+  .kpi-card {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .kpi-icon-wrap {
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+  }
+
+  .kpi-value {
+    font-size: 1.2rem;
+  }
+
+  .admin-card-header {
+    padding: 0.9rem 1rem;
+  }
+
+  .admin-table th, .admin-table td {
+    padding: 0.75rem 0.9rem;
+    font-size: 0.8rem;
+  }
+
+  /* Ensure modal images fit inside viewport */
+  .admin-modal-box {
+    padding: 1.2rem;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+/* Small Mobile (< 480px) */
+@media (max-width: 480px) {
+  .kpi-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+  }
+
+  .kpi-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.85rem;
+  }
+
+  .kpi-details h3 {
+    font-size: 0.68rem;
+  }
+
+  .kpi-value {
+    font-size: 1.05rem;
+  }
+
+  .kpi-trend {
+    display: none;
+  }
 }

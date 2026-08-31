@@ -33,15 +33,20 @@ $pendingPaymentCount = (int)$db->query("SELECT COUNT(*) FROM payments WHERE stat
 <body class="admin-body">
 
 <!-- Left Sidebar Navigation -->
+<div class="admin-sidebar-overlay" id="admin-sidebar-overlay"></div>
+
 <aside class="admin-sidebar" id="admin-sidebar">
     <div class="sidebar-brand">
-        <div class="sidebar-logo-box">
-            <img src="../assets/images/logo.jpg" alt="Logo">
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex: 1;">
+            <div class="sidebar-logo-box">
+                <img src="../assets/images/logo.jpg" alt="Logo">
+            </div>
+            <div class="sidebar-brand-text">
+                <h2>THE STITCH CO.</h2>
+                <span>WEAR YOUR VIBE</span>
+            </div>
         </div>
-        <div class="sidebar-brand-text">
-            <h2>THE STITCH CO.</h2>
-            <span>WEAR YOUR VIBE</span>
-        </div>
+        <button class="sidebar-close-btn" id="admin-sidebar-close" aria-label="Close sidebar">&times;</button>
     </div>
 
     <ul class="sidebar-nav">
@@ -132,6 +137,16 @@ $pendingPaymentCount = (int)$db->query("SELECT COUNT(*) FROM payments WHERE stat
             </a>
         </li>
         <li>
+            <a href="admins.php" class="sidebar-link <?= $currentFile === 'admins.php' ? 'active' : '' ?>">
+                <div class="sidebar-link-content">
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    </span>
+                    <span>Admin Staff</span>
+                </div>
+            </a>
+        </li>
+        <li>
             <a href="media.php" class="sidebar-link <?= $currentFile === 'media.php' ? 'active' : '' ?>">
                 <div class="sidebar-link-content">
                     <span class="sidebar-icon">
@@ -147,7 +162,7 @@ $pendingPaymentCount = (int)$db->query("SELECT COUNT(*) FROM payments WHERE stat
                     <span class="sidebar-icon">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                     </span>
-                    <span>Store & Deals Settings</span>
+                    <span>Store Settings</span>
                 </div>
             </a>
         </li>
@@ -167,10 +182,13 @@ $pendingPaymentCount = (int)$db->query("SELECT COUNT(*) FROM payments WHERE stat
 <div class="admin-main">
     <header class="admin-topbar">
         <div class="topbar-left">
+            <button type="button" class="admin-mobile-hamburger" id="admin-mobile-toggle" aria-label="Open navigation menu">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
             <h1 class="page-title"><?= e($adminTitle ?? 'Dashboard') ?></h1>
         </div>
         <div class="topbar-right">
-            <a href="../index.php" target="_blank" class="view-store-btn">
+            <a href="../index.php" target="_blank" class="view-store-btn" title="Open Storefront in new tab">
                 <span>View Store</span>
                 <span>↗</span>
             </a>
