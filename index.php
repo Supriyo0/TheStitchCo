@@ -124,14 +124,16 @@ require_once __DIR__ . '/includes/header.php';
     justify-content: center !important;
   }
   .hero-3d-showcase-container {
-    width: 142px !important;
-    height: 195px !important;
+    width: 170px !important;
+    height: 200px !important;
+    overflow: visible !important;
   }
   .hero-3d-stack-card {
     width: 130px !important;
     height: 185px !important;
     padding: 0.5rem !important;
     border-radius: 12px !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.6) !important;
   }
   .hero-3d-title {
     font-size: 0.66rem !important;
@@ -160,13 +162,22 @@ require_once __DIR__ . '/includes/header.php';
     font-size: 0.55rem !important;
     padding: 0.2rem 0.45rem !important;
   }
+  .hero-3d-stack-card.pos-center {
+    z-index: 10 !important;
+    transform: translateX(0) scale(1) translateZ(0) !important;
+    opacity: 1 !important;
+  }
   .hero-3d-stack-card.pos-left {
-    transform: translateX(-22px) scale(0.85) rotateY(8deg) !important;
-    opacity: 0.35 !important;
+    z-index: 5 !important;
+    transform: translateX(-35px) scale(0.9) rotateY(10deg) !important;
+    opacity: 0.82 !important;
+    filter: none !important;
   }
   .hero-3d-stack-card.pos-right {
-    transform: translateX(22px) scale(0.85) rotateY(-8deg) !important;
-    opacity: 0.35 !important;
+    z-index: 5 !important;
+    transform: translateX(35px) scale(0.9) rotateY(-10deg) !important;
+    opacity: 0.82 !important;
+    filter: none !important;
   }
 }
 </style>

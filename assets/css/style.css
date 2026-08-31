@@ -2318,39 +2318,33 @@ button, input, select, textarea {
    ========================================================================== */
 .hero-3d-showcase-container {
   position: relative;
-  width: 320px;
-  height: 320px;
-  perspective: 1000px;
+  width: 440px;
+  height: 380px;
+  perspective: 1200px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto;
+  overflow: visible;
 }
 
-@media (max-width: 480px) {
-  .hero-3d-showcase-container {
-    width: 270px;
-    height: 290px;
-  }
-}
-
-@media (min-width: 1200px) {
+@media (max-width: 1200px) {
   .hero-3d-showcase-container {
     width: 380px;
-    height: 380px;
+    height: 350px;
   }
 }
 
 .hero-3d-stack-card {
   position: absolute;
-  width: 215px;
-  height: 285px;
-  background: rgba(18, 24, 38, 0.95);
+  width: 240px;
+  height: 330px;
+  background: rgba(18, 24, 38, 0.96);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1.5px solid rgba(255, 255, 255, 0.12);
-  border-radius: 18px;
-  padding: 0.9rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 1.1rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -2359,15 +2353,7 @@ button, input, select, textarea {
   transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   user-select: none;
-}
-
-@media (min-width: 768px) {
-  .hero-3d-stack-card {
-    width: 250px;
-    height: 330px;
-    padding: 1.1rem;
-    border-radius: 20px;
-  }
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
 }
 
 /* Center Active Card */
@@ -2375,40 +2361,34 @@ button, input, select, textarea {
   z-index: 10;
   transform: translateX(0) scale(1) translateZ(0);
   opacity: 1;
-  border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 35px rgba(37, 99, 235, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85), 0 0 35px rgba(37, 99, 235, 0.35);
 }
 
-/* Left Peeking Card */
+/* Left Peeking Card - Clear, Vibrant & Stepped */
 .hero-3d-stack-card.pos-left {
   z-index: 5;
-  transform: translateX(-55px) scale(0.82) rotateY(10deg);
-  opacity: 0.45;
-  filter: blur(0.6px);
-}
-@media (min-width: 768px) {
-  .hero-3d-stack-card.pos-left {
-    transform: translateX(-75px) scale(0.82) rotateY(10deg);
-  }
+  transform: translateX(-110px) scale(0.9) rotateY(12deg);
+  opacity: 0.85;
+  filter: none;
+  border-color: rgba(255, 255, 255, 0.18);
 }
 .hero-3d-stack-card.pos-left:hover {
-  opacity: 0.75;
+  opacity: 1;
+  transform: translateX(-115px) scale(0.93) rotateY(6deg);
 }
 
-/* Right Peeking Card */
+/* Right Peeking Card - Clear, Vibrant & Stepped */
 .hero-3d-stack-card.pos-right {
   z-index: 5;
-  transform: translateX(55px) scale(0.82) rotateY(-10deg);
-  opacity: 0.45;
-  filter: blur(0.6px);
-}
-@media (min-width: 768px) {
-  .hero-3d-stack-card.pos-right {
-    transform: translateX(75px) scale(0.82) rotateY(-10deg);
-  }
+  transform: translateX(110px) scale(0.9) rotateY(-12deg);
+  opacity: 0.85;
+  filter: none;
+  border-color: rgba(255, 255, 255, 0.18);
 }
 .hero-3d-stack-card.pos-right:hover {
-  opacity: 0.75;
+  opacity: 1;
+  transform: translateX(115px) scale(0.93) rotateY(-6deg);
 }
 
 /* Hidden cards if more than 3 */
