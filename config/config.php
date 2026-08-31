@@ -62,7 +62,7 @@ if (!defined('STORE_NAME')) define('STORE_NAME', 'The Stitch Co.');
 if (!defined('STORE_TAGLINE')) define('STORE_TAGLINE', 'Wear Your Vibe');
 if (!defined('STORE_PHONE')) define('STORE_PHONE', '+91 98765 43210');
 if (!defined('STORE_EMAIL')) define('STORE_EMAIL', 'support@thestitchco.shop');
-if (!defined('CURRENCY_SYMBOL')) define('CURRENCY_SYMBOL', '₹');
+if (!defined('CURRENCY_SYMBOL')) define('CURRENCY_SYMBOL', "\xE2\x82\xB9");
 
 // CSRF Token Helper
 if (empty($_SESSION['csrf_token'])) {

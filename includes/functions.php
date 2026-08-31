@@ -14,11 +14,13 @@ function e(?string $string): string {
 
 // Currency Formatter
 function format_price($amount): string {
-    return CURRENCY_SYMBOL . number_format((float)$amount, 2);
+    $sym = defined('CURRENCY_SYMBOL') ? CURRENCY_SYMBOL : "\xE2\x82\xB9";
+    return $sym . number_format((float)$amount, 2);
 }
 
 function format_price_no_decimals($amount): string {
-    return CURRENCY_SYMBOL . number_format((float)$amount, 0);
+    $sym = defined('CURRENCY_SYMBOL') ? CURRENCY_SYMBOL : "\xE2\x82\xB9";
+    return $sym . number_format((float)$amount, 0);
 }
 
 // Fetch dynamic store setting from DB with caching

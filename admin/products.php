@@ -10,14 +10,17 @@ require_once __DIR__ . '/header.php';
 
 $action = $_GET['action'] ?? 'list';
 $editId = (int)($_GET['id'] ?? 0);
-$message = '';
+$message = $_GET['msg'] ?? '';
 $error = '';
 
 // Handle Delete
 if ($action === 'delete' && $editId > 0) {
-    $db->prepare("DELETE FROM products WHERE id = ?")->execute([$editId]);
-    header("Location: products.php?msg=" . urlencode("Product deleted successfully."));
-    exit;
+    try {
+        $db->prepare("DELETE FROM products WHERE id = ?")->execute([$editId]);
+        $message = "Product deleted successfully.";
+    } catch (Exception $e) {
+        $error = "Error deleting product: " . $e->getMessage();
+    }
 }
 
 // Handle Add / Edit POST
