@@ -102,7 +102,7 @@ $categories = $db->query("SELECT c.*, COUNT(p.id) as product_count FROM categori
 
                 <div style="margin-bottom: 1rem;">
                     <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem;">Subtext (Shown on Desktop Roundels)</label>
-                    <input type="text" name="subtext" value="<?= e($editCat['subtext'] ?? '') ?>" placeholder="e.g. Everyday Essential" style="width: 100%; padding: 0.65rem; border: 1.5px solid var(--admin-border); border-radius: 6px;">
+                    <input type="text" name="subtext" value="<?= e($editCat['description'] ?? $editCat['subtext'] ?? '') ?>" placeholder="e.g. Everyday Essential" style="width: 100%; padding: 0.65rem; border: 1.5px solid var(--admin-border); border-radius: 6px;">
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1rem;">
@@ -174,7 +174,7 @@ $categories = $db->query("SELECT c.*, COUNT(p.id) as product_count FROM categori
                                 </div>
                             </td>
                             <td><strong style="font-weight: 800; color: #000;"><?= e($cat['cat_name']) ?></strong></td>
-                            <td style="font-size: 0.82rem; color: #64748B;"><?= e($cat['subtext'] ?: '—') ?></td>
+                            <td style="font-size: 0.82rem; color: #64748B;"><?= e($cat['description'] ?? $cat['subtext'] ?? '—') ?></td>
                             <td><code><?= e($cat['cat_key']) ?></code></td>
                             <td><span style="font-weight: 800;"><?= $cat['display_order'] ?></span></td>
                             <td><span style="font-weight: 800;"><?= $cat['product_count'] ?> items</span></td>
