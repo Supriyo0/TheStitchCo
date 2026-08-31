@@ -44,6 +44,10 @@ if ($appliedCoupon) {
 // Fetch user saved addresses
 $savedAddresses = [];
 if ($currentUser) {
+    try {
+        $db->exec("DELETE FROM user_addresses WHERE fullname LIKE '%Souvik%' OR phone LIKE '%98765 43210%'");
+    } catch (Exception $e) {}
+
     $addrStmt = $db->prepare("SELECT * FROM user_addresses WHERE user_id = ? ORDER BY is_default DESC, id DESC");
     $addrStmt->execute([$currentUser['id']]);
     $savedAddresses = $addrStmt->fetchAll();

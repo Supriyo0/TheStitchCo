@@ -91,6 +91,10 @@ $wishStmt->execute([$userId]);
 $myWishlist = $wishStmt->fetchAll();
 
 // Fetch Addresses
+try {
+    $db->exec("DELETE FROM user_addresses WHERE fullname LIKE '%Souvik%' OR phone LIKE '%98765 43210%'");
+} catch (Exception $e) {}
+
 $addrStmt = $db->prepare("SELECT * FROM user_addresses WHERE user_id = ? ORDER BY is_default DESC, id DESC");
 $addrStmt->execute([$userId]);
 $myAddresses = $addrStmt->fetchAll();

@@ -338,8 +338,3 @@ INSERT INTO `coupons` (`id`, `code`, `description`, `discount_type`, `discount_v
 (2, 'STITCH100', 'Flat ₹100 OFF on orders above ₹999', 'fixed', 100.00, 999.00, 100.00, 1),
 (3, 'VIBE20', 'Special 20% OFF for Streetwear VIPs', 'percentage', 20.00, 1499.00, 500.00, 1)
 ON DUPLICATE KEY UPDATE `description` = VALUES(`description`);
-
--- Seed Default Customer Address
-INSERT INTO `user_addresses` (`id`, `user_id`, `fullname`, `phone`, `address_line1`, `address_line2`, `landmark`, `city`, `state`, `pincode`, `is_default`) VALUES
-(1, 3, 'Souvik Sayan Das', '+91 98765 43210', 'Vill - Fraserganj, PO - Fraserganj', 'P.S: Fraserganj Coastal', 'Near Sea Beach', 'South 24 Parganas', 'West Bengal', '743315', 1)
-ON DUPLICATE KEY UPDATE `fullname` = VALUES(`fullname`);
