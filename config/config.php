@@ -27,9 +27,9 @@ if (APP_ENV === 'development') {
 
 // Database Credentials
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'the_stitch_co');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_NAME', 'u609702858_TheStitchCo');
+define('DB_USER', 'u609702858_thestitchco');
+define('DB_PASS', 'Thestitch1');
 define('DB_CHARSET', 'utf8mb4');
 
 // Base Paths & URLs
