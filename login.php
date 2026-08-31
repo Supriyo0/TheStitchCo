@@ -92,27 +92,114 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['do_register'])) {
     }
 }
 
-// Handle Forgot Password POST
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['do_forgot'])) {
-    $email = trim($_POST['email'] ?? '');
-    $new_password = trim($_POST['new_password'] ?? '');
+$forgotStep = $_SESSION['forgot_step'] ?? 'email';
+if (isset($_GET['step']) && $_GET['step'] === 'email') {
+    $forgotStep = 'email';
+    unset($_SESSION['forgot_step'], $_SESSION['reset_otp'], $_SESSION['reset_email'], $_SESSION['reset_otp_expiry']);
+}
 
-    if (empty($email) || empty($new_password)) {
-        $error = 'Please provide both your registered email and new password.';
-    } elseif (strlen($new_password) < 6) {
-        $error = 'New password must be at least 6 characters.';
+// 1. Send OTP to Registered Email
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['do_send_otp'])) {
+    $email = trim($_POST['email'] ?? '');
+
+    if (empty($email)) {
+        $error = 'Please enter your registered email address.';
     } else {
         $stmt = $db->prepare("SELECT id, fullname, email FROM users WHERE email = ? AND status = 'active' LIMIT 1");
         $stmt->execute([$email]);
         $user = $stmt->fetch();
 
         if ($user) {
-            $hash = password_hash($new_password, PASSWORD_DEFAULT);
-            $db->prepare("UPDATE users SET password_hash = ? WHERE id = ?")->execute([$hash, $user['id']]);
-            $success = 'Your password has been successfully reset! You can now log in below.';
-            $action = 'login';
+            $otp = strval(random_int(100000, 999999));
+            $_SESSION['reset_email'] = $email;
+            $_SESSION['reset_otp'] = $otp;
+            $_SESSION['reset_otp_expiry'] = time() + 600; // 10 minutes
+            $_SESSION['forgot_step'] = 'verify';
+            $forgotStep = 'verify';
+
+            // Ensure password_resets table exists
+            try {
+                $db->exec("
+                    CREATE TABLE IF NOT EXISTS `password_resets` (
+                        `id` INT AUTO_INCREMENT PRIMARY KEY,
+                        `email` VARCHAR(255) NOT NULL,
+                        `otp` VARCHAR(10) NOT NULL,
+                        `expires_at` DATETIME NOT NULL,
+                        `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+                ");
+                $exp = date('Y-m-d H:i:s', time() + 600);
+                $insReset = $db->prepare("INSERT INTO password_resets (email, otp, expires_at) VALUES (?, ?, ?)");
+                $insReset->execute([$email, $otp, $exp]);
+            } catch (Exception $e) {}
+
+            // Send OTP Email via Google SMTP
+            require_once __DIR__ . '/includes/mailer.php';
+            try {
+                $mailRes = send_password_reset_otp_email($email, $otp, $user['fullname']);
+                if ($mailRes['success']) {
+                    $success = 'A 6-digit OTP code has been sent to ' . e($email) . '. Please check your inbox / spam folder and enter it below.';
+                } else {
+                    $error = 'Failed to send OTP email: ' . ($mailRes['message'] ?? 'Please check SMTP settings.');
+                }
+            } catch (Exception $mailEx) {
+                $error = 'Email sending error: ' . $mailEx->getMessage();
+            }
         } else {
             $error = 'No active account found with that email address.';
+        }
+    }
+}
+
+// 2. Verify OTP & Set New Password
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['do_verify_reset'])) {
+    $enteredOtp = trim($_POST['otp'] ?? '');
+    $new_password = trim($_POST['new_password'] ?? '');
+    $confirm_password = trim($_POST['confirm_password'] ?? '');
+    $resetEmail = $_SESSION['reset_email'] ?? trim($_POST['email'] ?? '');
+
+    if (empty($enteredOtp) || empty($new_password) || empty($confirm_password)) {
+        $error = 'Please fill out all required fields.';
+        $forgotStep = 'verify';
+    } elseif (strlen($new_password) < 6) {
+        $error = 'New password must be at least 6 characters.';
+        $forgotStep = 'verify';
+    } elseif ($new_password !== $confirm_password) {
+        $error = 'New passwords do not match. Please re-type.';
+        $forgotStep = 'verify';
+    } else {
+        $validOtp = false;
+        if (!empty($_SESSION['reset_otp']) && !empty($_SESSION['reset_otp_expiry'])) {
+            if (time() <= $_SESSION['reset_otp_expiry'] && hash_equals((string)$_SESSION['reset_otp'], (string)$enteredOtp)) {
+                $validOtp = true;
+            }
+        }
+
+        // DB fallback check
+        if (!$validOtp) {
+            $stmt = $db->prepare("SELECT id FROM password_resets WHERE email = ? AND otp = ? AND expires_at >= NOW() ORDER BY id DESC LIMIT 1");
+            $stmt->execute([$resetEmail, $enteredOtp]);
+            if ($stmt->fetch()) {
+                $validOtp = true;
+            }
+        }
+
+        if ($validOtp) {
+            $hash = password_hash($new_password, PASSWORD_DEFAULT);
+            $db->prepare("UPDATE users SET password_hash = ? WHERE email = ?")->execute([$hash, $resetEmail]);
+            
+            // Clean up session & reset table
+            unset($_SESSION['reset_email'], $_SESSION['reset_otp'], $_SESSION['reset_otp_expiry'], $_SESSION['forgot_step']);
+            try {
+                $db->prepare("DELETE FROM password_resets WHERE email = ?")->execute([$resetEmail]);
+            } catch (Exception $e) {}
+
+            $success = '🎉 Your password has been successfully updated! You can now log in below with your new password.';
+            $action = 'login';
+            $forgotStep = 'email';
+        } else {
+            $error = 'Invalid or expired OTP code. Please enter the 6-digit code sent to your email or request a new one.';
+            $forgotStep = 'verify';
         }
     }
 }
@@ -432,29 +519,77 @@ require_once __DIR__ . '/includes/header.php';
             </div>
 
         <?php elseif ($action === 'forgot'): ?>
-            <!-- Forgot / Reset Password Form -->
-            <form action="login.php?action=forgot" method="POST">
-                <div class="input-field-group">
-                    <label class="input-field-label">Registered Email Address *</label>
-                    <div class="input-control-box">
-                        <input type="email" name="email" placeholder="name@example.com" required class="auth-input">
+            <?php if ($forgotStep === 'verify'): ?>
+                <!-- Step 2: Enter OTP & New Password -->
+                <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 12px; padding: 0.9rem 1.1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 0.72rem; font-weight: 800; color: #1E40AF; text-transform: uppercase;">OTP SENT TO</div>
+                        <div style="font-weight: 800; font-size: 0.88rem; color: #1E3A8A; word-break: break-all;"><?= e($_SESSION['reset_email'] ?? '') ?></div>
                     </div>
+                    <a href="login.php?action=forgot&step=email" style="font-size: 0.75rem; font-weight: 800; color: #2563EB; text-decoration: underline;">Change</a>
                 </div>
 
-                <div class="input-field-group">
-                    <label class="input-field-label">New Password *</label>
-                    <div class="input-control-box">
-                        <input type="password" id="forgot-password" name="new_password" placeholder="Enter new password (min 6 characters)" required class="auth-input" style="padding-right: 42px;">
-                        <button type="button" class="input-icon-right" onclick="togglePasswordVisibility('forgot-password', this)" title="Show / Hide Password">
-                            👁️
-                        </button>
+                <form action="login.php?action=forgot" method="POST">
+                    <div class="input-field-group">
+                        <label class="input-field-label">6-Digit Verification OTP *</label>
+                        <div class="input-control-box">
+                            <input type="text" name="otp" maxlength="6" pattern="\d{6}" placeholder="• • • • • •" required autofocus class="auth-input" style="font-family: monospace; font-size: 1.3rem; letter-spacing: 8px; text-align: center; font-weight: 900; color: #1E3A8A;">
+                        </div>
+                        <span style="font-size: 0.72rem; color: #64748B; margin-top: 0.3rem; display: block;">Check your email inbox or spam folder for the code.</span>
                     </div>
-                </div>
 
-                <button type="submit" name="do_forgot" class="btn-auth-primary">
-                    SET NEW PASSWORD &rarr;
-                </button>
-            </form>
+                    <div class="input-field-group">
+                        <label class="input-field-label">New Password (min 6 characters) *</label>
+                        <div class="input-control-box">
+                            <input type="password" id="forgot-new-password" name="new_password" placeholder="Enter new password" required class="auth-input" style="padding-right: 42px;">
+                            <button type="button" class="input-icon-right" onclick="togglePasswordVisibility('forgot-new-password', this)" title="Show / Hide Password">
+                                👁️
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="input-field-group">
+                        <label class="input-field-label">Confirm New Password *</label>
+                        <div class="input-control-box">
+                            <input type="password" id="forgot-confirm-password" name="confirm_password" placeholder="Re-type new password" required class="auth-input" style="padding-right: 42px;">
+                            <button type="button" class="input-icon-right" onclick="togglePasswordVisibility('forgot-confirm-password', this)" title="Show / Hide Password">
+                                👁️
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" name="do_verify_reset" class="btn-auth-primary">
+                        VERIFY OTP & RESET PASSWORD 🔒
+                    </button>
+                </form>
+
+                <!-- Resend OTP Option -->
+                <form action="login.php?action=forgot" method="POST" style="margin-top: 1rem; text-align: center;">
+                    <input type="hidden" name="email" value="<?= e($_SESSION['reset_email'] ?? '') ?>">
+                    <span style="font-size: 0.8rem; color: #64748B;">Didn't receive the email?</span>
+                    <button type="submit" name="do_send_otp" style="background: none; border: none; font-size: 0.8rem; font-weight: 800; color: #2563EB; cursor: pointer; text-decoration: underline; padding: 0; margin-left: 4px;">
+                        Resend OTP
+                    </button>
+                </form>
+
+            <?php else: ?>
+                <!-- Step 1: Request OTP via Registered Email -->
+                <form action="login.php?action=forgot" method="POST">
+                    <div class="input-field-group">
+                        <label class="input-field-label">Registered Email Address *</label>
+                        <div class="input-control-box">
+                            <input type="email" name="email" placeholder="name@example.com" required autofocus class="auth-input">
+                        </div>
+                        <span style="font-size: 0.74rem; color: #64748B; margin-top: 0.35rem; display: block;">
+                            We will send a secure 6-digit verification code (OTP) to this email.
+                        </span>
+                    </div>
+
+                    <button type="submit" name="do_send_otp" class="btn-auth-primary">
+                        SEND 6-DIGIT OTP TO EMAIL 📩
+                    </button>
+                </form>
+            <?php endif; ?>
 
             <div class="auth-footer-link" style="margin-top: 1.5rem;">
                 Remembered your password? <a href="login.php">Back to Login</a>

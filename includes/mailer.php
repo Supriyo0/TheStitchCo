@@ -424,3 +424,39 @@ HTML;
     $html = wrap_email_template("Welcome to The Stitch Co.", $content);
     return send_smtp_mail($email, "Welcome to The Stitch Co. | Wear Your Vibe", $html, $fullname);
 }
+
+/**
+ * 4. Password Reset OTP Verification Email
+ */
+function send_password_reset_otp_email(string $email, string $otp, string $fullname = 'Valued Customer'): array {
+    $fullname = !empty($fullname) ? $fullname : 'Valued Customer';
+
+    $content = <<<HTML
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div style="display: inline-block; background-color: #FEF2F2; color: #DC2626; font-weight: 800; font-size: 12px; padding: 6px 14px; border-radius: 9999px; letter-spacing: 1px; text-transform: uppercase;">
+        Password Reset Request 🔐
+      </div>
+      <h2 style="margin: 12px 0 6px; font-size: 22px; font-weight: 900; color: #0F172A;">YOUR VERIFICATION CODE</h2>
+      <p style="margin: 0; color: #64748B; font-size: 14px;">Hi {$fullname}, use the 6-digit OTP below to reset your account password.</p>
+    </div>
+
+    <!-- OTP Code Highlight Box -->
+    <div style="background-color: #0F172A; border-radius: 16px; padding: 24px; text-align: center; color: #FFFFFF; margin-bottom: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);">
+      <span style="font-size: 11px; font-weight: 800; color: #94A3B8; letter-spacing: 2px; text-transform: uppercase;">ONE-TIME PASSWORD (OTP)</span>
+      <div style="font-family: 'Courier New', Courier, monospace; font-size: 34px; font-weight: 900; letter-spacing: 8px; color: #38BDF8; margin: 12px 0; padding: 10px 0; background: rgba(255,255,255,0.06); border-radius: 8px; border: 1px dashed rgba(56, 189, 248, 0.4);">
+        {$otp}
+      </div>
+      <div style="font-size: 12px; color: #94A3B8; margin-top: 8px;">
+        ⏳ This OTP is valid for <strong>10 minutes</strong>. Do not share it with anyone.
+      </div>
+    </div>
+
+    <div style="background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 14px; font-size: 13px; color: #475569; margin-bottom: 20px; line-height: 1.5;">
+      💡 If you did not request a password reset, you can safely ignore this email. Your password will remain unchanged.
+    </div>
+HTML;
+
+    $html = wrap_email_template("Password Reset OTP - The Stitch Co.", $content);
+    return send_smtp_mail($email, "Your Password Reset OTP is {$otp} - The Stitch Co.", $html, $fullname);
+}
+
