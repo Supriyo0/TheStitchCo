@@ -72,6 +72,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['do_register'])) {
             $newUserId = (int)$db->lastInsertId();
             login_user(['id' => $newUserId, 'fullname' => $fullname, 'email' => $email, 'role' => 'customer']);
 
+            // Set welcome popup flag for instant celebration modal
+            $_SESSION['show_welcome_popup'] = true;
+            $_SESSION['welcome_user_name'] = $fullname;
+
             // Send Welcome Email via Google SMTP
             require_once __DIR__ . '/includes/mailer.php';
             try {
@@ -80,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['do_register'])) {
                 error_log("Welcome email error: " . $mailEx->getMessage());
             }
 
-            $redirect = $_SESSION['redirect_after_login'] ?? 'account.php';
+            $redirect = $_SESSION['redirect_after_login'] ?? 'index.php';
             unset($_SESSION['redirect_after_login']);
             header("Location: " . $redirect);
             exit;
