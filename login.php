@@ -84,11 +84,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['do_register'])) {
             unset($_SESSION['redirect_after_login']);
             header("Location: " . $redirect);
             exit;
+// Handle Forgot Password POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['do_forgot'])) {
+    $email = trim($_POST['email'] ?? '');
+    $new_password = trim($_POST['new_password'] ?? '');
+
+    if (empty($email) || empty($new_password)) {
+        $error = 'Please provide both your registered email and new password.';
+    } elseif (strlen($new_password) < 6) {
+        $error = 'New password must be at least 6 characters.';
+    } else {
+        $stmt = $db->prepare("SELECT id, fullname, email FROM users WHERE email = ? AND status = 'active' LIMIT 1");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
+
+        if ($user) {
+            $hash = password_hash($new_password, PASSWORD_DEFAULT);
+            $db->prepare("UPDATE users SET password_hash = ? WHERE id = ?")->execute([$hash, $user['id']]);
+            $success = 'Your password has been successfully reset! You can now log in below.';
+            $action = 'login';
+        } else {
+            $error = 'No active account found with that email address.';
         }
     }
 }
 
-$pageTitle = ($action === 'register' ? 'Create Account' : 'Welcome Back') . ' | ' . STORE_NAME;
+if ($action === 'register') {
+    $pageTitle = 'Create Account | ' . STORE_NAME;
+} elseif ($action === 'forgot') {
+    $pageTitle = 'Reset Password | ' . STORE_NAME;
+} else {
+    $pageTitle = 'Welcome Back | ' . STORE_NAME;
+}
 require_once __DIR__ . '/includes/header.php';
 ?>
 
@@ -316,10 +343,18 @@ require_once __DIR__ . '/includes/header.php';
         <div class="auth-header">
             <img src="assets/images/logo.jpg" alt="The Stitch Co." class="auth-logo-img">
             <h1 class="auth-title">
-                <?= $action === 'register' ? 'Create Account' : 'Welcome Back!' ?>
+                <?php 
+                if ($action === 'register') echo 'Create Account';
+                elseif ($action === 'forgot') echo 'Reset Password';
+                else echo 'Welcome Back!';
+                ?>
             </h1>
             <p class="auth-subtitle">
-                <?= $action === 'register' ? 'Join us and start shopping premium streetwear.' : 'Login to continue to your account.' ?>
+                <?php 
+                if ($action === 'register') echo 'Join us and start shopping premium streetwear.';
+                elseif ($action === 'forgot') echo 'Enter your email address and new password below.';
+                else echo 'Login to continue to your account.';
+                ?>
             </p>
             <div class="auth-parent-tag">THE STITCH CO. • BY MJ COMPANY</div>
         </div>
@@ -331,20 +366,27 @@ require_once __DIR__ . '/includes/header.php';
             </div>
         <?php endif; ?>
 
+        <?php if (!empty($success)): ?>
+            <div style="background: #F0FDF4; border: 1px solid #22C55E; color: #15803D; padding: 0.8rem 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 700; margin-bottom: 1.4rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span>✅</span>
+                <span><?= e($success) ?></span>
+            </div>
+        <?php endif; ?>
+
         <?php if ($action === 'register'): ?>
             <!-- Sign Up Form -->
             <form action="login.php?action=register" method="POST">
                 <div class="input-field-group">
                     <label class="input-field-label">Full Name *</label>
                     <div class="input-control-box">
-                        <input type="text" name="fullname" placeholder="Souvik Sayan Das" required class="auth-input">
+                        <input type="text" name="fullname" placeholder="Enter your full name" required class="auth-input">
                     </div>
                 </div>
 
                 <div class="input-field-group">
                     <label class="input-field-label">Email Address *</label>
                     <div class="input-control-box">
-                        <input type="email" name="email" placeholder="souviksayan@gmail.com" required class="auth-input">
+                        <input type="email" name="email" placeholder="name@example.com" required class="auth-input">
                     </div>
                 </div>
 
@@ -377,23 +419,37 @@ require_once __DIR__ . '/includes/header.php';
                 </button>
             </form>
 
-            <div class="social-divider">
-                <span>or sign up with</span>
-            </div>
-
-            <div class="social-grid">
-                <button type="button" class="social-btn">
-                    <span>🌐</span>
-                    <span>Google</span>
-                </button>
-                <button type="button" class="social-btn">
-                    <span style="color: #1877F2; font-weight: 900;">f</span>
-                    <span>Facebook</span>
-                </button>
-            </div>
-
-            <div class="auth-footer-link">
+            <div class="auth-footer-link" style="margin-top: 1.5rem;">
                 Already have an account? <a href="login.php">Login</a>
+            </div>
+
+        <?php elseif ($action === 'forgot'): ?>
+            <!-- Forgot / Reset Password Form -->
+            <form action="login.php?action=forgot" method="POST">
+                <div class="input-field-group">
+                    <label class="input-field-label">Registered Email Address *</label>
+                    <div class="input-control-box">
+                        <input type="email" name="email" placeholder="name@example.com" required class="auth-input">
+                    </div>
+                </div>
+
+                <div class="input-field-group">
+                    <label class="input-field-label">New Password *</label>
+                    <div class="input-control-box">
+                        <input type="password" id="forgot-password" name="new_password" placeholder="Enter new password (min 6 characters)" required class="auth-input" style="padding-right: 42px;">
+                        <button type="button" class="input-icon-right" onclick="togglePasswordVisibility('forgot-password', this)" title="Show / Hide Password">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" name="do_forgot" class="btn-auth-primary">
+                    SET NEW PASSWORD &rarr;
+                </button>
+            </form>
+
+            <div class="auth-footer-link" style="margin-top: 1.5rem;">
+                Remembered your password? <a href="login.php">Back to Login</a>
             </div>
 
         <?php else: ?>
@@ -402,17 +458,17 @@ require_once __DIR__ . '/includes/header.php';
                 <div class="input-field-group">
                     <label class="input-field-label">Email or Phone *</label>
                     <div class="input-control-box">
-                        <input type="email" name="email" value="souviksayan@gmail.com" placeholder="name@example.com" required class="auth-input">
+                        <input type="email" name="email" placeholder="name@example.com" required class="auth-input">
                     </div>
                 </div>
 
                 <div class="input-field-group">
                     <div class="input-field-label">
                         <span>Password *</span>
-                        <a href="#" style="font-size: 0.78rem; color: #1E3A8A; font-weight: 700; text-decoration: none;">Forgot Password?</a>
+                        <a href="login.php?action=forgot" style="font-size: 0.78rem; color: #1E3A8A; font-weight: 700; text-decoration: none;">Forgot Password?</a>
                     </div>
                     <div class="input-control-box">
-                        <input type="password" id="login-password" name="password" value="password123" required class="auth-input" style="padding-right: 42px;">
+                        <input type="password" id="login-password" name="password" placeholder="Enter password" required class="auth-input" style="padding-right: 42px;">
                         <button type="button" class="input-icon-right" onclick="togglePasswordVisibility('login-password', this)" title="Show / Hide Password">
                             👁️
                         </button>
@@ -437,11 +493,6 @@ require_once __DIR__ . '/includes/header.php';
                     <span style="color: #1877F2; font-weight: 900;">f</span>
                     <span>Facebook</span>
                 </button>
-            </div>
-
-            <!-- Demo Credentials -->
-            <div style="background: #F8FAFC; border: 1px dashed #CBD5E1; border-radius: 8px; padding: 0.75rem 0.9rem; font-size: 0.75rem; color: #64748B; margin-bottom: 1.4rem;">
-                <strong>Demo Customer:</strong> <code>souviksayan@gmail.com</code> / <code>password123</code>
             </div>
 
             <div class="auth-footer-link">
