@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="100%" height="100%">
+  <rect width="300" height="300" fill="#ffffff" rx="16"/>
+  <!-- Corner QR Patterns -->
+  <rect x="25" y="25" width="60" height="60" fill="#000000" rx="8"/>
+  <rect x="35" y="35" width="40" height="40" fill="#ffffff" rx="4"/>
+  <rect x="45" y="45" width="20" height="20" fill="#000000" rx="2"/>
+
+  <rect x="215" y="25" width="60" height="60" fill="#000000" rx="8"/>
+  <rect x="225" y="35" width="40" height="40" fill="#ffffff" rx="4"/>
+  <rect x="235" y="45" width="20" height="20" fill="#000000" rx="2"/>
+
+  <rect x="25" y="215" width="60" height="60" fill="#000000" rx="8"/>
+  <rect x="35" y="225" width="40" height="40" fill="#ffffff" rx="4"/>
+  <rect x="45" y="235" width="20" height="20" fill="#000000" rx="2"/>
+
+  <!-- Matrix Data Grid Dots -->
+  <g fill="#111827">
+    <rect x="100" y="30" width="12" height="12" rx="2"/>
+    <rect x="120" y="30" width="12" height="12" rx="2"/>
+    <rect x="150" y="30" width="12" height="12" rx="2"/>
+    <rect x="175" y="30" width="12" height="12" rx="2"/>
+    <rect x="100" y="55" width="12" height="12" rx="2"/>
+    <rect x="135" y="55" width="12" height="12" rx="2"/>
+    <rect x="160" y="55" width="12" height="12" rx="2"/>
+    <rect x="100" y="75" width="12" height="12" rx="2"/>
+    <rect x="180" y="75" width="12" height="12" rx="2"/>
+
+    <rect x="30" y="105" width="12" height="12" rx="2"/>
+    <rect x="55" y="105" width="12" height="12" rx="2"/>
+    <rect x="80" y="105" width="12" height="12" rx="2"/>
+    <rect x="105" y="105" width="12" height="12" rx="2"/>
+    <rect x="180" y="105" width="12" height="12" rx="2"/>
+    <rect x="210" y="105" width="12" height="12" rx="2"/>
+    <rect x="245" y="105" width="12" height="12" rx="2"/>
+
+    <rect x="30" y="130" width="12" height="12" rx="2"/>
+    <rect x="65" y="130" width="12" height="12" rx="2"/>
+    <rect x="210" y="130" width="12" height="12" rx="2"/>
+    <rect x="255" y="130" width="12" height="12" rx="2"/>
+
+    <rect x="30" y="155" width="12" height="12" rx="2"/>
+    <rect x="75" y="155" width="12" height="12" rx="2"/>
+    <rect x="220" y="155" width="12" height="12" rx="2"/>
+    <rect x="250" y="155" width="12" height="12" rx="2"/>
+
+    <rect x="100" y="180" width="12" height="12" rx="2"/>
+    <rect x="140" y="180" width="12" height="12" rx="2"/>
+    <rect x="175" y="180" width="12" height="12" rx="2"/>
+    <rect x="240" y="180" width="12" height="12" rx="2"/>
+
+    <rect x="105" y="215" width="12" height="12" rx="2"/>
+    <rect x="135" y="215" width="12" height="12" rx="2"/>
+    <rect x="165" y="215" width="12" height="12" rx="2"/>
+    <rect x="200" y="215" width="12" height="12" rx="2"/>
+    <rect x="235" y="215" width="12" height="12" rx="2"/>
+
+    <rect x="110" y="245" width="12" height="12" rx="2"/>
+    <rect x="145" y="245" width="12" height="12" rx="2"/>
+    <rect x="180" y="245" width="12" height="12" rx="2"/>
+    <rect x="220" y="245" width="12" height="12" rx="2"/>
+    <rect x="250" y="245" width="12" height="12" rx="2"/>
+  </g>
+
+  <!-- Center Stitch Co Badge -->
+  <circle cx="150" cy="150" r="34" fill="#000000" stroke="#ffffff" stroke-width="4"/>
+  <text x="150" y="146" fill="#ffffff" font-family="Impact, sans-serif" font-size="10" font-weight="900" text-anchor="middle" letter-spacing="1">THE</text>
+  <text x="150" y="158" fill="#3B82F6" font-family="Impact, sans-serif" font-size="12" font-weight="900" text-anchor="middle" letter-spacing="1">STITCH CO.</text>
+</svg>

@@ -1,0 +1,344 @@
+<?php
+/**
+ * Storefront Homepage
+ * The Stitch Co. — A Fashion Brand by MJ Company
+ * Complete Responsive Mobile & Desktop Streetwear Experience
+ */
+
+require_once __DIR__ . '/config/config.php';
+require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/functions.php';
+require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/includes/order_functions.php';
+
+$db = get_db();
+
+// 1. Fetch All Active Hero Banners for 2-3s Auto-Slider
+$heroStmt = $db->query("SELECT * FROM hero_banners WHERE is_active = 1 ORDER BY display_order ASC, id ASC");
+$heroBanners = $heroStmt->fetchAll();
+if (empty($heroBanners)) {
+    $heroBanners = [[
+        'title' => 'OVERSIZED. PREMIUM. YOU.',
+        'subtitle' => 'Crafted to stand out with 240 GSM Bio-Wash Cotton',
+        'tag' => 'NEW DROP SUMMER \'26',
+        'button_text' => 'SHOP NOW',
+        'button_url' => 'shop.php?cat=oversized',
+        'image' => 'assets/images/banners/hero_oversized.svg'
+    ]];
+}
+
+// 2. Fetch Active Categories
+$catStmt = $db->query("SELECT * FROM categories WHERE is_active = 1 ORDER BY display_order ASC");
+$categories = $catStmt->fetchAll();
+
+// 3. Fetch Featured Drops for the Banner Sliding Rail
+$featuredDropsStmt = $db->query("SELECT id, name, price, mrp, thumbnail, category FROM products WHERE is_active = 1 ORDER BY is_best_seller DESC, id DESC LIMIT 6");
+$featuredDrops = $featuredDropsStmt->fetchAll();
+
+// 4. Fetch Best Sellers Products (2-Column Mobile Grid)
+$bestSellersStmt = $db->query("SELECT * FROM products WHERE is_active = 1 AND is_best_seller = 1 ORDER BY id DESC LIMIT 6");
+$bestSellers = $bestSellersStmt->fetchAll();
+
+// 5. Fetch New Arrivals Drops
+$newArrivalsStmt = $db->query("SELECT * FROM products WHERE is_active = 1 AND is_new_arrival = 1 ORDER BY id DESC LIMIT 6");
+$newArrivals = $newArrivalsStmt->fetchAll();
+
+$pageTitle = STORE_NAME . ' | ' . STORE_TAGLINE . ' - Premium Streetwear';
+require_once __DIR__ . '/includes/header.php';
+?>
+
+<!-- 1. Hero Auto-Sliding Horizontal Carousel (Matching Blueprint 1 & 2) -->
+<div class="hero-carousel-wrap">
+    <div class="container hero-carousel-container" id="hero-carousel">
+        
+        <!-- Track containing banner slides -->
+        <div class="hero-carousel-track" id="hero-carousel-track" style="width: <?= count($heroBanners) * 100 ?>%;">
+            <?php foreach ($heroBanners as $idx => $b): 
+                $bImgSrc = (strpos($b['image'], 'http') === 0) ? $b['image'] : $b['image'];
+            ?>
+                <div class="hero-slide-item" style="width: <?= 100 / count($heroBanners) ?>%;">
+                    
+                    <!-- Background Dark Grid Texture -->
+                    <div class="hero-slide-bg"></div>
+                    
+                    <div class="hero-slide-grid">
+                        <!-- Slide Left Content -->
+                        <div class="hero-slide-content">
+                            <span class="hero-slide-tag">
+                                <?= e($b['tag'] ?? 'NEW ARRIVALS') ?>
+                            </span>
+                            
+                            <h1 class="hero-slide-title">
+                                <?= e($b['title']) ?>
+                            </h1>
+                            
+                            <p class="hero-slide-subtitle">
+                                <?= e($b['subtitle'] ?? 'Premium Quality | 180 GSM | 100% Cotton') ?>
+                            </p>
+                            
+                            <!-- CTA Action Button -->
+                            <div class="hero-slide-actions">
+                                <a href="<?= e($b['button_url'] ?? 'shop.php?cat=oversized') ?>" class="hero-btn-white">
+                                    <?= e($b['button_text'] ?? 'SHOP NOW') ?>
+                                </a>
+                            </div>
+
+                            <!-- Carousel Indicators / Dots (Bottom Left) -->
+                            <div class="carousel-dots-wrap">
+                                <?php for ($i = 0; $i < count($heroBanners); $i++): ?>
+                                    <button type="button" class="carousel-dot <?= $i === 0 ? 'active' : '' ?>" onclick="goToHeroSlide(<?= $i ?>)" aria-label="Slide <?= $i + 1 ?>"></button>
+                                <?php endfor; ?>
+                            </div>
+                        </div>
+
+                        <!-- Slide Right: Floating Card (Desktop) -->
+                        <div class="hero-slide-right-card">
+                            <div class="hero-floating-card">
+                                <div class="hero-card-img">
+                                    <img src="assets/images/products/tokyo_vibes_black.svg" alt="Stitch Model">
+                                </div>
+                                <div class="hero-card-info">
+                                    <div class="hero-card-brand">STITCH</div>
+                                    <div class="hero-card-sub">WEAR YOUR VIBE</div>
+                                    <div class="hero-card-pill">HEAVYWEIGHT STREETWEAR</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</div>
+
+<!-- 2. Categories Row (Dynamic Circular Category Roundels from Database) -->
+<section class="container categories-section-wrap">
+    <div class="categories-header-row">
+        <h2 class="categories-section-heading">CATEGORIES</h2>
+        <a href="shop.php" class="section-view-all">View All &rarr;</a>
+    </div>
+
+    <div class="categories-scroll-track">
+        <?php foreach ($categories as $catIdx => $cat): 
+            $catImg = !empty($cat['image']) ? $cat['image'] : 'assets/images/products/good_vibes_white.svg';
+            $catIcon = $cat['icon'] ?? 'tshirt';
+        ?>
+            <a href="shop.php?cat=<?= e($cat['cat_key']) ?>" class="category-roundel-item">
+                <div class="category-roundel-avatar <?= $catIdx === 1 ? 'active' : '' ?> <?= $cat['cat_key'] === 'new_arrivals' ? 'category-avatar-new' : '' ?>">
+                    <span class="category-badge-icon">
+                        <?php if ($catIcon === 'box'): ?>
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                        <?php elseif ($catIcon === 'polo'): ?>
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.47a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.47a2 2 0 00-1.34-2.23z"/><path d="M10 2v6h4V2"/></svg>
+                        <?php elseif ($catIcon === 'hoodie'): ?>
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 10l8-6 8 6v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"></path></svg>
+                        <?php elseif ($catIcon === 'spark'): ?>
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        <?php else: ?>
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.47a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.47a2 2 0 00-1.34-2.23z"/></svg>
+                        <?php endif; ?>
+                    </span>
+                    <?php if ($cat['cat_key'] === 'new_arrivals'): ?>
+                        <span class="category-new-text">NEW<br>ARRIVALS</span>
+                    <?php else: ?>
+                        <img src="<?= e($catImg) ?>" alt="<?= e($cat['cat_name']) ?>">
+                    <?php endif; ?>
+                </div>
+                <span class="category-roundel-name"><?= e($cat['cat_name']) ?></span>
+                <span class="category-roundel-sub"><?= e($cat['subtext'] ?? '') ?></span>
+            </a>
+        <?php endforeach; ?>
+    </div>
+</section>
+
+<!-- 3. Trust Features Bar (4 Items matching Image 1 & 2 Blueprint) -->
+<div class="container trust-bar-container">
+    <div class="trust-bar-grid">
+        <div class="trust-bar-col">
+            <span class="trust-col-icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+            </span>
+            <div>
+                <h4 class="trust-col-title">PREMIUM QUALITY</h4>
+                <span class="trust-col-desc">100% Original Products</span>
+            </div>
+        </div>
+        <div class="trust-bar-col">
+            <span class="trust-col-icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+            </span>
+            <div>
+                <h4 class="trust-col-title">EASY RETURNS</h4>
+                <span class="trust-col-desc">Hassle Free Returns</span>
+            </div>
+        </div>
+        <div class="trust-bar-col">
+            <span class="trust-col-icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </span>
+            <div>
+                <h4 class="trust-col-title">SECURE PAYMENT</h4>
+                <span class="trust-col-desc">100% Secure Checkout</span>
+            </div>
+        </div>
+        <div class="trust-bar-col">
+            <span class="trust-col-icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>
+            </span>
+            <div>
+                <h4 class="trust-col-title">CUSTOMER SUPPORT</h4>
+                <span class="trust-col-desc">We're Here to Help</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 4. Best Sellers (Matching Image 1 & 2 Blueprint) -->
+<section class="container bestsellers-section">
+    <div class="bestsellers-header-row">
+        <div>
+            <h2 class="bestsellers-title">BEST SELLERS</h2>
+            <span class="bestsellers-sub">Heavyweight 240 GSM Bio Wash Cotton</span>
+        </div>
+        <a href="shop.php?sort=popularity" class="section-view-all">
+            View All &gt;
+        </a>
+    </div>
+
+    <!-- Product Grid: 4 Columns on Desktop, 2 on Mobile -->
+    <div class="products-grid">
+        <?php foreach ($bestSellers as $p): 
+            $pImg = (strpos($p['thumbnail'], 'http') === 0) ? $p['thumbnail'] : $p['thumbnail'];
+        ?>
+            <div class="product-card">
+                <div class="product-media">
+                    <?php if (!empty($p['badge'])): ?>
+                        <span class="product-badge"><?= e($p['badge']) ?></span>
+                    <?php endif; ?>
+
+                    <button class="wishlist-toggle-btn" data-product-id="<?= $p['id'] ?>" title="Add to Wishlist" aria-label="Add to Wishlist">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                    </button>
+
+                    <a href="product.php?id=<?= $p['id'] ?>">
+                        <img src="<?= e($pImg) ?>" alt="<?= e($p['name']) ?>" loading="lazy">
+                    </a>
+                </div>
+
+                <div class="product-info">
+                    <h3 class="product-name">
+                        <a href="product.php?id=<?= $p['id'] ?>"><?= e($p['name']) ?></a>
+                    </h3>
+
+                    <div class="product-pricing">
+                        <span class="price-current"><?= format_price_no_decimals($p['price']) ?></span>
+                        <?php if ($p['mrp'] > $p['price']): ?>
+                            <span class="price-mrp"><?= format_price_no_decimals($p['mrp']) ?></span>
+                            <span class="price-discount"><?= round((($p['mrp'] - $p['price']) / $p['mrp']) * 100) ?>% OFF</span>
+                        <?php endif; ?>
+                    </div>
+
+                    <button class="add-to-cart-btn" onclick="window.addToCart(<?= $p['id'] ?>)">
+                        ADD TO CART
+                    </button>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</section>
+
+<!-- 5. Special Offer Banner (Dynamic from Admin Settings) -->
+<?php
+$promoBadge = get_setting('promo_badge', 'SPECIAL OFFER');
+$promoTitle = get_setting('promo_title', 'GET 10% OFF ON YOUR FIRST ORDER');
+$promoCode = get_setting('promo_code', 'WELCOME10');
+$promoBtnText = get_setting('promo_button_text', 'SHOP NOW');
+$promoBtnUrl = get_setting('promo_button_url', 'shop.php');
+$promoImg = get_setting('promo_image', 'assets/images/products/chaos_club_green.svg');
+?>
+<div class="container promo-banner-container">
+    <div class="promo-banner-card">
+        <div class="promo-banner-content">
+            <span class="promo-banner-badge"><?= e($promoBadge) ?></span>
+            <h2 class="promo-banner-title">
+                <?= nl2br(e($promoTitle)) ?>
+            </h2>
+            <a href="<?= e($promoBtnUrl) ?>" class="promo-banner-btn">
+                <?= e($promoBtnText) ?>
+            </a>
+        </div>
+
+        <!-- Stamp Badge -->
+        <?php if (!empty($promoCode)): ?>
+            <div class="promo-stamp-badge">
+                <span>USE CODE<br><strong><?= e($promoCode) ?></strong></span>
+            </div>
+        <?php endif; ?>
+
+        <!-- Right Model Image -->
+        <div class="promo-banner-img">
+            <img src="<?= e($promoImg) ?>" alt="Special Offer Drop">
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for 2-3s Auto-Sliding Horizontal Banner -->
+<script>
+let currentSlideIdx = 0;
+const totalSlides = <?= count($heroBanners) ?>;
+let heroInterval = null;
+
+function updateHeroCarousel() {
+    const track = document.getElementById('hero-carousel-track');
+    if (!track) return;
+
+    const translatePercent = -(currentSlideIdx * (100 / totalSlides));
+    track.style.transform = `translateX(${translatePercent}%)`;
+
+    // Update dots
+    document.querySelectorAll('.carousel-dot').forEach((dot, idx) => {
+        if (idx === currentSlideIdx) {
+            dot.style.width = '24px';
+            dot.style.background = '#3B82F6';
+        } else {
+            dot.style.width = '8px';
+            dot.style.background = 'rgba(255,255,255,0.4)';
+        }
+    });
+}
+
+function nextHeroSlide() {
+    if (totalSlides <= 1) return;
+    currentSlideIdx = (currentSlideIdx + 1) % totalSlides;
+    updateHeroCarousel();
+}
+
+function goToHeroSlide(idx) {
+    currentSlideIdx = idx;
+    updateHeroCarousel();
+    resetHeroTimer();
+}
+
+function resetHeroTimer() {
+    if (heroInterval) clearInterval(heroInterval);
+    heroInterval = setInterval(nextHeroSlide, 2800); // 2.8s auto-scroll
+}
+
+// Start auto-slider on load
+document.addEventListener('DOMContentLoaded', () => {
+    resetHeroTimer();
+    
+    // Pause on hover
+    const carouselEl = document.getElementById('hero-carousel');
+    if (carouselEl) {
+        carouselEl.addEventListener('mouseenter', () => {
+            if (heroInterval) clearInterval(heroInterval);
+        });
+        carouselEl.addEventListener('mouseleave', () => {
+            resetHeroTimer();
+        });
+    }
+});
+</script>
+
+<?php require_once __DIR__ . '/includes/footer.php'; ?>
