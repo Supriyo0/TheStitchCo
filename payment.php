@@ -85,14 +85,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
 
             $customerId = $currentUser['id'] ?? 0;
 
+            $nowIst = date('Y-m-d H:i:s');
+
             // 1. Insert Order Record
             $orderStmt = $db->prepare("
                 INSERT INTO orders (
                     order_number, customer_id, customer_name, customer_email, customer_phone,
                     shipping_address, shipping_method, payment_method, subtotal,
                     discount_amount, coupon_code, shipping_fee, total_price,
-                    status, payment_status, notes
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Order Placed', 'Pending', ?)
+                    status, payment_status, notes, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Order Placed', 'Pending', ?, ?)
             ");
             $orderStmt->execute([
                 $orderNumber,
@@ -108,7 +110,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
                 $appliedCoupon['code'] ?? null,
                 $shippingFee,
                 $totalPrice,
-                $customerNote
+                $customerNote,
+                $nowIst
             ]);
             $orderId = (int)$db->lastInsertId();
 
