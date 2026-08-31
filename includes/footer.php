@@ -116,7 +116,7 @@
 </nav>
 
 <!-- Scripts -->
-<script src="assets/js/main.js"></script>
+<script src="assets/js/main.js?v=<?= time() ?>"></script>
 
 <?php
 $showWelcome = false;

@@ -157,4 +157,166 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // 7. Live AJAX Search Auto-Suggestions
+    function initLiveSearch(formSelector) {
+        document.querySelectorAll(formSelector).forEach(form => {
+            const input = form.querySelector('input[name="q"]');
+            if (!input) return;
+
+            // Create suggestions panel if not exists
+            let panel = form.querySelector('.search-suggestions-panel');
+            if (!panel) {
+                panel = document.createElement('div');
+                panel.className = 'search-suggestions-panel';
+                form.appendChild(panel);
+            }
+
+            let debounceTimer = null;
+
+            function highlightText(text, query) {
+                if (!query) return text;
+                const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`(${escaped})`, 'gi');
+                return text.replace(regex, '<mark>$1</mark>');
+            }
+
+            function fetchSuggestions(query) {
+                if (!query || query.trim().length < 1) {
+                    panel.classList.remove('show');
+                    panel.innerHTML = '';
+                    return;
+                }
+
+                fetch(`api/search.php?q=${encodeURIComponent(query.trim())}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!data) return;
+
+                        let html = '';
+
+                        // Matched Categories
+                        if (data.categories && data.categories.length > 0) {
+                            html += `<div class="search-section-header">Suggested Collections</div>`;
+                            html += `<div class="search-category-chips">`;
+                            data.categories.forEach(cat => {
+                                let icon = '👕';
+                                if (cat.cat_key === 'oversized') icon = '🔥';
+                                else if (cat.cat_key === 'polo') icon = '👔';
+                                else if (cat.cat_key === 'hoodies') icon = '🧥';
+                                else if (cat.cat_key === 'acid_wash') icon = '⚡';
+                                else if (cat.cat_key === 'bottoms') icon = '👖';
+                                html += `<a href="shop.php?cat=${encodeURIComponent(cat.cat_key)}" class="search-cat-chip">
+                                    <span>${icon}</span>
+                                    <span>${cat.cat_name}</span>
+                                </a>`;
+                            });
+                            html += `</div>`;
+                        }
+
+                        // Matched Products
+                        if (data.products && data.products.length > 0) {
+                            html += `<div class="search-section-header">Matching Streetwear Drops</div>`;
+                            data.products.forEach(p => {
+                                html += `
+                                <a href="${p.url}" class="search-item-row">
+                                    <div class="search-item-left">
+                                        <div class="search-item-thumb">
+                                            <img src="${p.thumbnail_url}" alt="${p.name}" onerror="this.onerror=null; this.src='assets/images/placeholder.svg';">
+                                        </div>
+                                        <div class="search-item-info">
+                                            <div class="search-item-name">${highlightText(p.name, query)}</div>
+                                            <div class="search-item-cat">${p.category} ${p.badge ? '• ' + p.badge : ''}</div>
+                                        </div>
+                                    </div>
+                                    <div class="search-item-right">
+                                        <div class="search-item-price">${p.price_formatted}</div>
+                                        ${p.discount_percent > 0 ? `<div class="search-item-discount">${p.discount_percent}% OFF</div>` : ''}
+                                    </div>
+                                </a>`;
+                            });
+
+                            // View All Results Footer
+                            html += `
+                            <a href="shop.php?q=${encodeURIComponent(query)}" class="search-footer-action">
+                                <span>🔍</span>
+                                <span>View all ${data.total} results for "<strong>${query}</strong>" &rarr;</span>
+                            </a>`;
+                        } else if (!data.categories || data.categories.length === 0) {
+                            // No exact results
+                            html += `
+                            <div class="search-no-results">
+                                <div class="search-no-results-text">No exact matches found for "<strong>${query}</strong>"</div>
+                                <div style="font-size: 0.7rem; font-weight: 800; color: #94A3B8; margin-bottom: 0.5rem; text-transform: uppercase;">Trending Searches:</div>
+                                <div class="search-popular-tags">
+                                    <a href="shop.php?cat=oversized" class="search-popular-tag">🔥 Oversized</a>
+                                    <a href="shop.php?cat=acid_wash" class="search-popular-tag">⚡ Acid Wash</a>
+                                    <a href="shop.php?cat=hoodies" class="search-popular-tag">🧥 Hoodies</a>
+                                    <a href="shop.php?cat=bottoms" class="search-popular-tag">👖 Cargo</a>
+                                </div>
+                            </div>`;
+                        }
+
+                        panel.innerHTML = html;
+                        panel.classList.add('show');
+                    })
+                    .catch(() => {
+                        panel.classList.remove('show');
+                    });
+            }
+
+            input.addEventListener('input', (e) => {
+                clearTimeout(debounceTimer);
+                const val = e.target.value;
+                debounceTimer = setTimeout(() => fetchSuggestions(val), 180);
+            });
+
+            input.addEventListener('focus', (e) => {
+                if (e.target.value.trim().length >= 1) {
+                    fetchSuggestions(e.target.value);
+                }
+            });
+
+            // Keyboard navigation in suggestions list
+            input.addEventListener('keydown', (e) => {
+                const items = panel.querySelectorAll('.search-item-row, .search-cat-chip, .search-footer-action');
+                if (!items.length || !panel.classList.contains('show')) return;
+
+                let activeItem = panel.querySelector('.search-item-row.selected');
+                let activeIndex = Array.from(items).indexOf(activeItem);
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (activeItem) activeItem.classList.remove('selected');
+                    activeIndex = (activeIndex + 1) % items.length;
+                    items[activeIndex].classList.add('selected');
+                    items[activeIndex].scrollIntoView({ block: 'nearest' });
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (activeItem) activeItem.classList.remove('selected');
+                    activeIndex = (activeIndex - 1 + items.length) % items.length;
+                    items[activeIndex].classList.add('selected');
+                    items[activeIndex].scrollIntoView({ block: 'nearest' });
+                } else if (e.key === 'Enter') {
+                    if (activeItem) {
+                        e.preventDefault();
+                        window.location.href = activeItem.getAttribute('href');
+                    }
+                } else if (e.key === 'Escape') {
+                    panel.classList.remove('show');
+                }
+            });
+
+            // Click outside closes panel
+            document.addEventListener('click', (e) => {
+                if (!form.contains(e.target)) {
+                    panel.classList.remove('show');
+                }
+            });
+        });
+    }
+
+    initLiveSearch('.header-search-form');
+    initLiveSearch('.mobile-search-form');
+    initLiveSearch('.drawer-search-form');
 });
