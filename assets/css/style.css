@@ -533,16 +533,16 @@ button, input, select, textarea {
 .hero-slide-item {
   position: relative;
   background: #0A0A0A;
-  min-height: 260px;
+  min-height: 540px;
   display: flex;
   align-items: center;
   overflow: hidden;
   flex-shrink: 0;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 992px) {
   .hero-slide-item {
-    min-height: 420px;
+    min-height: 440px;
   }
 }
 
@@ -556,17 +556,25 @@ button, input, select, textarea {
 
 .hero-slide-grid {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   width: 100%;
   position: relative;
   z-index: 2;
-  padding: 1.5rem 1.2rem;
+  padding: 2.2rem 1rem;
+  gap: 1.8rem;
+  text-align: center;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 992px) {
   .hero-slide-grid {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     padding: 3rem 4rem;
+    gap: 2.5rem;
+    text-align: left;
   }
 }
 
@@ -575,7 +583,7 @@ button, input, select, textarea {
   color: #FFFFFF;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 992px) {
   .hero-slide-content {
     max-width: 520px;
   }
@@ -633,8 +641,16 @@ button, input, select, textarea {
 .carousel-dots-wrap {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.45rem;
-  margin-top: 1.8rem;
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 992px) {
+  .carousel-dots-wrap {
+    justify-content: flex-start;
+    margin-top: 1.8rem;
+  }
 }
 
 .carousel-dot {
@@ -654,14 +670,20 @@ button, input, select, textarea {
   background: #FFFFFF;
 }
 
-/* Floating Card on Right (Desktop) */
+/* 3D Product Showcase Card (Visible & Optimized for Mobile + Desktop) */
 .hero-slide-right-card {
-  display: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 380px;
 }
 
 @media (min-width: 992px) {
   .hero-slide-right-card {
     display: block;
+    width: auto;
+    max-width: none;
   }
 }
 
@@ -2296,31 +2318,39 @@ button, input, select, textarea {
    ========================================================================== */
 .hero-3d-showcase-container {
   position: relative;
-  width: 380px;
-  height: 380px;
+  width: 320px;
+  height: 320px;
   perspective: 1000px;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 0 auto;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 480px) {
   .hero-3d-showcase-container {
-    width: 320px;
-    height: 340px;
+    width: 270px;
+    height: 290px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .hero-3d-showcase-container {
+    width: 380px;
+    height: 380px;
   }
 }
 
 .hero-3d-stack-card {
   position: absolute;
-  width: 250px;
-  height: 330px;
+  width: 215px;
+  height: 285px;
   background: rgba(18, 24, 38, 0.95);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1.5px solid rgba(255, 255, 255, 0.12);
-  border-radius: 20px;
-  padding: 1.1rem;
+  border-radius: 18px;
+  padding: 0.9rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -2329,6 +2359,15 @@ button, input, select, textarea {
   transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   user-select: none;
+}
+
+@media (min-width: 768px) {
+  .hero-3d-stack-card {
+    width: 250px;
+    height: 330px;
+    padding: 1.1rem;
+    border-radius: 20px;
+  }
 }
 
 /* Center Active Card */
@@ -2343,9 +2382,14 @@ button, input, select, textarea {
 /* Left Peeking Card */
 .hero-3d-stack-card.pos-left {
   z-index: 5;
-  transform: translateX(-75px) scale(0.82) rotateY(10deg);
-  opacity: 0.4;
+  transform: translateX(-55px) scale(0.82) rotateY(10deg);
+  opacity: 0.45;
   filter: blur(0.6px);
+}
+@media (min-width: 768px) {
+  .hero-3d-stack-card.pos-left {
+    transform: translateX(-75px) scale(0.82) rotateY(10deg);
+  }
 }
 .hero-3d-stack-card.pos-left:hover {
   opacity: 0.75;
@@ -2354,9 +2398,14 @@ button, input, select, textarea {
 /* Right Peeking Card */
 .hero-3d-stack-card.pos-right {
   z-index: 5;
-  transform: translateX(75px) scale(0.82) rotateY(-10deg);
-  opacity: 0.4;
+  transform: translateX(55px) scale(0.82) rotateY(-10deg);
+  opacity: 0.45;
   filter: blur(0.6px);
+}
+@media (min-width: 768px) {
+  .hero-3d-stack-card.pos-right {
+    transform: translateX(75px) scale(0.82) rotateY(-10deg);
+  }
 }
 .hero-3d-stack-card.pos-right:hover {
   opacity: 0.75;
@@ -2413,15 +2462,23 @@ button, input, select, textarea {
 
 .hero-3d-img-box {
   width: 100%;
-  height: 165px;
-  border-radius: 12px;
+  height: 135px;
+  border-radius: 10px;
   overflow: hidden;
   background: #000000;
-  margin: 0.5rem 0;
+  margin: 0.35rem 0;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+}
+
+@media (min-width: 768px) {
+  .hero-3d-img-box {
+    height: 165px;
+    border-radius: 12px;
+    margin: 0.5rem 0;
+  }
 }
 
 .hero-3d-img-box img {
