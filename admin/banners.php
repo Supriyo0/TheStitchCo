@@ -84,6 +84,7 @@ if ($action === 'edit' && $editId > 0) {
     $editBanner = $stmt->fetch();
 }
 
+$categoriesList = $db->query("SELECT * FROM categories WHERE is_active = 1 ORDER BY display_order ASC")->fetchAll();
 $banners = $db->query("SELECT * FROM hero_banners ORDER BY display_order ASC, id DESC")->fetchAll();
 ?>
 
@@ -112,11 +113,11 @@ $banners = $db->query("SELECT * FROM hero_banners ORDER BY display_order ASC, id
 
             <div>
                 <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem;">Hero Title *</label>
-                <input type="text" name="title" required value="<?= e($editBanner['title'] ?? 'OVERSIZED T-SHIRTS') ?>" style="width: 100%; padding: 0.65rem; border: 1.5px solid var(--admin-border); border-radius: 6px; font-weight: 700;">
+                <input type="text" name="title" required value="<?= e($editBanner['title'] ?? 'OVERSIZED T-SHIRTS') ?>" placeholder="e.g. OVERSIZED T-SHIRTS" style="width: 100%; padding: 0.65rem; border: 1.5px solid var(--admin-border); border-radius: 6px; font-weight: 700;">
             </div>
             <div>
                 <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem;">Hero Tag / Badge</label>
-                <input type="text" name="tag" value="<?= e($editBanner['tag'] ?? 'NEW ARRIVALS') ?>" style="width: 100%; padding: 0.65rem; border: 1.5px solid var(--admin-border); border-radius: 6px;">
+                <input type="text" name="tag" value="<?= e($editBanner['tag'] ?? 'NEW ARRIVALS') ?>" placeholder="e.g. NEW ARRIVALS or LIMITED DROP" style="width: 100%; padding: 0.65rem; border: 1.5px solid var(--admin-border); border-radius: 6px;">
             </div>
             <div style="grid-column: span 2;">
                 <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem;">Subtitle / Material Specs</label>
@@ -124,11 +125,26 @@ $banners = $db->query("SELECT * FROM hero_banners ORDER BY display_order ASC, id
             </div>
             <div>
                 <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem;">Button Text</label>
-                <input type="text" name="button_text" value="<?= e($editBanner['button_text'] ?? 'SHOP NOW') ?>" style="width: 100%; padding: 0.65rem; border: 1.5px solid var(--admin-border); border-radius: 6px;">
+                <input type="text" name="button_text" value="<?= e($editBanner['button_text'] ?? 'SHOP NOW') ?>" style="width: 100%; padding: 0.65rem; border: 1.5px solid var(--admin-border); border-radius: 6px; font-weight: 700;">
             </div>
             <div>
-                <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem;">Button Destination Category / URL *</label>
-                <input type="text" name="button_url" value="<?= e($editBanner['button_url'] ?? 'shop.php?cat=oversized') ?>" placeholder="e.g. shop.php?cat=oversized" style="width: 100%; padding: 0.65rem; border: 1.5px solid var(--admin-border); border-radius: 6px; background: #fff; font-weight: 700;">
+                <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem;">Button Destination Category / Target Page *</label>
+                <select name="button_url" style="width: 100%; padding: 0.65rem; border: 1.5px solid var(--admin-border); border-radius: 6px; background: #fff; font-weight: 700;">
+                    <option value="shop.php" <?= ($editBanner['button_url'] ?? '') === 'shop.php' ? 'selected' : '' ?>>🛍️ All Catalog (shop.php)</option>
+                    <option value="categories.php" <?= ($editBanner['button_url'] ?? '') === 'categories.php' ? 'selected' : '' ?>>📂 Categories Hub (categories.php)</option>
+                    <option value="shop.php?cat=new_arrivals" <?= ($editBanner['button_url'] ?? '') === 'shop.php?cat=new_arrivals' ? 'selected' : '' ?>>⚡ New Arrivals Drop (shop.php?cat=new_arrivals)</option>
+                    <option value="shop.php?sort=popular" <?= ($editBanner['button_url'] ?? '') === 'shop.php?sort=popular' ? 'selected' : '' ?>>🔥 Best Sellers Collection (shop.php?sort=popular)</option>
+                    <optgroup label="Select Category Collection">
+                        <?php foreach ($categoriesList as $catItem): 
+                            $targetUrl = 'shop.php?cat=' . $catItem['cat_key'];
+                            $isCatSelected = (($editBanner['button_url'] ?? '') === $targetUrl || ($editBanner['button_url'] ?? '') === $catItem['cat_key']);
+                        ?>
+                            <option value="<?= e($targetUrl) ?>" <?= $isCatSelected ? 'selected' : '' ?>>
+                                👕 <?= e($catItem['cat_name']) ?> (<?= e($targetUrl) ?>)
+                            </option>
+                        <?php endforeach; ?>
+                    </optgroup>
+                </select>
             </div>
             <div>
                 <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem;">Display Slide Order (1, 2, 3...)</label>
@@ -144,7 +160,7 @@ $banners = $db->query("SELECT * FROM hero_banners ORDER BY display_order ASC, id
                 <label style="display: block; font-size: 0.85rem; font-weight: 800; margin-bottom: 0.5rem; color: #1E3A8A;">🖼️ Banner Image Source (Upload or Direct URL)</label>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div>
-                        <label style="display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 0.2rem;">Upload File from Computer</label>
+                        <label style="display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 0.2rem;">Upload File from Computer (JPG, PNG, WEBP)</label>
                         <input type="file" name="banner_image" accept="image/*" style="width: 100%; font-size: 0.82rem;">
                         <label style="display: flex; align-items: center; gap: 0.4rem; font-weight: 700; font-size: 0.78rem; color: #2563EB; margin-top: 0.4rem; cursor: pointer;">
                             <input type="checkbox" name="upload_to_imgbb" value="1" checked>
@@ -153,9 +169,17 @@ $banners = $db->query("SELECT * FROM hero_banners ORDER BY display_order ASC, id
                     </div>
                     <div>
                         <label style="display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 0.2rem;">Or Direct Image URL / Path</label>
-                        <input type="text" name="banner_url" value="<?= e($editBanner['image'] ?? '') ?>" placeholder="https://i.ibb.co/... or assets/images/..." style="width: 100%; padding: 0.6rem; border: 1.5px solid var(--admin-border); border-radius: 6px; font-size: 0.82rem;">
+                        <input type="text" name="banner_url" value="<?= e($editBanner['image'] ?? '') ?>" placeholder="https://i.ibb.co/... or uploads/banners/..." style="width: 100%; padding: 0.6rem; border: 1.5px solid var(--admin-border); border-radius: 6px; font-size: 0.82rem;">
                     </div>
                 </div>
+                <?php if (!empty($editBanner['image'])): 
+                    $previewSrc = (strpos($editBanner['image'], 'http') === 0) ? $editBanner['image'] : '../' . $editBanner['image'];
+                ?>
+                    <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px dashed var(--admin-border); display: flex; align-items: center; gap: 1rem;">
+                        <span style="font-size: 0.78rem; font-weight: 700; color: var(--admin-text-muted);">Current Image:</span>
+                        <img src="<?= e($previewSrc) ?>" alt="Banner Preview" style="height: 60px; max-width: 160px; object-fit: cover; border-radius: 4px; border: 1px solid var(--admin-border);">
+                    </div>
+                <?php endif; ?>
             </div>
             <div style="grid-column: span 2;">
                 <button type="submit" name="save_banner" style="padding: 0.75rem 2rem; background: var(--admin-primary); color: #fff; border: none; border-radius: 6px; font-weight: 800; cursor: pointer;">

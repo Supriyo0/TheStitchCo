@@ -58,8 +58,8 @@ require_once __DIR__ . '/includes/header.php';
             ?>
                 <div class="hero-slide-item" style="width: <?= 100 / count($heroBanners) ?>%;">
                     
-                    <!-- Background Dark Grid Texture -->
-                    <div class="hero-slide-bg"></div>
+                    <!-- Background Dark Overlay with Uploaded Banner Image -->
+                    <div class="hero-slide-bg" style="background-image: linear-gradient(90deg, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.65) 50%, rgba(10,10,10,0.85) 100%), url('<?= e($bImgSrc) ?>'); background-size: cover; background-position: center; opacity: 1;"></div>
                     
                     <div class="hero-slide-grid">
                         <!-- Slide Left Content -->
@@ -79,7 +79,7 @@ require_once __DIR__ . '/includes/header.php';
                             <!-- CTA Action Button -->
                             <div class="hero-slide-actions">
                                 <a href="<?= e($b['button_url'] ?? 'shop.php?cat=oversized') ?>" class="hero-btn-white">
-                                    <?= e($b['button_text'] ?? 'SHOP NOW') ?>
+                                    <?= e($b['button_text'] ?? 'SHOP NOW') ?> &rarr;
                                 </a>
                             </div>
 
@@ -91,16 +91,16 @@ require_once __DIR__ . '/includes/header.php';
                             </div>
                         </div>
 
-                        <!-- Slide Right: Floating Card (Desktop) -->
+                        <!-- Slide Right: Floating Card (Desktop & Tablet) -->
                         <div class="hero-slide-right-card">
                             <div class="hero-floating-card">
                                 <div class="hero-card-img">
-                                    <img src="assets/images/products/tokyo_vibes_black.svg" alt="Stitch Model">
+                                    <img src="<?= e($bImgSrc) ?>" alt="<?= e($b['title']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
                                 </div>
                                 <div class="hero-card-info">
                                     <div class="hero-card-brand">STITCH</div>
                                     <div class="hero-card-sub">WEAR YOUR VIBE</div>
-                                    <div class="hero-card-pill">HEAVYWEIGHT STREETWEAR</div>
+                                    <div class="hero-card-pill"><?= e($b['tag'] ?? 'STREETWEAR') ?></div>
                                 </div>
                             </div>
                         </div>
