@@ -48,61 +48,125 @@ require_once __DIR__ . '/includes/header.php';
 ?>
 
 <style>
-/* Instant Responsive Hero Styles */
+/* Instant Responsive Hero Styles: Side-by-Side Horizontal Row on Mobile matching PC */
 @media (max-width: 991px) {
   .hero-slide-item {
-    min-height: 520px !important;
+    min-height: 250px !important;
     height: auto !important;
+    display: flex !important;
+    align-items: center !important;
   }
   .hero-slide-grid {
-    flex-direction: column !important;
+    flex-direction: row !important;
     align-items: center !important;
-    justify-content: center !important;
-    padding: 2rem 1rem !important;
-    gap: 1.5rem !important;
-    text-align: center !important;
+    justify-content: space-between !important;
+    padding: 1.2rem 0.85rem !important;
+    gap: 0.6rem !important;
+    text-align: left !important;
   }
   .hero-slide-content {
-    max-width: 100% !important;
+    flex: 1 1 54% !important;
+    max-width: 55% !important;
     display: flex !important;
     flex-direction: column !important;
-    align-items: center !important;
-    text-align: center !important;
+    align-items: flex-start !important;
+    text-align: left !important;
+    padding-right: 0.2rem !important;
+  }
+  .hero-slide-tag {
+    font-size: 0.62rem !important;
+    letter-spacing: 1px !important;
+    margin-bottom: 0.25rem !important;
+  }
+  .hero-slide-title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.1rem, 4.2vw, 1.45rem) !important;
+    line-height: 1.12 !important;
+    margin-bottom: 0.35rem !important;
+    word-break: break-word !important;
+  }
+  .hero-slide-subtitle {
+    font-size: 0.68rem !important;
+    line-height: 1.25 !important;
+    margin-bottom: 0.75rem !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
   }
   .hero-slide-actions {
     display: flex !important;
-    justify-content: center !important;
+    justify-content: flex-start !important;
+  }
+  .hero-btn-white {
+    padding: 0.45rem 0.85rem !important;
+    font-size: 0.72rem !important;
+    letter-spacing: 0.4px !important;
+    border-radius: 5px !important;
   }
   .carousel-dots-wrap {
-    justify-content: center !important;
-    margin-top: 1.2rem !important;
+    justify-content: flex-start !important;
+    margin-top: 0.65rem !important;
+    gap: 0.35rem !important;
+  }
+  .carousel-dot {
+    width: 6px !important;
+    height: 6px !important;
+  }
+  .carousel-dot.active {
+    width: 16px !important;
   }
   .hero-slide-right-card {
+    flex: 0 0 45% !important;
+    max-width: 45% !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    width: 100% !important;
-    margin-top: 0.8rem !important;
   }
   .hero-3d-showcase-container {
-    width: 290px !important;
-    height: 290px !important;
+    width: 142px !important;
+    height: 195px !important;
   }
   .hero-3d-stack-card {
-    width: 210px !important;
-    height: 270px !important;
-    padding: 0.85rem !important;
+    width: 130px !important;
+    height: 185px !important;
+    padding: 0.5rem !important;
+    border-radius: 12px !important;
+  }
+  .hero-3d-title {
+    font-size: 0.66rem !important;
+    margin-top: 0.1rem !important;
+  }
+  .hero-3d-cat-tag {
+    font-size: 0.55rem !important;
+  }
+  .hero-3d-icon-badge {
+    width: 12px !important;
+    height: 12px !important;
+    font-size: 0.5rem !important;
   }
   .hero-3d-img-box {
-    height: 130px !important;
+    height: 85px !important;
+    border-radius: 6px !important;
+    margin: 0.25rem 0 !important;
+  }
+  .hero-3d-footer {
+    padding-top: 0.25rem !important;
+  }
+  .hero-3d-price {
+    font-size: 0.78rem !important;
+  }
+  .hero-3d-btn {
+    font-size: 0.55rem !important;
+    padding: 0.2rem 0.45rem !important;
   }
   .hero-3d-stack-card.pos-left {
-    transform: translateX(-48px) scale(0.82) rotateY(10deg) !important;
-    opacity: 0.5 !important;
+    transform: translateX(-22px) scale(0.85) rotateY(8deg) !important;
+    opacity: 0.35 !important;
   }
   .hero-3d-stack-card.pos-right {
-    transform: translateX(48px) scale(0.82) rotateY(-10deg) !important;
-    opacity: 0.5 !important;
+    transform: translateX(22px) scale(0.85) rotateY(-8deg) !important;
+    opacity: 0.35 !important;
   }
 }
 </style>
@@ -114,7 +178,7 @@ require_once __DIR__ . '/includes/header.php';
         <!-- Track containing banner slides -->
         <div class="hero-carousel-track" id="hero-carousel-track" style="width: <?= count($heroBanners) * 100 ?>%;">
             <?php foreach ($heroBanners as $idx => $b): 
-                $bImgSrc = (strpos($b['image'], 'http') === 0) ? $b['image'] : $b['image'];
+                $bImgSrc = get_media_url($b['image'] ?? '');
                 
                 // Fetch 3 selected showcase products
                 $bProdIds = !empty($b['featured_products_json']) ? json_decode($b['featured_products_json'], true) : [];
@@ -168,7 +232,7 @@ require_once __DIR__ . '/includes/header.php';
                         <div class="hero-slide-right-card">
                             <div class="hero-3d-showcase-container" id="hero-3d-stack-<?= $idx ?>">
                                 <?php foreach ($bProducts as $pIdx => $prod): 
-                                    $pThumb = (strpos($prod['thumbnail'], 'http') === 0) ? $prod['thumbnail'] : $prod['thumbnail'];
+                                    $pThumb = get_media_url($prod['thumbnail'] ?? '');
                                     $posClass = ($pIdx === 0) ? 'pos-center' : (($pIdx === 1) ? 'pos-right' : (($pIdx === 2) ? 'pos-left' : 'pos-hidden'));
                                 ?>
                                     <a href="product.php?id=<?= $prod['id'] ?>" class="hero-3d-stack-card <?= $posClass ?>" data-index="<?= $pIdx ?>" onclick="handle3DCardClick(event, this, <?= $idx ?>)">
@@ -185,7 +249,7 @@ require_once __DIR__ . '/includes/header.php';
 
                                         <!-- Product Image -->
                                         <div class="hero-3d-img-box">
-                                            <img src="<?= e($pThumb) ?>" alt="<?= e($prod['name']) ?>" loading="lazy">
+                                            <img src="<?= e($pThumb) ?>" alt="<?= e($prod['name']) ?>" loading="lazy" onerror="this.onerror=null; this.src='assets/images/placeholder.svg';">
                                         </div>
 
                                         <!-- Card Footer (Price & Action) -->
