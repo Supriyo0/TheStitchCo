@@ -61,10 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
     $utrNumber = trim($_POST['utr_number'] ?? '');
     $customerNote = trim($_POST['customer_note'] ?? '');
 
-    if ($paymentMethod === 'UPI (Scan & Pay)' && empty($utrNumber)) {
-        $errorMessage = 'Please enter your 12-digit UPI Transaction / UTR reference number.';
-    } else {
-        $orderNumber = 'TSC-' . date('ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
+    $orderNumber = 'TSC-' . date('ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
 
         // Handle Payment Screenshot Upload via ImgBB / Local Storage
         $proofPath = '';
@@ -303,9 +300,9 @@ require_once __DIR__ . '/includes/header.php';
                             </h4>
                             <div style="display: flex; flex-direction: column; gap: 1rem;">
                                 <div>
-                                    <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem;">UPI Reference / UTR Number (12 Digits) *</label>
-                                    <input type="text" name="utr_number" placeholder="e.g. 324156789012" required pattern="[A-Za-z0-9]{6,30}" style="width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 0.95rem; font-weight: 800; letter-spacing: 0.5px;">
-                                    <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem; display: block;">You can find the 12-digit UTR/Ref number in your GPay / PhonePe / Paytm transaction receipt.</span>
+                                    <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem;">UPI Reference / UTR Number (Optional)</label>
+                                    <input type="text" name="utr_number" placeholder="e.g. 324156789012 (Optional)" style="width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 0.95rem; font-weight: 700; letter-spacing: 0.5px;">
+                                    <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem; display: block;">You can find the 12-digit UTR/Ref number in your GPay / PhonePe / Paytm transaction receipt, or send proof via WhatsApp.</span>
                                 </div>
                                 <div>
                                     <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem;">Upload Payment Screenshot (Optional for Instant Verification)</label>
