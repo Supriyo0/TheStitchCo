@@ -10,6 +10,23 @@ require_once __DIR__ . '/header.php';
 
 $filterStatus = $_GET['status'] ?? 'all';
 $search = trim($_GET['search'] ?? '');
+$params = [];
+
+// Ensure cancel_requested column exists in orders table
+try {
+    $chkCol = $db->query("SHOW COLUMNS FROM `orders` LIKE 'cancel_requested'")->fetch();
+    if (!$chkCol) {
+        $db->exec("ALTER TABLE `orders` ADD COLUMN `cancel_requested` TINYINT(1) DEFAULT 0");
+        $db->exec("ALTER TABLE `orders` ADD COLUMN `cancel_requested_at` DATETIME NULL DEFAULT NULL");
+        $db->exec("ALTER TABLE `orders` ADD COLUMN `cancel_reason` TEXT DEFAULT NULL");
+        $db->exec("ALTER TABLE `orders` ADD COLUMN `cancel_admin_note` TEXT DEFAULT NULL");
+    }
+} catch (Exception $e) {}
+
+$cancelCount = 0;
+try {
+    $cancelCount = (int)$db->query("SELECT COUNT(*) FROM orders WHERE cancel_requested = 1 AND status != 'Cancelled'")->fetchColumn();
+} catch (Exception $e) {}
 
 $sql = "
     SELECT o.*, p.id AS payment_id, p.utr_number, p.proof_screenshot, p.status AS p_status, s.courier_name, s.tracking_number
@@ -18,7 +35,6 @@ $sql = "
     LEFT JOIN shipping_details s ON o.id = s.order_id
     WHERE 1=1
 ";
-$cancelCount = (int)$db->query("SELECT COUNT(*) FROM orders WHERE cancel_requested = 1 AND status != 'Cancelled'")->fetchColumn();
 
 if ($filterStatus === 'pending_upi') {
     $sql .= " AND o.payment_status = 'Pending' AND o.status != 'Cancelled'";
