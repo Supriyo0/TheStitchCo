@@ -84,6 +84,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['do_register'])) {
             unset($_SESSION['redirect_after_login']);
             header("Location: " . $redirect);
             exit;
+        }
+    }
+}
+
 // Handle Forgot Password POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['do_forgot'])) {
     $email = trim($_POST['email'] ?? '');
