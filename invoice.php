@@ -102,7 +102,7 @@ $invoiceNumber = 'TSCINV-' . date('Y', strtotime($order['created_at'])) . '-' . 
     <!-- Header -->
     <div class="header-row">
         <div class="brand-header">
-            <img src="assets/images/logo.jpg" alt="Logo" class="brand-logo-img">
+            <img src="assets/images/logo.jpg" alt="Logo" class="brand-logo-img" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;">
             <div class="brand-name-text">
                 <h1>THE STITCH CO.</h1>
                 <div class="tagline">PREMIUM STREETWEAR</div>

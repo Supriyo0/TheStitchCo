@@ -11,8 +11,8 @@
         <div class="footer-grid">
             <!-- Brand Column -->
             <div>
-                <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1rem;">
-                    <img src="assets/images/logo.jpg" alt="The Stitch Co." style="width: 42px; height: 42px; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.2);">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                    <img src="assets/images/logo.jpg" alt="The Stitch Co." style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
                     <div>
                         <h3 class="footer-brand-title" style="margin-bottom: 0;">THE STITCH CO.</h3>
                         <span style="font-size: 0.72rem; color: #94A3B8; font-weight: 700; letter-spacing: 0.5px;">A Fashion Brand by MJ Company</span>

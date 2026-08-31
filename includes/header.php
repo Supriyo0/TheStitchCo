@@ -30,7 +30,7 @@ $pageTitle = $pageTitle ?? STORE_NAME . ' | ' . STORE_TAGLINE;
 <!-- Stage 1 & 2 Brand Loader -->
 <div id="brand-loader">
     <div class="loader-brand-box">
-        <img src="assets/images/logo.jpg" alt="The Stitch Co." style="width: 70px; height: 70px; border-radius: 12px; margin: 0 auto 1rem; border: 1.5px solid rgba(255,255,255,0.2);">
+        <img src="assets/images/logo.jpg" alt="The Stitch Co." style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; margin: 0 auto 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
         <h1>THE <span>STITCH</span> CO.</h1>
         <p style="color: #94A3B8; font-size: 0.82rem; font-weight: 700; letter-spacing: 2px; margin-top: 0.3rem;">WEAR YOUR VIBE</p>
         <div class="loader-spinner"></div>
@@ -130,7 +130,7 @@ $announcementText = get_setting('announcement_bar_text', 'FREE SHIPPING ON PREPA
 <div class="mobile-drawer" id="mobile-drawer">
     <div class="drawer-header">
         <div style="display: flex; align-items: center; gap: 0.6rem;">
-            <img src="assets/images/logo.jpg" alt="Logo" style="width: 32px; height: 32px; border-radius: 6px;">
+            <img src="assets/images/logo.jpg" alt="Logo" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
             <span style="font-family: var(--font-heading); font-weight: 900; font-size: 1.1rem; letter-spacing: 0.5px;">THE STITCH CO.</span>
         </div>
         <button class="drawer-close-btn" id="drawer-close-btn">&times;</button>

@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_login'])) {
 
 <div class="login-card">
     <div style="text-align: center; margin-bottom: 2rem;">
-        <img src="../assets/images/logo.jpg" alt="Logo" style="width: 58px; height: 58px; border-radius: 12px; margin: 0 auto 0.8rem; border: 1.5px solid #E5E7EB;">
+        <img src="../assets/images/logo.jpg" alt="Logo" style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover; margin: 0 auto 0.9rem; box-shadow: 0 4px 14px rgba(0,0,0,0.15);">
         <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 900; color: #111827;">ADMIN CONSOLE</h2>
         <span style="font-size: 0.78rem; font-weight: 700; color: #6B7280; letter-spacing: 1px;">THE STITCH CO. STORE CONTROL</span>
     </div>

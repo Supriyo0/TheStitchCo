@@ -161,12 +161,12 @@ require_once __DIR__ . '/includes/header.php';
 }
 
 .auth-logo-img {
-    width: 68px;
-    height: 68px;
-    border-radius: 14px;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
     margin: 0 auto 0.9rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    border: 1.5px solid #F1F5F9;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.12);
 }
 
 .auth-title {
