@@ -11,6 +11,7 @@ require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/auth.php';
 
 require_admin();
+header('Content-Type: text/html; charset=UTF-8');
 
 $db = get_db();
 $adminUser = current_user();
