@@ -67,10 +67,10 @@ $announcementText = get_setting('announcement_bar_text', 'FREE SHIPPING ON PREPA
         <!-- Center: Nav Links -->
         <ul class="nav-links">
             <li><a href="index.php" class="<?= basename($_SERVER['PHP_SELF']) === 'index.php' ? 'active' : '' ?>">HOME</a></li>
-            <li><a href="shop.php" class="<?= basename($_SERVER['PHP_SELF']) === 'shop.php' && empty($_GET['cat']) ? 'active' : '' ?>">CATEGORIES</a></li>
+            <li><a href="categories.php" class="<?= basename($_SERVER['PHP_SELF']) === 'categories.php' ? 'active' : '' ?>">CATEGORIES</a></li>
             <li><a href="shop.php?cat=new_arrivals" class="<?= ($_GET['cat'] ?? '') === 'new_arrivals' ? 'active' : '' ?>">NEW ARRIVALS</a></li>
-            <li><a href="shop.php?sort=popularity" class="<?= ($_GET['sort'] ?? '') === 'popularity' ? 'active' : '' ?>">BEST SELLERS</a></li>
-            <li><a href="shop.php?cat=oversized" class="<?= ($_GET['cat'] ?? '') === 'oversized' ? 'active' : '' ?>">SALE</a></li>
+            <li><a href="shop.php?sort=popular" class="<?= ($_GET['sort'] ?? '') === 'popular' && empty($_GET['cat']) ? 'active' : '' ?>">BEST SELLERS</a></li>
+            <li><a href="shop.php?cat=oversized" class="<?= ($_GET['cat'] ?? '') === 'oversized' ? 'active' : '' ?>">OVERSIZED</a></li>
         </ul>
 
         <!-- Search Bar (Desktop) -->

@@ -88,7 +88,7 @@
         </span>
         <span>Home</span>
     </a>
-    <a href="shop.php" class="mobile-nav-link <?= basename($_SERVER['PHP_SELF']) === 'shop.php' && !empty($_GET['cat']) ? 'active' : '' ?>">
+    <a href="categories.php" class="mobile-nav-link <?= basename($_SERVER['PHP_SELF']) === 'categories.php' ? 'active' : '' ?>">
         <span class="mobile-nav-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
         </span>
