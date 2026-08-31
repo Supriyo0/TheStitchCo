@@ -137,17 +137,46 @@ $announcementText = get_setting('announcement_bar_text', 'FREE SHIPPING ON PREPA
     </div>
 
     <!-- Mobile Search Form -->
-    <form action="shop.php" method="GET" style="margin-bottom: 1.5rem;">
+    <form action="shop.php" method="GET" style="margin-bottom: 1.2rem;">
         <input type="text" name="q" placeholder="Search products..." style="width: 100%; padding: 0.65rem 1rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: #fff;">
     </form>
 
+    <?php
+    // Fetch live categories from database
+    $drawerCategories = [];
+    try {
+        $db = get_db();
+        $drawerCategories = $db->query("SELECT cat_key, cat_name, icon FROM categories ORDER BY display_order ASC, id ASC")->fetchAll();
+    } catch (Exception $e) {}
+    ?>
+
     <ul class="drawer-menu">
         <li><a href="index.php">🏠 Home</a></li>
-        <li><a href="shop.php">👕 Shop All Catalog</a></li>
-        <li><a href="shop.php?cat=oversized">🔥 Oversized T-Shirts</a></li>
-        <li><a href="shop.php?cat=tshirts">✨ Graphic T-Shirts</a></li>
-        <li><a href="shop.php?cat=polo">👔 Structured Polos</a></li>
-        <li><a href="shop.php?cat=hoodies">🧥 Heavyweight Hoodies</a></li>
+        <li><a href="shop.php">🛍️ Shop All Catalog</a></li>
+        <li><a href="categories.php">✨ Browse Categories</a></li>
+
+        <li style="padding: 0.8rem 1rem 0.3rem; font-size: 0.68rem; font-weight: 900; color: #64748B; text-transform: uppercase; letter-spacing: 1.5px; border-top: 1px solid rgba(255,255,255,0.08); margin-top: 0.5rem;">COLLECTIONS</li>
+        
+        <?php foreach ($drawerCategories as $dCat): 
+            $dIcon = '👕';
+            $k = $dCat['cat_key'];
+            if ($k === 'oversized') $dIcon = '🔥';
+            elseif ($k === 'polo') $dIcon = '👔';
+            elseif ($k === 'hoodies') $dIcon = '🧥';
+            elseif ($k === 'acid_wash') $dIcon = '⚡';
+            elseif ($k === 'bottoms') $dIcon = '👖';
+            elseif ($k === 'new_arrivals') $dIcon = '✨';
+            elseif ($k === 'tshirts') $dIcon = '✨';
+        ?>
+            <li>
+                <a href="shop.php?cat=<?= e($dCat['cat_key']) ?>">
+                    <span><?= $dIcon ?></span>
+                    <span><?= e($dCat['cat_name']) ?></span>
+                </a>
+            </li>
+        <?php endforeach; ?>
+
+        <li style="padding: 0.8rem 1rem 0.3rem; font-size: 0.68rem; font-weight: 900; color: #64748B; text-transform: uppercase; letter-spacing: 1.5px; border-top: 1px solid rgba(255,255,255,0.08); margin-top: 0.5rem;">ACCOUNT & HELP</li>
         <li><a href="track-order.php">📦 Track My Order</a></li>
         <?php if ($currentUser): ?>
             <li><a href="account.php">👤 My Account (<?= e($currentUser['fullname']) ?>)</a></li>
