@@ -188,7 +188,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
             $errorMessage = 'Order placement failed: ' . $e->getMessage();
         }
     }
-}
 
 // UPI Dynamic QR & Deep Link
 $upiMerchantId = get_setting('upi_id', 'thestitchco@upi');
