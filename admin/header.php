@@ -205,6 +205,19 @@ try {
             <h1 class="page-title"><?= e($adminTitle ?? 'Dashboard') ?></h1>
         </div>
         <div class="topbar-right">
+            <!-- Maintenance Mode Live Animated Toggle -->
+            <?php $isMaintMode = (int)get_setting('maintenance_mode', '0') === 1; ?>
+            <div class="maint-toggle-pill" title="Toggle Maintenance Mode for public visitors" style="display: flex; align-items: center; gap: 0.6rem; background: #F8FAFC; padding: 0.35rem 0.85rem; border-radius: 30px; border: 1.5px solid var(--admin-border);">
+                <span class="maint-status-dot <?= $isMaintMode ? 'dot-red' : 'dot-green' ?>" id="topbar-maint-dot"></span>
+                <span id="topbar-maint-text" style="font-size: 0.76rem; font-weight: 900; color: <?= $isMaintMode ? '#DC2626' : '#16A34A' ?>; text-transform: uppercase; letter-spacing: 0.4px;">
+                    <?= $isMaintMode ? 'Maintenance ON' : 'Store Live' ?>
+                </span>
+                <label class="switch-toggle" style="position: relative; display: inline-block; width: 36px; height: 18px; margin: 0; cursor: pointer;">
+                    <input type="checkbox" id="topbar-maint-switch" <?= $isMaintMode ? 'checked' : '' ?> onchange="quickToggleMaintenance(this.checked)" style="opacity: 0; width: 0; height: 0;">
+                    <span class="slider-round"></span>
+                </label>
+            </div>
+
             <a href="../index.php" target="_blank" class="view-store-btn" title="Open Storefront in new tab">
                 <span>View Store</span>
                 <span>↗</span>
@@ -220,4 +233,45 @@ try {
             </div>
         </div>
     </header>
+
+    <script>
+    function quickToggleMaintenance(isEnabled) {
+        const mode = isEnabled ? 1 : 0;
+        const dot = document.getElementById('topbar-maint-dot');
+        const text = document.getElementById('topbar-maint-text');
+        const sw = document.getElementById('topbar-maint-switch');
+
+        const formData = new FormData();
+        formData.append('action', 'toggle_maintenance');
+        formData.append('mode', mode);
+
+        fetch('../api/admin_actions.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                if (mode === 1) {
+                    dot.className = 'maint-status-dot dot-red';
+                    text.textContent = 'Maintenance ON';
+                    text.style.color = '#DC2626';
+                } else {
+                    dot.className = 'maint-status-dot dot-green';
+                    text.textContent = 'Store Live';
+                    text.style.color = '#16A34A';
+                }
+                alert(data.message);
+            } else {
+                alert(data.message || 'Failed to update maintenance mode');
+                sw.checked = !isEnabled;
+            }
+        })
+        .catch(() => {
+            alert('Network error while toggling maintenance mode');
+            sw.checked = !isEnabled;
+        });
+    }
+    </script>
+
     <main class="admin-container">

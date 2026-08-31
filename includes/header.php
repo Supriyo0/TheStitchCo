@@ -10,10 +10,14 @@ require_once __DIR__ . '/functions.php';
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/order_functions.php';
 
+// Check Maintenance Mode
+check_maintenance_mode();
+
 $cartData = get_cart_contents();
 $wishlistCount = get_wishlist_count($_SESSION['user_id'] ?? null);
 $currentUser = current_user();
 $pageTitle = $pageTitle ?? STORE_NAME . ' | ' . STORE_TAGLINE;
+$isMaintenanceActive = (int)get_setting('maintenance_mode', '0') === 1;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -26,6 +30,19 @@ $pageTitle = $pageTitle ?? STORE_NAME . ' | ' . STORE_TAGLINE;
     <link rel="icon" href="assets/images/logo.jpg" type="image/jpeg">
 </head>
 <body>
+
+<?php if ($isMaintenanceActive && is_admin()): ?>
+    <!-- Persistent Admin Maintenance Mode Warning Banner -->
+    <div style="background: linear-gradient(90deg, #B91C1C 0%, #7F1D1D 100%); color: #FFFFFF; padding: 0.65rem 1rem; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; z-index: 999999; position: relative; border-bottom: 2px solid #EF4444; box-shadow: 0 4px 15px rgba(185, 28, 28, 0.4);">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.1rem; animation: blink 1.2s infinite alternate;">⚠️</span>
+            <span><strong>STORE IS IN MAINTENANCE MODE:</strong> Public visitors cannot access the site. (Admin Live Preview)</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <a href="admin/settings.php" style="background: #FFFFFF; color: #B91C1C; padding: 0.3rem 0.8rem; border-radius: 4px; text-decoration: none; font-size: 0.75rem; font-weight: 900; letter-spacing: 0.5px;">⚡ TURN OFF IN ADMIN</a>
+        </div>
+    </div>
+<?php endif; ?>
 
 <!-- Stage 1 & 2 Brand Loader -->
 <div id="brand-loader">
@@ -137,8 +154,8 @@ $announcementText = get_setting('announcement_bar_text', 'FREE SHIPPING ON PREPA
     </div>
 
     <!-- Mobile Search Form -->
-    <form action="shop.php" method="GET" style="margin-bottom: 1.2rem;">
-        <input type="text" name="q" placeholder="Search products..." style="width: 100%; padding: 0.65rem 1rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: #fff;">
+    <form action="shop.php" method="GET" class="drawer-search-form" style="margin-bottom: 1.2rem;">
+        <input type="text" name="q" placeholder="Search products..." style="width: 100%; padding: 0.65rem 1rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: #fff;" autocomplete="off">
     </form>
 
     <?php

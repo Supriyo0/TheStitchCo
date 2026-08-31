@@ -36,6 +36,37 @@ function get_setting(string $key, string $default = ''): string {
     return $settingsCache[$key] ?? $default;
 }
 
+// Check & Guard Storefront in Maintenance Mode
+function check_maintenance_mode() {
+    $uri = $_SERVER['REQUEST_URI'] ?? '';
+    $script = $_SERVER['SCRIPT_NAME'] ?? '';
+
+    // Never block Admin Panel, Admin Actions API, or Status Checker
+    if (strpos($uri, '/admin') !== false || strpos($script, '/admin') !== false || strpos($uri, 'api/admin_actions') !== false || strpos($uri, 'api/check_status') !== false) {
+        return;
+    }
+
+    $isMaintenance = (int)get_setting('maintenance_mode', '0');
+    if ($isMaintenance !== 1) {
+        return;
+    }
+
+    // Allow logged-in administrators to preview storefront
+    if (isset($_SESSION['user_id']) && isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'super_admin'])) {
+        return;
+    }
+
+    // If already on maintenance.php, prevent loop
+    if (basename($script) === 'maintenance.php' || strpos($uri, 'maintenance.php') !== false) {
+        return;
+    }
+
+    http_response_code(503);
+    header('Retry-After: 3600');
+    require_once __DIR__ . '/../maintenance.php';
+    exit;
+}
+
 // Update or insert store setting
 function update_setting(string $key, string $val): bool {
     $db = get_db();

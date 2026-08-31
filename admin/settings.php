@@ -13,8 +13,9 @@ $msg = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_settings'])) {
     $settingsData = $_POST['settings'] ?? [];
     
-    // Explicitly handle announcement bar checkbox
+    // Explicitly handle checkboxes
     $settingsData['announcement_bar_enabled'] = isset($settingsData['announcement_bar_enabled']) ? '1' : '0';
+    $settingsData['maintenance_mode'] = isset($settingsData['maintenance_mode']) ? '1' : '0';
 
     foreach ($settingsData as $key => $val) {
         update_setting($key, trim($val));
@@ -54,6 +55,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_settings'])) {
     <div style="padding: 1.8rem;">
         <form action="settings.php" method="POST" enctype="multipart/form-data">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                
+                <!-- Maintenance Mode Emergency Box -->
+                <?php $isMaintActive = (int)get_setting('maintenance_mode', '0') === 1; ?>
+                <div style="grid-column: span 2; background: <?= $isMaintActive ? '#FEF2F2' : '#F8FAFC' ?>; border: 1.5px solid <?= $isMaintActive ? '#FCA5A5' : 'var(--admin-border)' ?>; border-radius: 12px; padding: 1.3rem; margin-bottom: 0.5rem; transition: all 0.3s ease;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.6rem;">
+                            <span style="font-size: 1.3rem;">🛑</span>
+                            <div>
+                                <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 800; color: <?= $isMaintActive ? '#991B1B' : '#1E293B' ?>; margin: 0;">Store Maintenance Mode (Offline Screen)</h3>
+                                <span style="font-size: 0.78rem; color: var(--admin-text-muted);">When enabled, public visitors are redirected to the animated offline screen. Admins can still access the admin panel and preview the store.</span>
+                            </div>
+                        </div>
+                        <label style="display: flex; align-items: center; gap: 0.6rem; font-weight: 800; font-size: 0.88rem; color: <?= $isMaintActive ? '#DC2626' : '#64748B' ?>; cursor: pointer; background: #FFFFFF; padding: 0.45rem 0.9rem; border-radius: 20px; border: 1.5px solid <?= $isMaintActive ? '#DC2626' : '#CBD5E1' ?>;">
+                            <input type="checkbox" name="settings[maintenance_mode]" value="1" <?= $isMaintActive ? 'checked' : '' ?> style="accent-color: #DC2626; transform: scale(1.2);">
+                            <span><?= $isMaintActive ? '🔴 Maintenance Mode is ON' : '⚪ Maintenance Mode is OFF' ?></span>
+                        </label>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem; color: #475569;">Offline Notice Message for Customers</label>
+                        <input type="text" name="settings[maintenance_message]" value="<?= e(get_setting('maintenance_message', 'We are currently upgrading our core infrastructure, fine-tuning checkout performance, and preparing exclusive new streetwear drops.')) ?>" placeholder="Message displayed on the maintenance page..." style="width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--admin-border); border-radius: 6px; font-weight: 600; font-size: 0.88rem; background: #FFFFFF;">
+                    </div>
+                </div>
+
                 <!-- Top Announcement Bar Controls -->
                 <div style="grid-column: span 2; background: #F8FAFC; border: 1.5px solid var(--admin-border); border-radius: 8px; padding: 1.2rem; margin-bottom: 0.5rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">

@@ -483,4 +483,24 @@ if ($action === 'reject_return') {
     exit;
 }
 
+// 9. Maintenance Mode Toggle
+if ($action === 'toggle_maintenance') {
+    $mode = (int)($_POST['mode'] ?? 0);
+    $customMsg = trim($_POST['message'] ?? '');
+    
+    update_setting('maintenance_mode', (string)$mode);
+    if (!empty($customMsg)) {
+        update_setting('maintenance_message', $customMsg);
+    }
+    
+    log_admin_activity($admin['id'], $admin['fullname'], 'toggle_maintenance', ($mode ? 'Enabled' : 'Disabled') . ' Maintenance Mode');
+    
+    echo json_encode([
+        'success' => true,
+        'maintenance_mode' => $mode,
+        'message' => $mode ? 'Maintenance Mode is now ENABLED! Public visitors will see the offline screen.' : 'Store is now LIVE! Maintenance mode has been turned off.'
+    ]);
+    exit;
+}
+
 echo json_encode(['success' => false, 'message' => 'Unknown admin action.']);
