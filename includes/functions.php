@@ -98,6 +98,20 @@ function upload_to_imgbb($fileArray, $customApiKey = null) {
 }
 
 /**
+ * Resolve Media Image URL for Storefront or Admin Panel
+ */
+function get_media_url(?string $path, bool $isAdmin = false, string $defaultPlaceholder = 'assets/images/placeholder.svg'): string {
+    if (empty($path)) {
+        return $isAdmin ? '../' . $defaultPlaceholder : $defaultPlaceholder;
+    }
+    if (strpos($path, 'http://') === 0 || strpos($path, 'https://') === 0) {
+        return $path;
+    }
+    $cleanPath = ltrim($path, '/');
+    return $isAdmin ? '../' . $cleanPath : $cleanPath;
+}
+
+/**
  * Handle Image Upload (Local Storage with full fallback & path safety)
  */
 function handle_image_upload($fileArray, $targetSubfolder = 'products', $prefix = 'img') {
@@ -125,7 +139,8 @@ function handle_image_upload($fileArray, $targetSubfolder = 'products', $prefix 
     $uploadDir = $baseUploadDir . '/' . trim($targetSubfolder, '/');
     
     if (!is_dir($uploadDir)) {
-        @mkdir($uploadDir, 0777, true);
+        @mkdir($uploadDir, 0755, true);
+        @chmod($uploadDir, 0755);
     }
 
     $filename = $prefix . '_' . date('Ymd_His') . '_' . bin2hex(random_bytes(4)) . '.' . $origExt;

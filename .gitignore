@@ -1,0 +1,24 @@
+# The Stitch Co. .gitignore
+
+# Environment & local credentials
+config/credentials.local.php
+.env
+*.log
+
+# Ignore user uploads content, but keep directory structure
+uploads/avatars/*
+!uploads/avatars/.gitkeep
+uploads/banners/*
+!uploads/banners/.gitkeep
+uploads/products/*
+!uploads/products/.gitkeep
+uploads/proofs/*
+!uploads/proofs/.gitkeep
+uploads/qrcodes/*
+!uploads/qrcodes/.gitkeep
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
