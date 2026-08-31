@@ -262,6 +262,11 @@ require_once __DIR__ . '/includes/header.php';
                                     $sStmt = $db->prepare("SELECT * FROM shipping_details WHERE order_id = ? LIMIT 1");
                                     $sStmt->execute([$ord['id']]);
                                     $ordShipping = $sStmt->fetch();
+
+                                    // Fetch return info
+                                    $retStmt = $db->prepare("SELECT * FROM order_returns WHERE order_id = ? LIMIT 1");
+                                    $retStmt->execute([$ord['id']]);
+                                    $ordReturn = $retStmt->fetch();
                                 ?>
                                 <div style="background: #F8FAFC; border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 1.2rem;">
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
@@ -301,7 +306,39 @@ require_once __DIR__ . '/includes/header.php';
                                     <?php endif; ?>
                                 </div>
 
-                                <!-- Order Cancellation Status & Store Notes -->
+                                <!-- Post-Delivery Return & Refund Status Banner -->
+                                <?php if ($ordReturn): ?>
+                                    <div style="background: #F0FDF4; border: 1.5px solid #86EFAC; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                                            <div>
+                                                <strong style="color: #166534; font-size: 0.88rem;">🔄 Return & Refund Request: <?= e($ordReturn['status']) ?></strong>
+                                                <div style="font-size: 0.78rem; color: #15803D; margin-top: 2px;">
+                                                    Reason: <strong><?= e($ordReturn['reason']) ?></strong> | Refund Amount: <strong><?= format_price($ordReturn['refund_amount']) ?></strong> to UPI <code><?= e($ordReturn['upi_id']) ?></code>
+                                                </div>
+                                            </div>
+                                            <span style="font-size: 0.75rem; background: #DCFCE7; color: #15803D; padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 800;">
+                                                <?= e($ordReturn['status']) ?>
+                                            </span>
+                                        </div>
+                                        <?php if (!empty($ordReturn['pickup_date']) && strpos($ordReturn['status'], 'Approved') !== false): ?>
+                                            <div style="margin-top: 0.6rem; font-size: 0.8rem; background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E40AF; padding: 0.5rem 0.8rem; border-radius: 6px; font-weight: 700;">
+                                                🚚 Reverse Pickup Scheduled: <strong><?= date('d M Y', strtotime($ordReturn['pickup_date'])) ?></strong> via <?= e($ordReturn['courier_name']) ?>
+                                            </div>
+                                        <?php endif; ?>
+                                        <?php if (!empty($ordReturn['admin_note'])): ?>
+                                            <div style="margin-top: 0.5rem; font-size: 0.78rem; color: #166534; background: #DCFCE7; padding: 0.4rem 0.6rem; border-radius: 4px;">
+                                                📝 <strong>Store Update:</strong> <?= e($ordReturn['admin_note']) ?>
+                                            </div>
+                                        <?php endif; ?>
+                                        <?php if (!empty($ordReturn['refund_ref'])): ?>
+                                            <div style="margin-top: 0.5rem; font-size: 0.8rem; color: #047857; font-weight: 800;">
+                                                💸 UPI Payout Reference / UTR: <code><?= e($ordReturn['refund_ref']) ?></code>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
+
+                                <!-- Pre-Shipment Order Cancellation Status & Store Notes -->
                                 <?php if (!empty($ord['cancel_requested']) && (int)$ord['cancel_requested'] === 1 && $ord['status'] !== 'Cancelled'): ?>
                                     <div style="background: #FFFBEB; border: 1.5px solid #FCD34D; border-radius: 8px; padding: 0.8rem 1rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.6rem;">
                                         <div>
@@ -312,7 +349,7 @@ require_once __DIR__ . '/includes/header.php';
                                     </div>
                                 <?php endif; ?>
 
-                                <?php if (!empty($ord['admin_note'])): ?>
+                                <?php if (!empty($ord['admin_note']) && empty($ordReturn)): ?>
                                     <div style="background: #EFF6FF; border: 1.5px solid #BFDBFE; border-radius: 8px; padding: 0.8rem 1rem; margin-bottom: 1rem; font-size: 0.82rem; color: #1E40AF;">
                                         <strong>📝 Store Cancellation / Status Note:</strong> <?= e($ord['admin_note']) ?>
                                     </div>
@@ -330,6 +367,13 @@ require_once __DIR__ . '/includes/header.php';
                                                 🚫 Request Cancellation
                                             </button>
                                         <?php endif; ?>
+
+                                        <?php if ($ord['status'] === 'Delivered' && empty($ordReturn)): ?>
+                                            <button type="button" onclick="openReturnModal(<?= $ord['id'] ?>, '<?= e($ord['order_number']) ?>', <?= $ord['total_price'] ?>)" style="background: #ECFDF5; color: #059669; border: 1.5px solid #A7F3D0; font-size: 0.8rem; font-weight: 800; padding: 0.5rem 1rem; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.2s;">
+                                                🔄 7-Day Return / Refund
+                                            </button>
+                                        <?php endif; ?>
+
                                         <a href="track-order.php?order_number=<?= urlencode($ord['order_number']) ?>" class="hero-btn" style="background: var(--brand-blue); color: #fff; font-size: 0.82rem; padding: 0.55rem 1.2rem; text-decoration: none;">
                                             Full Tracking 📦
                                         </a>
@@ -602,6 +646,165 @@ function submitCancelRequest(e) {
             btn.textContent = 'SUBMIT CANCELLATION REQUEST';
         });
 }
+
+function openReturnModal(orderId, orderNo, totalAmount) {
+    document.getElementById('return-order-id').value = orderId;
+    document.getElementById('modal-return-order-no').textContent = orderNo;
+    document.getElementById('modal-return-amount').textContent = '₹' + Number(totalAmount).toFixed(2);
+    document.getElementById('return-modal-overlay').style.display = 'flex';
+}
+
+function closeReturnModal() {
+    document.getElementById('return-modal-overlay').style.display = 'none';
+}
+
+function previewUpload(input, previewId) {
+    const file = input.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const previewEl = document.getElementById(previewId);
+            previewEl.src = e.target.result;
+            previewEl.style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+    }
+}
+
+function submitReturnRequest(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btn-submit-return');
+    btn.disabled = true;
+    btn.textContent = 'Uploading Photos & Submitting...';
+
+    const form = document.getElementById('return-request-form');
+    const formData = new FormData(form);
+    formData.append('action', 'request_return');
+
+    fetch('api/customer_actions.php', { method: 'POST', body: formData })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            if (data.success) {
+                location.reload();
+            } else {
+                btn.disabled = false;
+                btn.textContent = 'SUBMIT RETURN & REFUND REQUEST';
+            }
+        })
+        .catch(() => {
+            alert('Failed to connect to server. Please try again.');
+            btn.disabled = false;
+            btn.textContent = 'SUBMIT RETURN & REFUND REQUEST';
+        });
+}
 </script>
+
+<!-- 7-Day Return / Refund Modal -->
+<div id="return-modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 99999; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(5px);">
+    <div style="background: #FFFFFF; border-radius: 18px; max-width: 540px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 2rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem;">
+            <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 900; color: #059669; margin: 0;">
+                🔄 7-Day Easy Return & Refund
+            </h3>
+            <button onclick="closeReturnModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+        </div>
+
+        <div style="background: #F0FDF4; border: 1.5px solid #86EFAC; border-radius: 8px; padding: 0.8rem 1rem; margin-bottom: 1.2rem; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <span style="font-size: 0.75rem; color: #166534; font-weight: 700; text-transform: uppercase;">Order Reference</span>
+                <div style="font-weight: 900; font-size: 1.05rem; color: #15803D;" id="modal-return-order-no"></div>
+            </div>
+            <div style="text-align: right;">
+                <span style="font-size: 0.75rem; color: #166534; font-weight: 700; text-transform: uppercase;">Refund Amount</span>
+                <div style="font-weight: 900; font-size: 1.15rem; color: #15803D;" id="modal-return-amount"></div>
+            </div>
+        </div>
+
+        <form id="return-request-form" onsubmit="submitReturnRequest(event)" enctype="multipart/form-data">
+            <input type="hidden" id="return-order-id" name="order_id" value="">
+
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.82rem; font-weight: 800; margin-bottom: 0.35rem;">Reason for Return *</label>
+                <select name="reason" required style="width: 100%; padding: 0.65rem; border: 1.5px solid var(--border); border-radius: 6px; font-weight: 600; background: #fff;">
+                    <option value="">-- Select Reason --</option>
+                    <option value="Size issue (Too tight / small)">Size issue (Too tight / small)</option>
+                    <option value="Size issue (Too loose / big)">Size issue (Too loose / big)</option>
+                    <option value="Defective / Damaged garment">Defective / Damaged garment</option>
+                    <option value="Received incorrect item / color">Received incorrect item / color</option>
+                    <option value="Fabric quality not as expected">Fabric quality not as expected</option>
+                    <option value="Other reason">Other reason</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 1.2rem;">
+                <label style="display: block; font-size: 0.82rem; font-weight: 800; margin-bottom: 0.35rem;">Explain Issue / Comments</label>
+                <textarea name="notes" placeholder="Please describe the fit or reason for support review..." rows="2" style="width: 100%; padding: 0.6rem; border: 1.5px solid var(--border); border-radius: 6px; font-size: 0.84rem;"></textarea>
+            </div>
+
+            <!-- 3 Required Photos Upload Box -->
+            <div style="background: #F8FAFC; border: 1.5px dashed #CBD5E1; border-radius: 12px; padding: 1.2rem; margin-bottom: 1.2rem;">
+                <div style="font-size: 0.85rem; font-weight: 900; color: #1E293B; margin-bottom: 0.3rem;">
+                    📷 Upload 3 Product Verification Photos (Required)
+                </div>
+                <div style="font-size: 0.75rem; color: #64748B; margin-bottom: 1rem; line-height: 1.3;">
+                    Ensure brand tags are intact for instant pickup approval.
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem;">
+                    <!-- 1. Front View -->
+                    <div style="text-align: center;">
+                        <label style="display: block; font-size: 0.75rem; font-weight: 800; color: #334155; margin-bottom: 0.3rem;">1. Front View *</label>
+                        <input type="file" name="img_front" accept="image/*" required onchange="previewUpload(this, 'prev-front')" style="display: none;" id="input-front">
+                        <label for="input-front" style="display: block; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 8px; padding: 0.6rem 0.4rem; cursor: pointer; font-size: 0.72rem; font-weight: 700; color: #2563EB;">
+                            📁 Choose Photo
+                        </label>
+                        <img id="prev-front" src="" alt="Preview" style="display: none; width: 100%; height: 60px; object-fit: cover; border-radius: 4px; margin-top: 0.4rem; border: 1px solid var(--border);">
+                    </div>
+
+                    <!-- 2. Back View -->
+                    <div style="text-align: center;">
+                        <label style="display: block; font-size: 0.75rem; font-weight: 800; color: #334155; margin-bottom: 0.3rem;">2. Back View *</label>
+                        <input type="file" name="img_back" accept="image/*" required onchange="previewUpload(this, 'prev-back')" style="display: none;" id="input-back">
+                        <label for="input-back" style="display: block; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 8px; padding: 0.6rem 0.4rem; cursor: pointer; font-size: 0.72rem; font-weight: 700; color: #2563EB;">
+                            📁 Choose Photo
+                        </label>
+                        <img id="prev-back" src="" alt="Preview" style="display: none; width: 100%; height: 60px; object-fit: cover; border-radius: 4px; margin-top: 0.4rem; border: 1px solid var(--border);">
+                    </div>
+
+                    <!-- 3. Brand Tag View -->
+                    <div style="text-align: center;">
+                        <label style="display: block; font-size: 0.75rem; font-weight: 800; color: #334155; margin-bottom: 0.3rem;">3. Brand Tag *</label>
+                        <input type="file" name="img_tag" accept="image/*" required onchange="previewUpload(this, 'prev-tag')" style="display: none;" id="input-tag">
+                        <label for="input-tag" style="display: block; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 8px; padding: 0.6rem 0.4rem; cursor: pointer; font-size: 0.72rem; font-weight: 700; color: #2563EB;">
+                            📁 Choose Photo
+                        </label>
+                        <img id="prev-tag" src="" alt="Preview" style="display: none; width: 100%; height: 60px; object-fit: cover; border-radius: 4px; margin-top: 0.4rem; border: 1px solid var(--border);">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer UPI ID for Instant Refund -->
+            <div style="background: #FFFBEB; border: 1.5px solid #FCD34D; border-radius: 12px; padding: 1.1rem; margin-bottom: 1.5rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 900; color: #92400E; margin-bottom: 0.3rem;">
+                    💸 Your UPI ID for 100% Refund Payout *
+                </label>
+                <div style="font-size: 0.75rem; color: #B45309; margin-bottom: 0.6rem; line-height: 1.3;">
+                    Required for instant automated bank transfer (even for Cash On Delivery orders).
+                </div>
+                <input type="text" name="upi_id" required placeholder="e.g. yourname@oksbi or 9876543210@paytm" style="width: 100%; padding: 0.65rem; border: 1.5px solid #F59E0B; border-radius: 6px; font-weight: 800; font-family: monospace; font-size: 0.95rem; background: #FFFFFF;">
+            </div>
+
+            <div style="display: flex; gap: 0.8rem; justify-content: flex-end;">
+                <button type="button" onclick="closeReturnModal()" style="padding: 0.65rem 1.2rem; background: #F1F5F9; color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; font-weight: 700; font-size: 0.85rem; cursor: pointer;">
+                    Cancel
+                </button>
+                <button type="submit" id="btn-submit-return" style="padding: 0.65rem 1.5rem; background: #059669; color: #FFFFFF; border: none; border-radius: 6px; font-weight: 800; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);">
+                    SUBMIT RETURN & REFUND REQUEST
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

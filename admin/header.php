@@ -17,9 +17,13 @@ $db = get_db();
 $adminUser = current_user();
 $currentFile = basename($_SERVER['PHP_SELF']);
 
-// Count Pending Orders & Pending Payments
+// Count Pending Orders, Payments & Returns
 $pendingOrdersCount = (int)$db->query("SELECT COUNT(*) FROM orders WHERE status = 'Order Placed' OR payment_status = 'Pending'")->fetchColumn();
 $pendingPaymentCount = (int)$db->query("SELECT COUNT(*) FROM payments WHERE status = 'Pending'")->fetchColumn();
+$pendingReturnsCount = 0;
+try {
+    $pendingReturnsCount = (int)$db->query("SELECT COUNT(*) FROM order_returns WHERE status = 'Pending Review'")->fetchColumn();
+} catch (Exception $e) {}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -43,10 +47,10 @@ $pendingPaymentCount = (int)$db->query("SELECT COUNT(*) FROM payments WHERE stat
             </div>
             <div class="sidebar-brand-text">
                 <h2>THE STITCH CO.</h2>
-                <span>WEAR YOUR VIBE</span>
+                <span>ADMIN PANEL</span>
             </div>
         </div>
-        <button class="sidebar-close-btn" id="admin-sidebar-close" aria-label="Close sidebar">&times;</button>
+        <button id="sidebar-close-btn" class="sidebar-close-btn">&times;</button>
     </div>
 
     <ul class="sidebar-nav">
@@ -70,6 +74,19 @@ $pendingPaymentCount = (int)$db->query("SELECT COUNT(*) FROM payments WHERE stat
                 </div>
                 <?php if ($pendingOrdersCount > 0): ?>
                     <span class="nav-badge-pill"><?= $pendingOrdersCount ?></span>
+                <?php endif; ?>
+            </a>
+        </li>
+        <li>
+            <a href="returns.php" class="sidebar-link <?= $currentFile === 'returns.php' ? 'active' : '' ?>">
+                <div class="sidebar-link-content">
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                    </span>
+                    <span>Returns & Refunds</span>
+                </div>
+                <?php if ($pendingReturnsCount > 0): ?>
+                    <span class="nav-badge-pill" style="background: #DC2626;"><?= $pendingReturnsCount ?></span>
                 <?php endif; ?>
             </a>
         </li>

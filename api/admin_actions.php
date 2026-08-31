@@ -276,4 +276,211 @@ if ($action === 'reject_cancellation') {
     exit;
 }
 
+// 6. Approve Return & Schedule Pickup (Today / Tomorrow)
+if ($action === 'approve_return_pickup') {
+    $returnId = (int)($_POST['return_id'] ?? 0);
+    $pickupDate = trim($_POST['pickup_date'] ?? date('Y-m-d'));
+    $courierName = trim($_POST['courier_name'] ?? 'Delhivery Reverse Pickup');
+    $adminNote = trim($_POST['admin_note'] ?? 'Return approved! Our courier executive will visit your address for product pickup today.');
+
+    if ($returnId <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid return ID.']);
+        exit;
+    }
+
+    try {
+        $stmt = $db->prepare("SELECT * FROM order_returns WHERE id = ?");
+        $stmt->execute([$returnId]);
+        $return = $stmt->fetch();
+
+        if (!$return) {
+            echo json_encode(['success' => false, 'message' => 'Return record not found.']);
+            exit;
+        }
+
+        $upStmt = $db->prepare("
+            UPDATE order_returns 
+            SET status = 'Approved - Pickup Scheduled',
+                pickup_date = ?,
+                courier_name = ?,
+                admin_note = ?
+            WHERE id = ?
+        ");
+        $upStmt->execute([$pickupDate, $courierName, $adminNote, $returnId]);
+
+        create_notification(
+            $return['customer_id'],
+            'Return Approved #' . $return['order_number'],
+            'Your return request is approved! Pickup scheduled for ' . date('d M Y', strtotime($pickupDate)) . ' via ' . $courierName . '. ' . $adminNote,
+            'order',
+            'account.php?tab=orders'
+        );
+
+        log_admin_activity($admin['id'], $admin['fullname'], 'approve_return', 'Approved return #' . $returnId . ' for Order #' . $return['order_number'] . ' with pickup on ' . $pickupDate);
+
+        echo json_encode(['success' => true, 'message' => 'Return approved and pickup scheduled for ' . $pickupDate . '!']);
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
+    exit;
+}
+
+// 7. Mark Return Pickup Completed
+if ($action === 'complete_return_pickup') {
+    $returnId = (int)($_POST['return_id'] ?? 0);
+    $adminNote = trim($_POST['admin_note'] ?? 'Item received and verified at store warehouse.');
+
+    if ($returnId <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid return ID.']);
+        exit;
+    }
+
+    try {
+        $stmt = $db->prepare("SELECT * FROM order_returns WHERE id = ?");
+        $stmt->execute([$returnId]);
+        $return = $stmt->fetch();
+
+        if (!$return) {
+            echo json_encode(['success' => false, 'message' => 'Return record not found.']);
+            exit;
+        }
+
+        $upStmt = $db->prepare("
+            UPDATE order_returns 
+            SET status = 'Pickup Completed',
+                admin_note = ?
+            WHERE id = ?
+        ");
+        $upStmt->execute([$adminNote, $returnId]);
+
+        create_notification(
+            $return['customer_id'],
+            'Return Pickup Completed #' . $return['order_number'],
+            'Your returned item has been successfully picked up and is now undergoing refund processing.',
+            'order',
+            'account.php?tab=orders'
+        );
+
+        log_admin_activity($admin['id'], $admin['fullname'], 'complete_pickup', 'Marked pickup completed for Return #' . $returnId);
+
+        echo json_encode(['success' => true, 'message' => 'Return pickup marked as completed!']);
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
+    exit;
+}
+
+// 8. Process & Issue Refund to Customer UPI
+if ($action === 'process_return_refund') {
+    $returnId = (int)($_POST['return_id'] ?? 0);
+    $refundRef = trim($_POST['refund_ref'] ?? '');
+    $adminNote = trim($_POST['admin_note'] ?? 'Refund processed and credited to your UPI ID.');
+
+    if ($returnId <= 0 || empty($refundRef)) {
+        echo json_encode(['success' => false, 'message' => 'Please provide the UPI Transaction / Payout Reference Number.']);
+        exit;
+    }
+
+    try {
+        $db->beginTransaction();
+
+        $stmt = $db->prepare("SELECT * FROM order_returns WHERE id = ?");
+        $stmt->execute([$returnId]);
+        $return = $stmt->fetch();
+
+        if (!$return) {
+            $db->rollBack();
+            echo json_encode(['success' => false, 'message' => 'Return record not found.']);
+            exit;
+        }
+
+        // Restock inventory for items in this order
+        $itemStmt = $db->prepare("SELECT product_id, quantity FROM order_items WHERE order_id = ?");
+        $itemStmt->execute([$return['order_id']]);
+        $items = $itemStmt->fetchAll();
+
+        $restockStmt = $db->prepare("UPDATE products SET stock = stock + ? WHERE id = ?");
+        foreach ($items as $it) {
+            $restockStmt->execute([$it['quantity'], $it['product_id']]);
+        }
+
+        // Update return record
+        $upStmt = $db->prepare("
+            UPDATE order_returns 
+            SET status = 'Refund Processed',
+                refund_ref = ?,
+                admin_note = ?
+            WHERE id = ?
+        ");
+        $upStmt->execute([$refundRef, $adminNote, $returnId]);
+
+        // Update order payment status
+        $db->prepare("UPDATE orders SET payment_status = 'Refunded', status = 'Cancelled' WHERE id = ?")->execute([$return['order_id']]);
+
+        log_order_status_transition($return['order_id'], 'Delivered', 'Cancelled', 'Return completed & refund of ' . format_price($return['refund_amount']) . ' sent to UPI ' . $return['upi_id'] . ' (Ref: ' . $refundRef . ')', $admin['fullname']);
+
+        create_notification(
+            $return['customer_id'],
+            'Refund Disbursed #' . $return['order_number'],
+            'Refund of ' . format_price($return['refund_amount']) . ' has been credited to your UPI: ' . $return['upi_id'] . ' (Ref: ' . $refundRef . ')',
+            'payment',
+            'account.php?tab=orders'
+        );
+
+        log_admin_activity($admin['id'], $admin['fullname'], 'process_refund', 'Disbursed refund of ' . $return['refund_amount'] . ' to ' . $return['upi_id'] . ' for Return #' . $returnId);
+
+        $db->commit();
+        echo json_encode(['success' => true, 'message' => 'Refund processed successfully and inventory restored!']);
+    } catch (Exception $e) {
+        $db->rollBack();
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
+    exit;
+}
+
+// 9. Reject Return Request
+if ($action === 'reject_return') {
+    $returnId = (int)($_POST['return_id'] ?? 0);
+    $adminNote = trim($_POST['admin_note'] ?? '');
+
+    if ($returnId <= 0 || empty($adminNote)) {
+        echo json_encode(['success' => false, 'message' => 'Please provide a rejection reason note for the customer.']);
+        exit;
+    }
+
+    try {
+        $stmt = $db->prepare("SELECT * FROM order_returns WHERE id = ?");
+        $stmt->execute([$returnId]);
+        $return = $stmt->fetch();
+
+        if (!$return) {
+            echo json_encode(['success' => false, 'message' => 'Return record not found.']);
+            exit;
+        }
+
+        $upStmt = $db->prepare("
+            UPDATE order_returns 
+            SET status = 'Rejected',
+                admin_note = ?
+            WHERE id = ?
+        ");
+        $upStmt->execute([$adminNote, $returnId]);
+
+        create_notification(
+            $return['customer_id'],
+            'Return Request Update #' . $return['order_number'],
+            'Your return request could not be approved: ' . $adminNote,
+            'order',
+            'account.php?tab=orders'
+        );
+
+        log_admin_activity($admin['id'], $admin['fullname'], 'reject_return', 'Rejected Return #' . $returnId . ' with note: ' . $adminNote);
+
+        echo json_encode(['success' => true, 'message' => 'Return request rejected and explanation sent to customer.']);
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
+    exit;
+}
+
 echo json_encode(['success' => false, 'message' => 'Unknown admin action.']);
