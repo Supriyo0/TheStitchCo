@@ -2292,26 +2292,171 @@ button, input, select, textarea {
 }
 
 /* ==========================================================================
-   FUTURISTIC & STREETWEAR MICRO-ANIMATIONS
+   HERO 3D PRODUCT SHOWCASE CAROUSEL (Center active card + left/right peeking)
    ========================================================================== */
-@keyframes cyberGlow {
-  0%, 100% { box-shadow: 0 0 15px rgba(37, 99, 235, 0.2); }
-  50% { box-shadow: 0 0 25px rgba(37, 99, 235, 0.4); }
+.hero-3d-showcase-container {
+  position: relative;
+  width: 380px;
+  height: 380px;
+  perspective: 1000px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.cyber-tag {
-  font-family: var(--font-tech);
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  background: #000000;
-  color: #FFFFFF;
-  padding: 0.2rem 0.55rem;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
+@media (max-width: 1200px) {
+  .hero-3d-showcase-container {
+    width: 320px;
+    height: 340px;
+  }
 }
+
+.hero-3d-stack-card {
+  position: absolute;
+  width: 250px;
+  height: 330px;
+  background: rgba(18, 24, 38, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-decoration: none;
+  color: #FFFFFF;
+  transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Center Active Card */
+.hero-3d-stack-card.pos-center {
+  z-index: 10;
+  transform: translateX(0) scale(1) translateZ(0);
+  opacity: 1;
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 35px rgba(37, 99, 235, 0.25);
+}
+
+/* Left Peeking Card */
+.hero-3d-stack-card.pos-left {
+  z-index: 5;
+  transform: translateX(-75px) scale(0.82) rotateY(10deg);
+  opacity: 0.4;
+  filter: blur(0.6px);
+}
+.hero-3d-stack-card.pos-left:hover {
+  opacity: 0.75;
+}
+
+/* Right Peeking Card */
+.hero-3d-stack-card.pos-right {
+  z-index: 5;
+  transform: translateX(75px) scale(0.82) rotateY(-10deg);
+  opacity: 0.4;
+  filter: blur(0.6px);
+}
+.hero-3d-stack-card.pos-right:hover {
+  opacity: 0.75;
+}
+
+/* Hidden cards if more than 3 */
+.hero-3d-stack-card.pos-hidden {
+  z-index: 1;
+  transform: scale(0.7);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hero-3d-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.hero-3d-icon-badge {
+  background: #10B981;
+  color: #000;
+  font-size: 0.65rem;
+  font-weight: 900;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-3d-cat-tag {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #10B981;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.hero-3d-title {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-align: center;
+  color: #FFFFFF;
+  margin-top: 0.2rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hero-3d-img-box {
+  width: 100%;
+  height: 165px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000000;
+  margin: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.hero-3d-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.hero-3d-stack-card.pos-center:hover .hero-3d-img-box img {
+  transform: scale(1.06);
+}
+
+.hero-3d-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.4rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hero-3d-price {
+  font-weight: 900;
+  font-size: 1.05rem;
+  color: #FFFFFF;
+}
+
+.hero-3d-btn {
+  font-size: 0.72rem;
+  font-weight: 800;
+  background: #FFFFFF;
+  color: #000000;
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
 

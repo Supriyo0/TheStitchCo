@@ -19,6 +19,15 @@ if (isset($_GET['toggle'])) {
     $msg = 'Banner status updated!';
 }
 
+// Auto-migrate schema if featured_products_json missing
+try {
+    $db->query("SELECT featured_products_json FROM hero_banners LIMIT 1");
+} catch (Exception $e) {
+    try {
+        $db->exec("ALTER TABLE hero_banners ADD COLUMN featured_products_json TEXT NULL AFTER image");
+    } catch (Exception $ex) {}
+}
+
 // Handle Add / Edit Banner
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_banner'])) {
     $bannerId = (int)($_POST['banner_id'] ?? 0);
@@ -29,6 +38,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_banner'])) {
     $btnUrl = trim($_POST['button_url'] ?? 'shop.php');
     $displayOrder = (int)($_POST['display_order'] ?? 1);
     $isActive = isset($_POST['is_active']) ? 1 : 0;
+
+    $featuredProducts = isset($_POST['featured_products']) ? (array)$_POST['featured_products'] : [];
+    $featuredProducts = array_slice(array_filter(array_map('intval', $featuredProducts)), 0, 3);
+    $featuredProductsJson = json_encode($featuredProducts);
 
     $imagePath = trim($_POST['banner_url'] ?? '');
 
@@ -53,12 +66,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_banner'])) {
 
     try {
         if ($bannerId > 0) {
-            $stmt = $db->prepare("UPDATE hero_banners SET title = ?, subtitle = ?, tag = ?, button_text = ?, button_url = ?, image = ?, display_order = ?, is_active = ? WHERE id = ?");
-            $stmt->execute([$title, $subtitle, $tag, $btnText, $btnUrl, $imagePath, $displayOrder, $isActive, $bannerId]);
+            $stmt = $db->prepare("UPDATE hero_banners SET title = ?, subtitle = ?, tag = ?, button_text = ?, button_url = ?, image = ?, featured_products_json = ?, display_order = ?, is_active = ? WHERE id = ?");
+            $stmt->execute([$title, $subtitle, $tag, $btnText, $btnUrl, $imagePath, $featuredProductsJson, $displayOrder, $isActive, $bannerId]);
             $msg = 'Banner updated successfully!';
         } else {
-            $stmt = $db->prepare("INSERT INTO hero_banners (title, subtitle, tag, button_text, button_url, image, display_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$title, $subtitle, $tag, $btnText, $btnUrl, $imagePath, $displayOrder, $isActive]);
+            $stmt = $db->prepare("INSERT INTO hero_banners (title, subtitle, tag, button_text, button_url, image, featured_products_json, display_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$title, $subtitle, $tag, $btnText, $btnUrl, $imagePath, $featuredProductsJson, $displayOrder, $isActive]);
             $msg = 'Banner created successfully!';
         }
     } catch (Exception $e) {
@@ -78,13 +91,18 @@ if (isset($_GET['del'])) {
 }
 
 $editBanner = null;
+$selectedProductIds = [];
 if ($action === 'edit' && $editId > 0) {
     $stmt = $db->prepare("SELECT * FROM hero_banners WHERE id = ?");
     $stmt->execute([$editId]);
     $editBanner = $stmt->fetch();
+    if ($editBanner && !empty($editBanner['featured_products_json'])) {
+        $selectedProductIds = json_decode($editBanner['featured_products_json'], true) ?: [];
+    }
 }
 
 $categoriesList = $db->query("SELECT * FROM categories WHERE is_active = 1 ORDER BY display_order ASC")->fetchAll();
+$allProducts = $db->query("SELECT id, name, price, category, sku, thumbnail FROM products WHERE is_active = 1 ORDER BY id DESC")->fetchAll();
 $banners = $db->query("SELECT * FROM hero_banners ORDER BY display_order ASC, id DESC")->fetchAll();
 ?>
 
@@ -100,7 +118,7 @@ $banners = $db->query("SELECT * FROM hero_banners ORDER BY display_order ASC, id
     <div class="admin-card-header">
         <div>
             <h2 class="admin-card-title"><?= $editBanner ? '✏️ Edit Hero Slider Banner' : 'Homepage Hero Slider Banners' ?></h2>
-            <span style="font-size: 0.8rem; color: var(--admin-text-muted);">Manage high-impact promotional banners shown at the top of your homepage.</span>
+            <span style="font-size: 0.8rem; color: var(--admin-text-muted);">Manage high-impact promotional banners and select up to 3 showcase products shown on the right side.</span>
         </div>
         <?php if ($editBanner): ?>
             <a href="banners.php" style="padding: 0.4rem 1rem; background: var(--admin-primary); color: #fff; border-radius: 6px; font-weight: 700; font-size: 0.8rem; text-decoration: none;">+ Add New Banner</a>
@@ -156,8 +174,10 @@ $banners = $db->query("SELECT * FROM hero_banners ORDER BY display_order ASC, id
                     <span>Active on Homepage</span>
                 </label>
             </div>
+
+            <!-- Banner Image Uploader -->
             <div style="grid-column: span 2; background: #FFFFFF; border: 1.5px solid var(--admin-border); border-radius: 6px; padding: 1rem;">
-                <label style="display: block; font-size: 0.85rem; font-weight: 800; margin-bottom: 0.5rem; color: #1E3A8A;">🖼️ Banner Image Source (Upload or Direct URL)</label>
+                <label style="display: block; font-size: 0.85rem; font-weight: 800; margin-bottom: 0.5rem; color: #1E3A8A;">🖼️ Banner Background / Artwork Image</label>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div>
                         <label style="display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 0.2rem;">Upload File from Computer (JPG, PNG, WEBP)</label>
@@ -176,10 +196,51 @@ $banners = $db->query("SELECT * FROM hero_banners ORDER BY display_order ASC, id
                     $previewSrc = (strpos($editBanner['image'], 'http') === 0) ? $editBanner['image'] : '../' . $editBanner['image'];
                 ?>
                     <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px dashed var(--admin-border); display: flex; align-items: center; gap: 1rem;">
-                        <span style="font-size: 0.78rem; font-weight: 700; color: var(--admin-text-muted);">Current Image:</span>
+                        <span style="font-size: 0.78rem; font-weight: 700; color: var(--admin-text-muted);">Current Background:</span>
                         <img src="<?= e($previewSrc) ?>" alt="Banner Preview" style="height: 60px; max-width: 160px; object-fit: cover; border-radius: 4px; border: 1px solid var(--admin-border);">
                     </div>
                 <?php endif; ?>
+            </div>
+
+            <!-- 3 Featured Products Selection with Live Search (Right-Side 3D Stack) -->
+            <div style="grid-column: span 2; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 1.2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.8rem;">
+                    <div>
+                        <label style="font-size: 0.92rem; font-weight: 800; color: #0F172A; display: flex; align-items: center; gap: 0.4rem;">
+                            <span>🎯</span> Select 3 Featured Products for Right-Side 3D Card Stack
+                        </label>
+                        <span style="font-size: 0.78rem; color: var(--admin-text-muted);">These 3 products will be displayed as an interactive 3D card carousel on the right side of this banner.</span>
+                    </div>
+                    <span id="selected-product-count-badge" style="background: #EEF2FF; color: #1E3A8A; font-size: 0.78rem; font-weight: 800; padding: 0.25rem 0.7rem; border-radius: 20px; border: 1px solid #C7D2FE;">
+                        Selected: <span id="sel-count"><?= count($selectedProductIds) ?></span> / 3 Max
+                    </span>
+                </div>
+
+                <!-- Live Search Bar -->
+                <div style="margin-bottom: 1rem; position: relative;">
+                    <input type="text" id="prod-search-input" placeholder="🔍 Search products by name, SKU, or category to select..." onkeyup="filterProductSelectionList()" style="width: 100%; padding: 0.65rem 1rem; border: 1.5px solid var(--admin-border); border-radius: 6px; font-size: 0.85rem;">
+                </div>
+
+                <!-- Products Selection Grid -->
+                <div id="product-selection-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.8rem; max-height: 260px; overflow-y: auto; padding: 0.4rem; background: #F8FAFC; border-radius: 8px; border: 1px solid var(--admin-border);">
+                    <?php foreach ($allProducts as $prod): 
+                        $isProductChecked = in_array((int)$prod['id'], $selectedProductIds);
+                        $prodThumb = (strpos($prod['thumbnail'], 'http') === 0) ? $prod['thumbnail'] : '../' . $prod['thumbnail'];
+                    ?>
+                        <label class="prod-select-card" data-name="<?= strtolower(e($prod['name'])) ?>" data-sku="<?= strtolower(e($prod['sku'] ?? '')) ?>" data-cat="<?= strtolower(e($prod['category'])) ?>" style="display: flex; align-items: center; gap: 0.7rem; padding: 0.6rem; background: #FFFFFF; border: 1.5px solid <?= $isProductChecked ? '#2563EB' : 'var(--admin-border)' ?>; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                            <input type="checkbox" name="featured_products[]" value="<?= $prod['id'] ?>" class="prod-checkbox" <?= $isProductChecked ? 'checked' : '' ?> onchange="handleProductCheck(this)" style="transform: scale(1.15);">
+                            <img src="<?= e($prodThumb) ?>" alt="" style="width: 42px; height: 42px; object-fit: cover; border-radius: 6px; border: 1px solid var(--admin-border);">
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-size: 0.8rem; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--admin-text-main);">
+                                    <?= e($prod['name']) ?>
+                                </div>
+                                <div style="font-size: 0.72rem; color: #10B981; font-weight: 800;">
+                                    <?= format_price($prod['price']) ?> <span style="color: var(--admin-text-muted); font-weight: normal;">• <?= ucfirst($prod['category']) ?></span>
+                                </div>
+                            </div>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
             </div>
             <div style="grid-column: span 2;">
                 <button type="submit" name="save_banner" style="padding: 0.75rem 2rem; background: var(--admin-primary); color: #fff; border: none; border-radius: 6px; font-weight: 800; cursor: pointer;">
@@ -236,8 +297,41 @@ $banners = $db->query("SELECT * FROM hero_banners ORDER BY display_order ASC, id
                     <?php endforeach; ?>
                 </tbody>
             </table>
-        </div>
-    </div>
-</div>
+<script>
+function filterProductSelectionList() {
+    const input = document.getElementById('prod-search-input').value.toLowerCase().trim();
+    const cards = document.querySelectorAll('.prod-select-card');
+    cards.forEach(card => {
+        const name = card.getAttribute('data-name') || '';
+        const sku = card.getAttribute('data-sku') || '';
+        const cat = card.getAttribute('data-cat') || '';
+        if (name.includes(input) || sku.includes(input) || cat.includes(input)) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function handleProductCheck(checkbox) {
+    const checked = document.querySelectorAll('.prod-checkbox:checked');
+    if (checked.length > 3) {
+        alert('You can select a maximum of 3 showcase products for a banner.');
+        checkbox.checked = false;
+        return;
+    }
+    
+    // Update card border styling
+    const card = checkbox.closest('.prod-select-card');
+    if (card) {
+        card.style.borderColor = checkbox.checked ? '#2563EB' : 'var(--admin-border)';
+    }
+
+    const countEl = document.getElementById('sel-count');
+    if (countEl) {
+        countEl.textContent = document.querySelectorAll('.prod-checkbox:checked').length;
+    }
+}
+</script>
 
 <?php require_once __DIR__ . '/footer.php'; ?>

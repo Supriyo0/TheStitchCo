@@ -55,6 +55,19 @@ require_once __DIR__ . '/includes/header.php';
         <div class="hero-carousel-track" id="hero-carousel-track" style="width: <?= count($heroBanners) * 100 ?>%;">
             <?php foreach ($heroBanners as $idx => $b): 
                 $bImgSrc = (strpos($b['image'], 'http') === 0) ? $b['image'] : $b['image'];
+                
+                // Fetch 3 selected showcase products
+                $bProdIds = !empty($b['featured_products_json']) ? json_decode($b['featured_products_json'], true) : [];
+                $bProducts = [];
+                if (!empty($bProdIds) && is_array($bProdIds)) {
+                    $inClause = implode(',', array_map('intval', $bProdIds));
+                    if (!empty($inClause)) {
+                        $bProducts = $db->query("SELECT id, name, price, mrp, category, thumbnail, badge FROM products WHERE id IN ($inClause) AND is_active = 1")->fetchAll();
+                    }
+                }
+                if (empty($bProducts)) {
+                    $bProducts = $db->query("SELECT id, name, price, mrp, category, thumbnail, badge FROM products WHERE is_active = 1 ORDER BY is_best_seller DESC, is_hero DESC, id DESC LIMIT 3")->fetchAll();
+                }
             ?>
                 <div class="hero-slide-item" style="width: <?= 100 / count($heroBanners) ?>%;">
                     
@@ -91,17 +104,42 @@ require_once __DIR__ . '/includes/header.php';
                             </div>
                         </div>
 
-                        <!-- Slide Right: Floating Card (Desktop & Tablet) -->
+                        <!-- Slide Right: 3D Product Showcase Stack (Center + Left/Right Peeking) -->
                         <div class="hero-slide-right-card">
-                            <div class="hero-floating-card">
-                                <div class="hero-card-img">
-                                    <img src="<?= e($bImgSrc) ?>" alt="<?= e($b['title']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
-                                </div>
-                                <div class="hero-card-info">
-                                    <div class="hero-card-brand">STITCH</div>
-                                    <div class="hero-card-sub">WEAR YOUR VIBE</div>
-                                    <div class="hero-card-pill"><?= e($b['tag'] ?? 'STREETWEAR') ?></div>
-                                </div>
+                            <div class="hero-3d-showcase-container" id="hero-3d-stack-<?= $idx ?>">
+                                <?php foreach ($bProducts as $pIdx => $prod): 
+                                    $pThumb = (strpos($prod['thumbnail'], 'http') === 0) ? $prod['thumbnail'] : $prod['thumbnail'];
+                                    $posClass = ($pIdx === 0) ? 'pos-center' : (($pIdx === 1) ? 'pos-right' : (($pIdx === 2) ? 'pos-left' : 'pos-hidden'));
+                                ?>
+                                    <a href="product.php?id=<?= $prod['id'] ?>" class="hero-3d-stack-card <?= $posClass ?>" data-index="<?= $pIdx ?>" onclick="handle3DCardClick(event, this, <?= $idx ?>)">
+                                        <!-- Card Header -->
+                                        <div>
+                                            <div class="hero-3d-header">
+                                                <span class="hero-3d-icon-badge">★</span>
+                                                <span class="hero-3d-cat-tag"><?= e(strtoupper($prod['category'])) ?></span>
+                                            </div>
+                                            <div class="hero-3d-title" title="<?= e($prod['name']) ?>">
+                                                <?= e($prod['name']) ?>
+                                            </div>
+                                        </div>
+
+                                        <!-- Product Image -->
+                                        <div class="hero-3d-img-box">
+                                            <img src="<?= e($pThumb) ?>" alt="<?= e($prod['name']) ?>" loading="lazy">
+                                        </div>
+
+                                        <!-- Card Footer (Price & Action) -->
+                                        <div class="hero-3d-footer">
+                                            <div>
+                                                <div class="hero-3d-price"><?= format_price_no_decimals($prod['price']) ?></div>
+                                                <?php if ($prod['mrp'] > $prod['price']): ?>
+                                                    <div style="font-size: 0.68rem; color: #94A3B8; text-decoration: line-through;"><?= format_price_no_decimals($prod['mrp']) ?></div>
+                                                <?php endif; ?>
+                                            </div>
+                                            <span class="hero-3d-btn">VIEW &rarr;</span>
+                                        </div>
+                                    </a>
+                                <?php endforeach; ?>
                             </div>
                         </div>
                     </div>
@@ -322,6 +360,36 @@ function goToHeroSlide(idx) {
 function resetHeroTimer() {
     if (heroInterval) clearInterval(heroInterval);
     heroInterval = setInterval(nextHeroSlide, 2800); // 2.8s auto-scroll
+}
+
+// 3D Product Showcase Card Interaction
+function handle3DCardClick(e, cardEl, slideIdx) {
+    if (!cardEl.classList.contains('pos-center')) {
+        e.preventDefault();
+        rotate3DStack(slideIdx, parseInt(cardEl.getAttribute('data-index')));
+    }
+}
+
+function rotate3DStack(slideIdx, targetIdx) {
+    const container = document.getElementById('hero-3d-stack-' + slideIdx);
+    if (!container) return;
+    const cards = container.querySelectorAll('.hero-3d-stack-card');
+    const total = cards.length;
+    if (total <= 1) return;
+
+    cards.forEach((c) => {
+        const cIdx = parseInt(c.getAttribute('data-index'));
+        c.classList.remove('pos-center', 'pos-left', 'pos-right', 'pos-hidden');
+        if (cIdx === targetIdx) {
+            c.classList.add('pos-center');
+        } else if (cIdx === (targetIdx + 1) % total) {
+            c.classList.add('pos-right');
+        } else if (cIdx === (targetIdx - 1 + total) % total) {
+            c.classList.add('pos-left');
+        } else {
+            c.classList.add('pos-hidden');
+        }
+    });
 }
 
 // Start auto-slider on load
