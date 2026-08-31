@@ -179,6 +179,53 @@ require_once __DIR__ . '/includes/header.php';
     opacity: 0.82 !important;
     filter: none !important;
   }
+
+  /* Compact Horizontal Trust Bar on Mobile */
+  .trust-bar-container {
+    margin-bottom: 1.4rem !important;
+    padding: 0 0.75rem !important;
+  }
+  .trust-bar-grid {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    gap: 0.6rem !important;
+    padding: 0.6rem 0.75rem !important;
+    background: #FAFAFA !important;
+    border-radius: 10px !important;
+    border: 1px solid #E2E8F0 !important;
+  }
+  .trust-bar-grid::-webkit-scrollbar {
+    display: none !important;
+  }
+  .trust-bar-col {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    flex: 0 0 auto !important;
+  }
+  .trust-col-icon svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  .trust-col-title {
+    font-size: 0.62rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.2px !important;
+    text-transform: uppercase !important;
+    color: #000000 !important;
+    margin-bottom: 0.05rem !important;
+    white-space: nowrap !important;
+  }
+  .trust-col-desc {
+    font-size: 0.54rem !important;
+    color: #64748B !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+  }
 }
 </style>
 
