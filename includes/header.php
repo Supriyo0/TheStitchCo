@@ -22,7 +22,7 @@ $pageTitle = $pageTitle ?? STORE_NAME . ' | ' . STORE_TAGLINE;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle) ?></title>
     <meta name="description" content="Premium heavyweight oversized graphic streetwear designed to elevate your style. 240 GSM Bio-Wash Combed Cotton.">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css?v=<?= time() ?>">
     <link rel="icon" href="assets/images/logo.jpg" type="image/jpeg">
 </head>
 <body>

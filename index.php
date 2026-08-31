@@ -47,6 +47,66 @@ $pageTitle = STORE_NAME . ' | ' . STORE_TAGLINE . ' - Premium Streetwear';
 require_once __DIR__ . '/includes/header.php';
 ?>
 
+<style>
+/* Instant Responsive Hero Styles */
+@media (max-width: 991px) {
+  .hero-slide-item {
+    min-height: 520px !important;
+    height: auto !important;
+  }
+  .hero-slide-grid {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 2rem 1rem !important;
+    gap: 1.5rem !important;
+    text-align: center !important;
+  }
+  .hero-slide-content {
+    max-width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+  .hero-slide-actions {
+    display: flex !important;
+    justify-content: center !important;
+  }
+  .carousel-dots-wrap {
+    justify-content: center !important;
+    margin-top: 1.2rem !important;
+  }
+  .hero-slide-right-card {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    margin-top: 0.8rem !important;
+  }
+  .hero-3d-showcase-container {
+    width: 290px !important;
+    height: 290px !important;
+  }
+  .hero-3d-stack-card {
+    width: 210px !important;
+    height: 270px !important;
+    padding: 0.85rem !important;
+  }
+  .hero-3d-img-box {
+    height: 130px !important;
+  }
+  .hero-3d-stack-card.pos-left {
+    transform: translateX(-48px) scale(0.82) rotateY(10deg) !important;
+    opacity: 0.5 !important;
+  }
+  .hero-3d-stack-card.pos-right {
+    transform: translateX(48px) scale(0.82) rotateY(-10deg) !important;
+    opacity: 0.5 !important;
+  }
+}
+</style>
+
 <!-- 1. Hero Auto-Sliding Horizontal Carousel (Matching Blueprint 1 & 2) -->
 <div class="hero-carousel-wrap">
     <div class="container hero-carousel-container" id="hero-carousel">
