@@ -180,19 +180,9 @@ $announcementText = get_setting('announcement_bar_text', 'FREE SHIPPING ON PREPA
                                     <span class="glass-nav-icon">📦</span>
                                     <div class="glass-nav-text">
                                         <span class="glass-nav-title">My Orders</span>
-                                        <span class="glass-nav-sub">Track delivery, invoice & status</span>
+                                        <span class="glass-nav-sub">Order history & status</span>
                                     </div>
                                     <span class="glass-count-tag"><?= $userOrderCount ?></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="track-order.php" class="glass-nav-item">
-                                    <span class="glass-nav-icon">🚚</span>
-                                    <div class="glass-nav-text">
-                                        <span class="glass-nav-title">Track Live Order</span>
-                                        <span class="glass-nav-sub">Delhivery & courier updates</span>
-                                    </div>
-                                    <span class="glass-nav-arrow">&rarr;</span>
                                 </a>
                             </li>
                             <li>
@@ -228,16 +218,6 @@ $announcementText = get_setting('announcement_bar_text', 'FREE SHIPPING ON PREPA
                                     <div class="glass-nav-text">
                                         <span class="glass-nav-title">Profile Settings</span>
                                         <span class="glass-nav-sub">Avatar, phone & security</span>
-                                    </div>
-                                    <span class="glass-nav-arrow">&rarr;</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="coupons.php" class="glass-nav-item">
-                                    <span class="glass-nav-icon">🎟️</span>
-                                    <div class="glass-nav-text">
-                                        <span class="glass-nav-title">Coupons & Offers</span>
-                                        <span class="glass-nav-sub">Discount codes & vouchers</span>
                                     </div>
                                     <span class="glass-nav-arrow">&rarr;</span>
                                 </a>
@@ -295,11 +275,11 @@ $announcementText = get_setting('announcement_bar_text', 'FREE SHIPPING ON PREPA
                         <div class="glass-section-heading">QUICK LINKS</div>
                         <ul class="glass-dropdown-nav">
                             <li>
-                                <a href="track-order.php" class="glass-nav-item">
-                                    <span class="glass-nav-icon">🚚</span>
+                                <a href="shop.php" class="glass-nav-item">
+                                    <span class="glass-nav-icon">🛍️</span>
                                     <div class="glass-nav-text">
-                                        <span class="glass-nav-title">Track My Order</span>
-                                        <span class="glass-nav-sub">Search with Order ID</span>
+                                        <span class="glass-nav-title">Shop All Drops</span>
+                                        <span class="glass-nav-sub">Explore streetwear catalog</span>
                                     </div>
                                     <span class="glass-nav-arrow">&rarr;</span>
                                 </a>
@@ -308,8 +288,8 @@ $announcementText = get_setting('announcement_bar_text', 'FREE SHIPPING ON PREPA
                                 <a href="categories.php" class="glass-nav-item">
                                     <span class="glass-nav-icon">✨</span>
                                     <div class="glass-nav-text">
-                                        <span class="glass-nav-title">Browse Collections</span>
-                                        <span class="glass-nav-sub">All streetwear categories</span>
+                                        <span class="glass-nav-title">Browse Categories</span>
+                                        <span class="glass-nav-sub">Oversized tees, hoodies & more</span>
                                     </div>
                                     <span class="glass-nav-arrow">&rarr;</span>
                                 </a>
