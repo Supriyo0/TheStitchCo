@@ -90,13 +90,23 @@ require_once __DIR__ . '/includes/header.php';
         </div>
     </div>
 
-    <!-- Account Navigation Sub-Bar (iOS Glass Floating Dock) -->
-    <div style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1.5px solid rgba(255, 255, 255, 0.7); border-radius: 16px; padding: 0.5rem; margin-bottom: 2.5rem; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08); display: flex; gap: 0.5rem; overflow-x: auto; scrollbar-width: none;">
-        <a href="dashboard.php" style="padding: 0.65rem 1.2rem; border-radius: 12px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">📊 Dashboard</a>
-        <a href="orders.php" style="padding: 0.65rem 1.2rem; border-radius: 12px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">📦 My Orders (<?= $orderCount ?>)</a>
-        <a href="wishlist.php" style="padding: 0.65rem 1.2rem; border-radius: 12px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">❤️ Wishlist (<?= $wishlistCount ?>)</a>
-        <a href="addresses.php" style="padding: 0.65rem 1.2rem; border-radius: 12px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">📍 Saved Addresses (<?= $addressCount ?>)</a>
-        <a href="profile.php" style="padding: 0.65rem 1.2rem; border-radius: 12px; background: #0F172A; color: #FFFFFF; font-weight: 800; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">⚙️ Profile Settings</a>
+    <!-- Account Navigation Sub-Bar (Groww Style Pill Subdock) -->
+    <div class="account-subdock">
+        <a href="dashboard.php" style="padding: 0.6rem 1.1rem; border-radius: 9999px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <span>📊</span> <span>Dashboard</span>
+        </a>
+        <a href="orders.php" style="padding: 0.6rem 1.1rem; border-radius: 9999px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <span>📦</span> <span>My Orders (<?= $orderCount ?>)</span>
+        </a>
+        <a href="wishlist.php" style="padding: 0.6rem 1.1rem; border-radius: 9999px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <span>❤️</span> <span>Wishlist (<?= $wishlistCount ?>)</span>
+        </a>
+        <a href="addresses.php" style="padding: 0.6rem 1.1rem; border-radius: 9999px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <span>📍</span> <span>Saved Addresses (<?= $addressCount ?>)</span>
+        </a>
+        <a href="profile.php" style="padding: 0.6rem 1.1rem; border-radius: 9999px; background: #0F172A; color: #FFFFFF; font-weight: 800; font-size: 0.85rem; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <span>⚙️</span> <span>Profile Settings</span>
+        </a>
     </div>
 
     <?php if (!empty($msg)): ?>
@@ -133,13 +143,15 @@ require_once __DIR__ . '/includes/header.php';
                             <div style="margin-bottom: 0.8rem;">
                                 <input type="file" name="avatar_file" accept="image/*" required style="font-size: 0.82rem; width: 100%;">
                             </div>
-                            <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
-                                <button type="submit" name="upload_avatar" class="hero-btn-primary" style="padding: 0.5rem 1.1rem; font-size: 0.8rem; border: none; cursor: pointer; border-radius: 6px;">
-                                    Upload Photo 📷
+                            <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center;">
+                                <button type="submit" name="upload_avatar" class="btn-fintech-pill">
+                                    <span class="btn-icon-badge badge-blue">📷</span>
+                                    <span>Upload Photo</span>
                                 </button>
                                 <?php if (!empty($currentUser['avatar'])): ?>
-                                    <button type="submit" name="remove_avatar" onclick="return confirm('Remove your profile photo?')" style="background: transparent; border: 1.5px solid #EF4444; color: #EF4444; padding: 0.45rem 1rem; border-radius: 6px; font-weight: 800; font-size: 0.78rem; cursor: pointer;">
-                                        Remove Photo
+                                    <button type="submit" name="remove_avatar" onclick="return confirm('Remove your profile photo?')" class="hero-btn-secondary" style="border-color: #F87171; color: #DC2626;">
+                                        <span class="btn-icon-badge badge-red">✕</span>
+                                        <span>Remove Photo</span>
                                     </button>
                                 <?php endif; ?>
                             </div>
@@ -170,8 +182,9 @@ require_once __DIR__ . '/includes/header.php';
                         </div>
                     </div>
 
-                    <button type="submit" name="update_profile" class="hero-btn-primary" style="margin-top: 1.4rem; padding: 0.75rem 1.6rem; font-size: 0.88rem; border: none; cursor: pointer; border-radius: 8px;">
-                        SAVE PERSONAL CHANGES
+                    <button type="submit" name="update_profile" class="btn-fintech-pill" style="margin-top: 1.4rem;">
+                        <span class="btn-icon-badge badge-blue">✓</span>
+                        <span>SAVE PERSONAL CHANGES</span>
                     </button>
                 </form>
             </div>
@@ -200,8 +213,9 @@ require_once __DIR__ . '/includes/header.php';
                         </div>
                     </div>
 
-                    <button type="submit" name="update_password" class="hero-btn-primary" style="margin-top: 1.4rem; padding: 0.75rem 1.6rem; font-size: 0.88rem; border: none; cursor: pointer; border-radius: 8px;">
-                        UPDATE PASSWORD 🔐
+                    <button type="submit" name="update_password" class="btn-fintech-pill" style="margin-top: 1.4rem;">
+                        <span class="btn-icon-badge badge-amber">🔐</span>
+                        <span>UPDATE PASSWORD</span>
                     </button>
                 </form>
             </div>

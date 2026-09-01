@@ -78,13 +78,23 @@ require_once __DIR__ . '/includes/header.php';
         </div>
     </div>
 
-    <!-- Account Navigation Sub-Bar (iOS Glass Floating Dock) -->
-    <div style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1.5px solid rgba(255, 255, 255, 0.7); border-radius: 16px; padding: 0.5rem; margin-bottom: 2.5rem; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08); display: flex; gap: 0.5rem; overflow-x: auto; scrollbar-width: none;">
-        <a href="dashboard.php" style="padding: 0.65rem 1.2rem; border-radius: 12px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">📊 Dashboard</a>
-        <a href="orders.php" style="padding: 0.65rem 1.2rem; border-radius: 12px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">📦 My Orders (<?= $orderCount ?>)</a>
-        <a href="wishlist.php" style="padding: 0.65rem 1.2rem; border-radius: 12px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">❤️ Wishlist (<?= $wishlistCount ?>)</a>
-        <a href="addresses.php" style="padding: 0.65rem 1.2rem; border-radius: 12px; background: #0F172A; color: #FFFFFF; font-weight: 800; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">📍 Saved Addresses (<?= count($myAddresses) ?>)</a>
-        <a href="profile.php" style="padding: 0.65rem 1.2rem; border-radius: 12px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">⚙️ Profile Settings</a>
+    <!-- Account Navigation Sub-Bar (Groww Style Pill Subdock) -->
+    <div class="account-subdock">
+        <a href="dashboard.php" style="padding: 0.6rem 1.1rem; border-radius: 9999px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <span>📊</span> <span>Dashboard</span>
+        </a>
+        <a href="orders.php" style="padding: 0.6rem 1.1rem; border-radius: 9999px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <span>📦</span> <span>My Orders (<?= $orderCount ?>)</span>
+        </a>
+        <a href="wishlist.php" style="padding: 0.6rem 1.1rem; border-radius: 9999px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <span>❤️</span> <span>Wishlist (<?= $wishlistCount ?>)</span>
+        </a>
+        <a href="addresses.php" style="padding: 0.6rem 1.1rem; border-radius: 9999px; background: #0F172A; color: #FFFFFF; font-weight: 800; font-size: 0.85rem; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <span>📍</span> <span>Saved Addresses (<?= count($myAddresses) ?>)</span>
+        </a>
+        <a href="profile.php" style="padding: 0.6rem 1.1rem; border-radius: 9999px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <span>⚙️</span> <span>Profile Settings</span>
+        </a>
     </div>
 
     <?php if (!empty($msg)): ?>
@@ -155,7 +165,7 @@ require_once __DIR__ . '/includes/header.php';
                 </h3>
 
                 <form action="addresses.php" method="POST">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;" class="form-responsive-grid">
                         <div>
                             <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.3rem;">Receiver Name *</label>
                             <input type="text" name="fullname" required value="<?= e($currentUser['fullname']) ?>" style="width: 100%; padding: 0.65rem 0.8rem; border: 1.5px solid #CBD5E1; border-radius: 6px; font-size: 0.88rem;">
@@ -190,8 +200,9 @@ require_once __DIR__ . '/includes/header.php';
                         </div>
                     </div>
 
-                    <button type="submit" name="add_address" class="hero-btn-primary" style="width: 100%; margin-top: 1.4rem; padding: 0.85rem; font-size: 0.9rem; border: none; cursor: pointer; border-radius: 8px;">
-                        SAVE ADDRESS 📍
+                    <button type="submit" name="add_address" class="btn-fintech-pill" style="width: 100%; margin-top: 1.4rem; justify-content: center;">
+                        <span class="btn-icon-badge badge-green">📍</span>
+                        <span>SAVE DELIVERY ADDRESS</span>
                     </button>
                 </form>
             </div>

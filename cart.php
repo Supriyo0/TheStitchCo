@@ -143,8 +143,9 @@ require_once __DIR__ . '/includes/header.php';
                         <span style="color: var(--primary);"><?= format_price($grandTotal) ?></span>
                     </div>
 
-                    <a href="checkout.php" class="cart-checkout-btn">
-                        PROCEED TO CHECKOUT →
+                    <a href="checkout.php" class="btn-fintech-pill" style="width: 100%; justify-content: center; padding: 0.5rem 1.4rem !important;">
+                        <span class="btn-icon-badge badge-green">🔒</span>
+                        <span>PROCEED TO SECURE CHECKOUT</span>
                     </a>
 
                     <div style="text-align: center; margin-top: 1rem;">

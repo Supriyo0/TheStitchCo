@@ -79,12 +79,12 @@ $announcementText = get_setting('announcement_bar_text', 'FREE SHIPPING ON PREPA
 <header class="main-header">
     <div class="container navbar">
         <!-- Left: Mobile Toggle & Brand Logo -->
-        <div style="display: flex; align-items: center; gap: 0.85rem;">
-            <button type="button" class="mobile-menu-toggle" id="mobile-menu-btn" aria-label="Open mobile menu">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        <div style="display: flex; align-items: center; gap: 0.65rem; min-width: 0;">
+            <button type="button" class="mobile-menu-toggle" id="mobile-menu-toggle" onclick="window.openMobileDrawer()" aria-label="Open navigation menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
             <a href="index.php" class="nav-brand">
-                <img src="assets/images/logo.jpg" alt="The Stitch Co. Logo" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.15); flex-shrink: 0;">
+                <img src="assets/images/logo.jpg" alt="The Stitch Co. Logo" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.12); flex-shrink: 0;">
                 <div class="nav-brand-text-box">
                     <span class="nav-brand-title">THE STITCH CO.</span>
                     <span class="nav-brand-sub">WEAR YOUR VIBE</span>

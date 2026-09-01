@@ -39,19 +39,35 @@ require_once __DIR__ . '/includes/header.php';
             </h1>
             <span style="font-size: 0.85rem; color: #64748B;">Welcome back, <strong><?= e($currentUser['fullname']) ?></strong>! Manage your account and orders.</span>
         </div>
-        <div style="display: flex; gap: 0.8rem;">
-            <a href="orders.php" class="hero-btn-primary" style="padding: 0.55rem 1.2rem; font-size: 0.82rem; text-decoration: none;">📦 View Orders</a>
-            <a href="shop.php" class="hero-btn-secondary" style="padding: 0.55rem 1.2rem; font-size: 0.82rem; text-decoration: none;">🛍️ Explore Catalog</a>
+        <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
+            <a href="orders.php" class="btn-fintech-pill">
+                <span class="btn-icon-badge badge-blue">📦</span>
+                <span>View Orders</span>
+            </a>
+            <a href="shop.php" class="hero-btn-secondary">
+                <span class="btn-icon-badge badge-amber">🛍️</span>
+                <span>Explore Catalog</span>
+            </a>
         </div>
     </div>
 
-    <!-- Account Navigation Sub-Bar (iOS Glass Floating Dock) -->
-    <div style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1.5px solid rgba(255, 255, 255, 0.7); border-radius: 16px; padding: 0.5rem; margin-bottom: 2.5rem; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08); display: flex; gap: 0.5rem; overflow-x: auto; scrollbar-width: none;">
-        <a href="dashboard.php" style="padding: 0.65rem 1.2rem; border-radius: 12px; background: #0F172A; color: #FFFFFF; font-weight: 800; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">📊 Dashboard</a>
-        <a href="orders.php" style="padding: 0.65rem 1.2rem; border-radius: 12px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">📦 My Orders (<?= $orderCount ?>)</a>
-        <a href="wishlist.php" style="padding: 0.65rem 1.2rem; border-radius: 12px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">❤️ Wishlist (<?= $wishlistCount ?>)</a>
-        <a href="addresses.php" style="padding: 0.65rem 1.2rem; border-radius: 12px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">📍 Saved Addresses (<?= $addressCount ?>)</a>
-        <a href="profile.php" style="padding: 0.65rem 1.2rem; border-radius: 12px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">⚙️ Profile Settings</a>
+    <!-- Account Navigation Sub-Bar (Groww Style Pill Subdock) -->
+    <div class="account-subdock">
+        <a href="dashboard.php" style="padding: 0.6rem 1.1rem; border-radius: 9999px; background: #0F172A; color: #FFFFFF; font-weight: 800; font-size: 0.85rem; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <span>📊</span> <span>Dashboard</span>
+        </a>
+        <a href="orders.php" style="padding: 0.6rem 1.1rem; border-radius: 9999px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <span>📦</span> <span>My Orders (<?= $orderCount ?>)</span>
+        </a>
+        <a href="wishlist.php" style="padding: 0.6rem 1.1rem; border-radius: 9999px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <span>❤️</span> <span>Wishlist (<?= $wishlistCount ?>)</span>
+        </a>
+        <a href="addresses.php" style="padding: 0.6rem 1.1rem; border-radius: 9999px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <span>📍</span> <span>Saved Addresses (<?= $addressCount ?>)</span>
+        </a>
+        <a href="profile.php" style="padding: 0.6rem 1.1rem; border-radius: 9999px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <span>⚙️</span> <span>Profile Settings</span>
+        </a>
     </div>
 
     <!-- Quick Stats Cards (iOS Frosted Glass) -->

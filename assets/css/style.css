@@ -218,47 +218,93 @@ button, input, select, textarea {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 72px;
-  gap: 1.5rem;
-}.nav-brand {
+  height: 68px;
+  gap: 1rem;
+}
+
+.mobile-menu-toggle {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  color: #0F172A;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mobile-menu-toggle:hover {
+  background: #FFFFFF;
+  transform: scale(1.06);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+@media (min-width: 992px) {
+  .mobile-menu-toggle {
+    display: none;
+  }
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   text-decoration: none;
+  min-width: 0;
+  flex-shrink: 1;
 }
 
 .nav-brand-text-box {
   display: flex;
   flex-direction: column;
-  line-height: 1;
+  line-height: 1.1;
+  min-width: 0;
 }
 
 .nav-brand-title {
   font-family: var(--font-heading);
   font-weight: 900;
-  font-size: 1.45rem;
-  letter-spacing: 1.5px;
-  color: #000000;
+  font-size: 1.25rem;
+  letter-spacing: 0.8px;
+  color: #0F172A;
+  white-space: nowrap;
 }
 
 .nav-brand-sub {
-  font-size: 0.58rem;
+  font-size: 0.55rem;
   font-weight: 800;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   color: #64748B;
-  margin-top: 3px;
+  margin-top: 2px;
+  white-space: nowrap;
 }
 
-.nav-links {
-  display: none;
-  align-items: center;
-  gap: 2.2rem;
-  list-style: none;
+@media (max-width: 768px) {
+  .nav-brand-title {
+    font-size: 1rem;
+    letter-spacing: 0.3px;
+  }
+  .nav-brand-sub {
+    font-size: 0.48rem;
+    letter-spacing: 0.8px;
+  }
 }
 
-@media (min-width: 992px) {
-  .nav-links {
-    display: flex;
+@media (max-width: 440px) {
+  .nav-brand-title {
+    font-size: 0.92rem;
+    letter-spacing: 0.2px;
+  }
+  .nav-brand-sub {
+    display: none;
   }
 }
 
@@ -3336,6 +3382,158 @@ select:focus {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15) !important;
 }
 
+/* ==========================================================================
+   GROWW / FINTECH STYLE ICON-BADGE PILL BUTTONS (Matching Image Blueprint)
+   ========================================================================== */
 
+.btn-fintech-pill,
+.hero-btn-primary,
+.hero-btn,
+.btn-primary,
+.cart-checkout-btn,
+button[type="submit"]:not(.header-search-submit):not(.mobile-search-submit) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.65rem !important;
+  padding: 0.38rem 1.25rem 0.38rem 0.45rem !important;
+  background: #25282E !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 9999px !important;
+  color: #FFFFFF !important;
+  font-family: var(--font-main) !important;
+  font-weight: 800 !important;
+  font-size: 0.85rem !important;
+  letter-spacing: 0.3px !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18), 0 1px 0 rgba(255, 255, 255, 0.15) inset !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+}
 
+.btn-fintech-pill:hover,
+.hero-btn-primary:hover,
+.hero-btn:hover,
+.btn-primary:hover,
+.cart-checkout-btn:hover,
+button[type="submit"]:not(.header-search-submit):not(.mobile-search-submit):hover {
+  background: #31353E !important;
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28), 0 1px 0 rgba(255, 255, 255, 0.3) inset !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  color: #FFFFFF !important;
+}
 
+.btn-fintech-pill:active,
+.hero-btn-primary:active,
+.hero-btn:active {
+  transform: translateY(0) scale(0.98) !important;
+}
+
+/* Secondary Button Pill */
+.hero-btn-secondary,
+.btn-secondary {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.65rem !important;
+  padding: 0.38rem 1.25rem 0.38rem 0.45rem !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1.5px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 9999px !important;
+  color: #0F172A !important;
+  font-weight: 800 !important;
+  font-size: 0.85rem !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04) !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+}
+
+.hero-btn-secondary:hover,
+.btn-secondary:hover {
+  background: #FFFFFF !important;
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08) !important;
+  border-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Rounded Icon Badge inside Button */
+.btn-icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  color: #FFFFFF;
+  font-size: 0.85rem;
+  font-weight: 900;
+  flex-shrink: 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.badge-blue { background: #2563EB; }
+.badge-green { background: #059669; }
+.badge-amber { background: #D97706; }
+.badge-red { background: #DC2626; }
+.badge-purple { background: #7C3AED; }
+.badge-dark { background: #0F172A; }
+
+/* ==========================================================================
+   MOBILE RESPONSIVENESS ENHANCEMENTS FOR ALL ACCOUNT & STORE PAGES
+   ========================================================================== */
+@media (max-width: 860px) {
+  .checkout-grid {
+    grid-template-columns: 1fr !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .form-responsive-grid {
+    grid-template-columns: 1fr !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.85rem !important;
+  }
+  .form-responsive-grid > * {
+    grid-column: span 1 !important;
+    width: 100% !important;
+  }
+}
+
+/* Mobile subdock smooth scroll */
+.account-subdock {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  border-radius: 9999px;
+  padding: 0.35rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08);
+  display: flex;
+  gap: 0.35rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.account-subdock::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .account-subdock a {
+    padding: 0.45rem 0.85rem !important;
+    font-size: 0.76rem !important;
+    border-radius: 9999px !important;
+  }
+}

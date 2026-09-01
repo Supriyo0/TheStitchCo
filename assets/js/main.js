@@ -13,31 +13,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     }
 
-    // 2. Mobile Slide Drawer Toggle
-    const mobileToggle = document.getElementById('mobile-menu-toggle');
-    const mobileDrawer = document.getElementById('mobile-drawer');
-    const drawerOverlay = document.getElementById('mobile-drawer-overlay');
-    const drawerClose = document.getElementById('drawer-close-btn');
-
-    function openDrawer() {
+    // 2. Mobile Slide Drawer Toggle (Bulletproof global functions)
+    window.openMobileDrawer = function() {
+        const mobileDrawer = document.getElementById('mobile-drawer');
+        const drawerOverlay = document.getElementById('mobile-drawer-overlay');
         if (mobileDrawer && drawerOverlay) {
             mobileDrawer.classList.add('active');
             drawerOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
-    }
+    };
 
-    function closeDrawer() {
+    window.closeMobileDrawer = function() {
+        const mobileDrawer = document.getElementById('mobile-drawer');
+        const drawerOverlay = document.getElementById('mobile-drawer-overlay');
         if (mobileDrawer && drawerOverlay) {
             mobileDrawer.classList.remove('active');
             drawerOverlay.classList.remove('active');
             document.body.style.overflow = '';
         }
-    }
+    };
 
-    if (mobileToggle) mobileToggle.addEventListener('click', openDrawer);
-    if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
-    if (drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
+    const mobileToggle = document.getElementById('mobile-menu-toggle') || document.getElementById('mobile-menu-btn');
+    const drawerClose = document.getElementById('drawer-close-btn');
+    const drawerOverlay = document.getElementById('mobile-drawer-overlay');
+
+    if (mobileToggle) mobileToggle.addEventListener('click', window.openMobileDrawer);
+    if (drawerClose) drawerClose.addEventListener('click', window.closeMobileDrawer);
+    if (drawerOverlay) drawerOverlay.addEventListener('click', window.closeMobileDrawer);
 
     // 3. Global Toast Notifications
     window.showToast = function(message, type = 'success') {

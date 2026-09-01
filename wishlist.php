@@ -43,17 +43,30 @@ require_once __DIR__ . '/includes/header.php';
             <span style="font-size: 0.85rem; color: #64748B;">Your curated collection of saved heavyweight streetwear drops.</span>
         </div>
         <div>
-            <a href="shop.php" class="hero-btn-primary" style="padding: 0.6rem 1.3rem; font-size: 0.85rem; text-decoration: none;">🛍️ Continue Shopping</a>
+            <a href="shop.php" class="btn-fintech-pill">
+                <span class="btn-icon-badge badge-amber">🛍️</span>
+                <span>Continue Shopping</span>
+            </a>
         </div>
     </div>
 
-    <!-- Account Navigation Sub-Bar (iOS Glass Floating Dock) -->
-    <div style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1.5px solid rgba(255, 255, 255, 0.7); border-radius: 16px; padding: 0.5rem; margin-bottom: 2.5rem; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08); display: flex; gap: 0.5rem; overflow-x: auto; scrollbar-width: none;">
-        <a href="dashboard.php" style="padding: 0.65rem 1.2rem; border-radius: 12px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">📊 Dashboard</a>
-        <a href="orders.php" style="padding: 0.65rem 1.2rem; border-radius: 12px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">📦 My Orders (<?= $orderCount ?>)</a>
-        <a href="wishlist.php" style="padding: 0.65rem 1.2rem; border-radius: 12px; background: #0F172A; color: #FFFFFF; font-weight: 800; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">❤️ Wishlist (<?= count($wishlistItems) ?>)</a>
-        <a href="addresses.php" style="padding: 0.65rem 1.2rem; border-radius: 12px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">📍 Saved Addresses (<?= $addressCount ?>)</a>
-        <a href="profile.php" style="padding: 0.65rem 1.2rem; border-radius: 12px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">⚙️ Profile Settings</a>
+    <!-- Account Navigation Sub-Bar (Groww Style Pill Subdock) -->
+    <div class="account-subdock">
+        <a href="dashboard.php" style="padding: 0.6rem 1.1rem; border-radius: 9999px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <span>📊</span> <span>Dashboard</span>
+        </a>
+        <a href="orders.php" style="padding: 0.6rem 1.1rem; border-radius: 9999px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <span>📦</span> <span>My Orders (<?= $orderCount ?>)</span>
+        </a>
+        <a href="wishlist.php" style="padding: 0.6rem 1.1rem; border-radius: 9999px; background: #0F172A; color: #FFFFFF; font-weight: 800; font-size: 0.85rem; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <span>❤️</span> <span>Wishlist (<?= count($wishlistItems) ?>)</span>
+        </a>
+        <a href="addresses.php" style="padding: 0.6rem 1.1rem; border-radius: 9999px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <span>📍</span> <span>Saved Addresses (<?= $addressCount ?>)</span>
+        </a>
+        <a href="profile.php" style="padding: 0.6rem 1.1rem; border-radius: 9999px; background: transparent; color: #334155; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <span>⚙️</span> <span>Profile Settings</span>
+        </a>
     </div>
 
     <!-- Wishlist Content Grid -->
@@ -93,8 +106,9 @@ require_once __DIR__ . '/includes/header.php';
                             </div>
                         </div>
 
-                        <a href="product.php?slug=<?= urlencode($prod['slug']) ?>" class="hero-btn-primary" style="width: 100%; text-align: center; text-decoration: none; font-size: 0.82rem; padding: 0.65rem 0.5rem; border-radius: 8px;">
-                            SELECT SIZE & BUY ⚡
+                        <a href="product.php?slug=<?= urlencode($prod['slug']) ?>" class="btn-fintech-pill" style="width: 100%; justify-content: center;">
+                            <span class="btn-icon-badge badge-blue">⚡</span>
+                            <span>SELECT SIZE & BUY</span>
                         </a>
                     </div>
                 </div>
