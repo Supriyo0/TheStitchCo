@@ -4,13 +4,13 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Brand Loader dismiss
+    // 1. Brand Loader dismiss (3 second display)
     const loader = document.getElementById('brand-loader');
     if (loader) {
         setTimeout(() => {
             loader.classList.add('fade-out');
-            setTimeout(() => loader.remove(), 400);
-        }, 500);
+            setTimeout(() => loader.remove(), 500);
+        }, 3000);
     }
 
     // 2. Mobile Slide Drawer Toggle (Bulletproof global functions)
