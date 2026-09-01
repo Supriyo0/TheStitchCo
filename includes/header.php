@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Header & Responsive Navbar Component
  * The Stitch Co.
@@ -49,11 +49,11 @@ if ($currentUser) {
     <!-- Persistent Admin Maintenance Mode Warning Banner -->
     <div style="background: linear-gradient(90deg, #B91C1C 0%, #7F1D1D 100%); color: #FFFFFF; padding: 0.65rem 1rem; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; z-index: 999999; position: relative; border-bottom: 2px solid #EF4444; box-shadow: 0 4px 15px rgba(185, 28, 28, 0.4);">
         <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <span style="font-size: 1.1rem; animation: blink 1.2s infinite alternate;">âš ï¸</span>
+            <span style="font-size: 1.1rem; animation: blink 1.2s infinite alternate;">&#9888;</span>
             <span><strong>STORE IS IN MAINTENANCE MODE:</strong> Public visitors cannot access the site. (Admin Live Preview)</span>
         </div>
         <div style="display: flex; align-items: center; gap: 0.6rem;">
-            <a href="admin/settings.php" style="background: #FFFFFF; color: #B91C1C; padding: 0.3rem 0.8rem; border-radius: 4px; text-decoration: none; font-size: 0.75rem; font-weight: 900; letter-spacing: 0.5px;">âš¡ TURN OFF IN ADMIN</a>
+            <a href="admin/settings.php" style="background: #FFFFFF; color: #B91C1C; padding: 0.3rem 0.8rem; border-radius: 4px; text-decoration: none; font-size: 0.75rem; font-weight: 900; letter-spacing: 0.5px;">TURN OFF IN ADMIN</a>
         </div>
     </div>
 <?php endif; ?>
@@ -78,12 +78,12 @@ if ($currentUser) {
         <div class="loader-brand-sub">
             <?php
             $loaderSubs = [
-                'durga_puja'  => 'SHUBHO SARODIYA Â· PUJOR MAHOTSAV',
-                'diwali'      => 'SHUBH DEEPAVALI Â· FESTIVAL OF LIGHTS',
-                'winter'      => 'WINTER COLLECTION Â· FROST EDITION',
-                'christmas'   => 'HOLIDAY SEASON Â· YULETIDE DROPS',
-                'freedom'     => 'CELEBRATING FREEDOM Â· JAI HIND',
-                'summer'      => 'SUMMER COLLECTION Â· SOLAR DROPS',
+                'durga_puja'  => 'SHUBHO SARODIYA &bull; PUJOR MAHOTSAV',
+                'diwali'      => 'SHUBH DEEPAVALI &bull; FESTIVAL OF LIGHTS',
+                'winter'      => 'WINTER COLLECTION &bull; FROST EDITION',
+                'christmas'   => 'HOLIDAY SEASON &bull; YULETIDE DROPS',
+                'freedom'     => 'CELEBRATING FREEDOM &bull; JAI HIND',
+                'summer'      => 'SUMMER COLLECTION &bull; SOLAR DROPS',
                 'default'     => 'WEAR YOUR VIBE',
             ];
             echo e($loaderSubs[$activeTheme] ?? 'WEAR YOUR VIBE');
@@ -97,7 +97,7 @@ if ($currentUser) {
 
 <?php
 $showAnnouncement = (int)get_setting('announcement_bar_enabled', 1);
-$defaultAnnouncement = 'FREE SHIPPING ON ALL PREPAID ORDERS ABOVE â‚¹999 ðŸšš &nbsp;|&nbsp; USE CODE <strong>WELCOME10</strong> FOR 10% OFF';
+$defaultAnnouncement = 'FREE SHIPPING ON ALL PREPAID ORDERS ABOVE &#8377;999 &nbsp;|&nbsp; USE CODE <strong>WELCOME10</strong> FOR 10% OFF';
 $announcementText = trim(get_setting('announcement_bar_text', $defaultAnnouncement));
 
 // If text is gibberish or empty, fallback to default
@@ -107,27 +107,19 @@ if (empty($announcementText) || strlen($announcementText) < 8 || strpos($announc
 
 // Theme specific default greetings if not customized
 if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !== false || $announcementText === $defaultAnnouncement)) {
-    $announcementText = 'SHUBHO SARODIYA! ðŸŒ¸ PUJOR EXCLUSIVE STREETWEAR DROPS &nbsp;|&nbsp; USE CODE <strong>PUJO10</strong> FOR 10% OFF';
+    $announcementText = 'SHUBHO SARODIYA &bull; PUJOR EXCLUSIVE STREETWEAR DROPS &nbsp;|&nbsp; USE CODE <strong>PUJO10</strong> FOR 10% OFF';
 } elseif ($activeTheme === 'diwali' && (strpos($announcementText, 'WELCOME10') !== false || $announcementText === $defaultAnnouncement)) {
-    $announcementText = 'HAPPY DIWALI ðŸª” ILLUMINATE YOUR STREETWEAR STYLE &nbsp;|&nbsp; USE CODE <strong>DIWALI200</strong> FOR â‚¹200 OFF';
+    $announcementText = 'HAPPY DIWALI &bull; ILLUMINATE YOUR STREETWEAR STYLE &nbsp;|&nbsp; USE CODE <strong>DIWALI200</strong> FOR &#8377;200 OFF';
 } elseif ($activeTheme === 'freedom' && (strpos($announcementText, 'WELCOME10') !== false || $announcementText === $defaultAnnouncement)) {
-    $announcementText = 'CELEBRATE FREEDOM ðŸ‡®ðŸ‡³ PROUDLY CRAFTED IN INDIA &nbsp;|&nbsp; USE CODE <strong>INDIA78</strong>';
+    $announcementText = 'CELEBRATE FREEDOM &bull; PROUDLY CRAFTED IN INDIA &nbsp;|&nbsp; USE CODE <strong>INDIA78</strong>';
 } elseif ($activeTheme === 'winter' && (strpos($announcementText, 'WELCOME10') !== false || $announcementText === $defaultAnnouncement)) {
-    $announcementText = 'WINTER STREETWEAR DROPS â„ï¸ STAY WARM & STYLISH &nbsp;|&nbsp; USE CODE <strong>WINTER10</strong> FOR 10% OFF';
+    $announcementText = 'WINTER STREETWEAR DROPS &bull; STAY WARM &amp; STYLISH &nbsp;|&nbsp; USE CODE <strong>WINTER10</strong> FOR 10% OFF';
 } elseif ($activeTheme === 'christmas' && (strpos($announcementText, 'WELCOME10') !== false || $announcementText === $defaultAnnouncement)) {
-    $announcementText = 'MERRY CHRISTMAS & HAPPY NEW YEAR ðŸŽ„ HOLIDAY SALE &nbsp;|&nbsp; USE CODE <strong>NOEL15</strong> FOR 15% OFF';
+    $announcementText = 'MERRY CHRISTMAS &amp; HAPPY NEW YEAR &bull; HOLIDAY SALE &nbsp;|&nbsp; USE CODE <strong>NOEL15</strong> FOR 15% OFF';
 } elseif ($activeTheme === 'summer' && (strpos($announcementText, 'WELCOME10') !== false || $announcementText === $defaultAnnouncement)) {
-    $announcementText = 'SUMMER STREET DROPS â˜€ï¸ 100% BREATHABLE COTTON &nbsp;|&nbsp; USE CODE <strong>SUMMER10</strong>';
+    $announcementText = 'SUMMER STREET DROPS &bull; 100% BREATHABLE COTTON &nbsp;|&nbsp; USE CODE <strong>SUMMER10</strong>';
 }
 ?>
-<?php if (in_array($activeTheme, ['durga_puja', 'diwali', 'christmas'])): ?>
-    <!-- Sparkling Festive Fairy Lights Garland -->
-    <div class="fairy-lights-garland" aria-hidden="true">
-        <?php for ($i = 0; $i < 18; $i++): ?>
-            <span class="fairy-light-bulb"></span>
-        <?php endfor; ?>
-    </div>
-<?php endif; ?>
 
 <?php if ($showAnnouncement && !empty($announcementText)): ?>
     <!-- Top Announcement Banner -->
@@ -237,7 +229,6 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
                     </button>
                 </div>
 
-                <!-- iOS Liquid Glass Dropdown Panel -->
                 <div class="ios-liquid-glass-dropdown" id="profile-glass-menu">
                     <?php if ($currentUser): ?>
                         <!-- User Card Link -->
@@ -252,38 +243,44 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
                             <div class="glass-user-info">
                                 <div class="glass-user-name"><?= e($currentUser['fullname']) ?></div>
                                 <div class="glass-user-email"><?= e($currentUser['email']) ?></div>
-                                <div style="font-size: 0.65rem; font-weight: 800; color: #16A34A; margin-top: 2px;">âš¡ Verified Customer Account &rarr;</div>
+                                <div style="font-size: 0.65rem; font-weight: 800; color: #16A34A; margin-top: 2px;">&#10003; Verified Customer Account &rarr;</div>
                             </div>
                         </a>
 
                         <div class="glass-menu-divider"></div>
 
                         <!-- Section: Orders & Dashboard -->
-                        <div class="glass-section-heading">MY ACCOUNT & ORDERS</div>
+                        <div class="glass-section-heading">MY ACCOUNT &amp; ORDERS</div>
                         <ul class="glass-dropdown-nav">
                             <li>
                                 <a href="dashboard.php" class="glass-nav-item">
-                                    <span class="glass-nav-icon">ðŸ“Š</span>
+                                    <span class="glass-nav-icon">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                                    </span>
                                     <div class="glass-nav-text">
                                         <span class="glass-nav-title">Profile Dashboard</span>
-                                        <span class="glass-nav-sub">Overview, stats & recent activity</span>
+                                        <span class="glass-nav-sub">Overview, stats &amp; recent activity</span>
                                     </div>
                                     <span class="glass-nav-arrow">&rarr;</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="orders.php" class="glass-nav-item">
-                                    <span class="glass-nav-icon">ðŸ“¦</span>
+                                    <span class="glass-nav-icon">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14M5 8a2 2 0 1 0-4 0v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8m-14 0V6a2 2 0 1 1 4 0v2"/></svg>
+                                    </span>
                                     <div class="glass-nav-text">
                                         <span class="glass-nav-title">My Orders</span>
-                                        <span class="glass-nav-sub">Order history & status</span>
+                                        <span class="glass-nav-sub">Order history &amp; status</span>
                                     </div>
                                     <span class="glass-count-tag"><?= $userOrderCount ?></span>
                                 </a>
                             </li>
                             <li>
                                 <a href="wishlist.php" class="glass-nav-item">
-                                    <span class="glass-nav-icon">â¤ï¸</span>
+                                    <span class="glass-nav-icon">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                                    </span>
                                     <div class="glass-nav-text">
                                         <span class="glass-nav-title">My Wishlist</span>
                                         <span class="glass-nav-sub">Saved street drops</span>
@@ -296,11 +293,13 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
                         <div class="glass-menu-divider"></div>
 
                         <!-- Section: Settings & Addresses -->
-                        <div class="glass-section-heading">SETTINGS & PREFERENCES</div>
+                        <div class="glass-section-heading">SETTINGS &amp; PREFERENCES</div>
                         <ul class="glass-dropdown-nav">
                             <li>
                                 <a href="addresses.php" class="glass-nav-item">
-                                    <span class="glass-nav-icon">ðŸ“</span>
+                                    <span class="glass-nav-icon">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    </span>
                                     <div class="glass-nav-text">
                                         <span class="glass-nav-title">Saved Addresses</span>
                                         <span class="glass-nav-sub">Doorstep delivery locations</span>
@@ -310,20 +309,24 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
                             </li>
                             <li>
                                 <a href="profile.php" class="glass-nav-item">
-                                    <span class="glass-nav-icon">âš™ï¸</span>
+                                    <span class="glass-nav-icon">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                                    </span>
                                     <div class="glass-nav-text">
                                         <span class="glass-nav-title">Profile Settings</span>
-                                        <span class="glass-nav-sub">Avatar, phone & security</span>
+                                        <span class="glass-nav-sub">Avatar, phone &amp; security</span>
                                     </div>
                                     <span class="glass-nav-arrow">&rarr;</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="contact.php" class="glass-nav-item">
-                                    <span class="glass-nav-icon">ðŸ’¬</span>
+                                    <span class="glass-nav-icon">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                                    </span>
                                     <div class="glass-nav-text">
-                                        <span class="glass-nav-title">Help & Support</span>
-                                        <span class="glass-nav-sub">WhatsApp & customer care</span>
+                                        <span class="glass-nav-title">Help &amp; Support</span>
+                                        <span class="glass-nav-sub">WhatsApp &amp; customer care</span>
                                     </div>
                                     <span class="glass-nav-arrow">&rarr;</span>
                                 </a>
@@ -332,10 +335,12 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
                             <?php if (in_array($currentUser['role'] ?? '', ['admin', 'super_admin'])): ?>
                                 <li>
                                     <a href="admin/index.php" class="glass-nav-item glass-admin-link">
-                                        <span class="glass-nav-icon">âš¡</span>
+                                        <span class="glass-nav-icon">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                        </span>
                                         <div class="glass-nav-text">
                                             <span class="glass-nav-title" style="color: #2563EB;">Admin Control Panel</span>
-                                            <span class="glass-nav-sub">Manage catalog, orders & site</span>
+                                            <span class="glass-nav-sub">Manage catalog, orders &amp; site</span>
                                         </div>
                                         <span class="glass-nav-arrow" style="color: #2563EB;">&rarr;</span>
                                     </a>
@@ -347,22 +352,20 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
 
                         <div class="glass-logout-wrap">
                             <a href="logout.php" class="glass-logout-btn">
-                                <span>ðŸšª</span>
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                                 <span>Log Out (<?= e($currentUser['fullname']) ?>)</span>
                             </a>
                         </div>
                     <?php else: ?>
                         <!-- Guest Mode -->
                         <div class="glass-guest-box">
-                            <div class="glass-guest-title">
-                                Welcome to The Stitch Co. ðŸ‘‹
-                            </div>
+                            <div class="glass-guest-title">Welcome to The Stitch Co.</div>
                             <p class="glass-guest-desc">
-                                Sign in to access your orders, track shipments & get exclusive drop perks.
+                                Sign in to access your orders, track shipments &amp; get exclusive drop perks.
                             </p>
                             <div class="glass-guest-actions">
-                                <a href="login.php" class="glass-btn-primary">ðŸ”‘ Sign In</a>
-                                <a href="login.php#register" class="glass-btn-secondary">âœ¨ Create Account</a>
+                                <a href="login.php" class="glass-btn-primary">Sign In</a>
+                                <a href="login.php#register" class="glass-btn-secondary">Create Account</a>
                             </div>
                         </div>
 
@@ -372,7 +375,9 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
                         <ul class="glass-dropdown-nav">
                             <li>
                                 <a href="shop.php" class="glass-nav-item">
-                                    <span class="glass-nav-icon">ðŸ›ï¸</span>
+                                    <span class="glass-nav-icon">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                                    </span>
                                     <div class="glass-nav-text">
                                         <span class="glass-nav-title">Shop All Drops</span>
                                         <span class="glass-nav-sub">Explore streetwear catalog</span>
@@ -382,17 +387,21 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
                             </li>
                             <li>
                                 <a href="categories.php" class="glass-nav-item">
-                                    <span class="glass-nav-icon">âœ¨</span>
+                                    <span class="glass-nav-icon">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                                    </span>
                                     <div class="glass-nav-text">
                                         <span class="glass-nav-title">Browse Categories</span>
-                                        <span class="glass-nav-sub">Oversized tees, hoodies & more</span>
+                                        <span class="glass-nav-sub">Oversized tees, hoodies &amp; more</span>
                                     </div>
                                     <span class="glass-nav-arrow">&rarr;</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="contact.php" class="glass-nav-item">
-                                    <span class="glass-nav-icon">ðŸ’¬</span>
+                                    <span class="glass-nav-icon">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                                    </span>
                                     <div class="glass-nav-text">
                                         <span class="glass-nav-title">Customer Support</span>
                                         <span class="glass-nav-sub">Get help on WhatsApp</span>
@@ -403,6 +412,7 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
                         </ul>
                     <?php endif; ?>
                 </div>
+
             </div>
         </div>
     </div>
@@ -444,45 +454,89 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
     ?>
 
     <ul class="drawer-menu">
-        <li><a href="index.php">ðŸ  Home</a></li>
-        <li><a href="shop.php">ðŸ›ï¸ Shop All Catalog</a></li>
-        <li><a href="categories.php">âœ¨ Browse Categories</a></li>
+        <li>
+            <a href="index.php">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Home</span>
+            </a>
+        </li>
+        <li>
+            <a href="shop.php">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                <span>Shop All Catalog</span>
+            </a>
+        </li>
+        <li>
+            <a href="categories.php">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <span>Browse Categories</span>
+            </a>
+        </li>
 
         <li style="padding: 0.8rem 1rem 0.3rem; font-size: 0.68rem; font-weight: 900; color: #64748B; text-transform: uppercase; letter-spacing: 1.5px; border-top: 1px solid rgba(255,255,255,0.08); margin-top: 0.5rem;">COLLECTIONS</li>
         
-        <?php foreach ($drawerCategories as $dCat): 
-            $dIcon = 'ðŸ‘•';
-            $k = $dCat['cat_key'];
-            if ($k === 'oversized') $dIcon = 'ðŸ”¥';
-            elseif ($k === 'polo') $dIcon = 'ðŸ‘”';
-            elseif ($k === 'hoodies') $dIcon = 'ðŸ§¥';
-            elseif ($k === 'acid_wash') $dIcon = 'âš¡';
-            elseif ($k === 'bottoms') $dIcon = 'ðŸ‘–';
-            elseif ($k === 'new_arrivals') $dIcon = 'âœ¨';
-            elseif ($k === 'tshirts') $dIcon = 'âœ¨';
-        ?>
+        <?php foreach ($drawerCategories as $dCat): ?>
             <li>
                 <a href="shop.php?cat=<?= e($dCat['cat_key']) ?>">
-                    <span><?= $dIcon ?></span>
+                    <span style="opacity: 0.6; margin-right: 0.5rem;">&bull;</span>
                     <span><?= e($dCat['cat_name']) ?></span>
                 </a>
             </li>
         <?php endforeach; ?>
 
-        <li style="padding: 0.8rem 1rem 0.3rem; font-size: 0.68rem; font-weight: 900; color: #94A3B8; text-transform: uppercase; letter-spacing: 1.5px; border-top: 1px solid rgba(255,255,255,0.12); margin-top: 0.5rem;">ACCOUNT & SERVICES</li>
+        <li style="padding: 0.8rem 1rem 0.3rem; font-size: 0.68rem; font-weight: 900; color: #94A3B8; text-transform: uppercase; letter-spacing: 1.5px; border-top: 1px solid rgba(255,255,255,0.12); margin-top: 0.5rem;">ACCOUNT &amp; SERVICES</li>
         <?php if ($currentUser): ?>
-            <li><a href="dashboard.php">ðŸ“Š Account Dashboard</a></li>
-            <li><a href="orders.php">ðŸ“¦ My Orders (<?= $userOrderCount ?>)</a></li>
-            <li><a href="wishlist.php">â¤ï¸ Saved Wishlist</a></li>
-            <li><a href="addresses.php">ðŸ“ Saved Addresses (<?= $userAddressCount ?>)</a></li>
-            <li><a href="profile.php">âš™ï¸ Profile Settings</a></li>
+            <li>
+                <a href="dashboard.php">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    <span>Account Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="orders.php">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M5 8h14M5 8a2 2 0 1 0-4 0v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8m-14 0V6a2 2 0 1 1 4 0v2"/></svg>
+                    <span>My Orders (<?= $userOrderCount ?>)</span>
+                </a>
+            </li>
+            <li>
+                <a href="wishlist.php">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    <span>Saved Wishlist</span>
+                </a>
+            </li>
+            <li>
+                <a href="addresses.php">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <span>Saved Addresses (<?= $userAddressCount ?>)</span>
+                </a>
+            </li>
+            <li>
+                <a href="profile.php">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                    <span>Profile Settings</span>
+                </a>
+            </li>
             <?php if (in_array($currentUser['role'], ['admin', 'super_admin'])): ?>
-                <li><a href="admin/index.php" style="color: #60A5FA !important; font-weight: 900;">âš¡ Admin Panel</a></li>
+                <li>
+                    <a href="admin/index.php" style="color: #60A5FA !important; font-weight: 900;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        <span>Admin Panel</span>
+                    </a>
+                </li>
             <?php endif; ?>
-            <li><a href="logout.php" style="color: #F87171 !important;">ðŸšª Sign Out (<?= e($currentUser['fullname']) ?>)</a></li>
+            <li>
+                <a href="logout.php" style="color: #F87171 !important;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    <span>Sign Out (<?= e($currentUser['fullname']) ?>)</span>
+                </a>
+            </li>
         <?php else: ?>
-            <li><a href="login.php">ðŸ”‘ Login / Register</a></li>
+            <li>
+                <a href="login.php">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                    <span>Login / Register</span>
+                </a>
+            </li>
         <?php endif; ?>
     </ul>
 </div>
-
