@@ -141,42 +141,26 @@ $footerTheme = $activeTheme ?? 'default';
 
 <!-- Scripts -->
 <script src="assets/js/main.js?v=<?= time() ?>"></script>
-<script src="assets/js/theme-sound-engine.js?v=<?= time() ?>"></script>
-
 <?php if (!empty($themeParticlesEnabled) && ($activeTheme ?? 'default') !== 'default'): ?>
-    <!-- Active Theme Particle Physics Engine -->
     <canvas id="theme-particles-canvas"></canvas>
     <script src="assets/js/theme-effects.js?v=<?= time() ?>"></script>
 <?php endif; ?>
 
-<?php if (($activeTheme ?? 'default') !== 'default'): ?>
-    <!-- Floating Festive Theme Corner Badge with Sound Chime Trigger & Mute Control -->
-    <div class="theme-corner-festive-badge" title="Click to play seasonal chime! Active: <?= e(ucfirst($activeTheme)) ?>" onclick="window.playThemeSound('<?= e($activeTheme) ?>')">
-        <?php if ($activeTheme === 'durga_puja'): ?>
-            <span>🌸</span> <span>Pujor Mahotsav 🪔</span>
-        <?php elseif ($activeTheme === 'diwali'): ?>
-            <span>✨</span> <span>Diwali Lights 🪔</span>
-        <?php elseif ($activeTheme === 'winter'): ?>
-            <span>❄️</span> <span>Winter Drops 🧊</span>
-        <?php elseif ($activeTheme === 'christmas'): ?>
-            <span>🎄</span> <span>Merry Noel 🎅</span>
-        <?php elseif ($activeTheme === 'freedom'): ?>
-            <span>🇮🇳</span> <span>Proudly Indian ☸️</span>
-        <?php elseif ($activeTheme === 'summer'): ?>
-            <span>☀️</span> <span>Summer Vibes 🌊</span>
-        <?php endif; ?>
-
-        <!-- Mini Audio Wave Animation -->
-        <span class="theme-sound-audio-wave" aria-hidden="true">
-            <span></span><span></span><span></span>
-        </span>
-
-        <!-- Sound Mute/Unmute Quick Pill -->
-        <button type="button" id="theme-sound-toggle-btn" class="theme-sound-pill-btn" onclick="event.stopPropagation(); window.toggleThemeSound();" title="Toggle theme sounds">
-            🔊 <span>Sound</span>
-        </button>
-    </div>
+<?php
+// Minimal season text labels (no emojis)
+$seasonLabels = [
+    'durga_puja' => 'SHUBHO SARODIYA',
+    'diwali'     => 'SHUBH DEEPAVALI',
+    'winter'     => 'WINTER COLLECTION',
+    'christmas'  => 'HOLIDAY SEASON',
+    'freedom'    => 'CELEBRATING FREEDOM',
+    'summer'     => 'SUMMER COLLECTION',
+];
+if (isset($seasonLabels[$activeTheme ?? ''])): ?>
+    <div class="theme-season-tag" aria-label="Current theme"><?= $seasonLabels[$activeTheme] ?></div>
 <?php endif; ?>
+
+
 
 <?php
 $showWelcome = false;

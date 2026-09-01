@@ -1,695 +1,898 @@
 /* ==========================================================================
-   THE STITCH CO. - FESTIVE & SEASONAL THEME ENGINE v2.0
-   7 Immersive Themes: Default, Winter, Summer, Durga Puja, Freedom, Diwali, Christmas
-   Deep per-theme: body background, hero, cards, buttons, footer, animations, particles
+   THE STITCH CO. — SEASONAL THEME ENGINE v3.0
+   Editorial Dark Atmosphere — Premium Streetwear Aesthetic
+   
+   Philosophy: Luxury whispers with authority. No emoji garlands. No toy colors.
+   Each theme shifts the COLOR TEMPERATURE of the entire page — like a cinematic
+   color grade — while preserving the core obsidian streetwear identity.
+   
+   Technique:
+   - One restrained metallic accent per theme
+   - CSS atmospheric temperature overlay (warm/cool page tone)
+   - Cinematic hero gradient depth layers
+   - Subtle card aura system
+   - Noise grain texture pseudo-element for premium material feel
+   - Zero emoji decorations, zero sound, zero childish effects
    ========================================================================== */
 
 /* ==========================================================================
-   GOOGLE FONTS - SEASONAL TYPOGRAPHY
+   PREMIUM FONTS
    ========================================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Cinzel:wght@700;900&family=Playfair+Display:wght@700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
 
 /* ==========================================================================
-   1. DEFAULT THEME: Obsidian Liquid Glass (Modern Streetwear)
+   PROFILE AVATAR ORBIT RING SYSTEM
+   Each theme gets a unique rotating SVG ring around the avatar
+   ========================================================================== */
+.profile-orbit-ring-wrap {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.profile-orbit-svg {
+  position: absolute;
+  inset: -6px;
+  width: calc(100% + 12px);
+  height: calc(100% + 12px);
+  pointer-events: none;
+  stroke: currentColor;
+  animation: orbitRotate 10s linear infinite;
+}
+
+@keyframes orbitRotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Profile button reset — new styling */
+.profile-trigger-btn {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: none !important;
+  background: transparent !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.profile-initials-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: #111827;
+  color: #FFFFFF;
+  font-size: 0.85rem;
+  font-weight: 800;
+  border-radius: 50%;
+}
+
+.profile-guest-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* Theme-specific orbit ring colors */
+body[data-theme="durga_puja"] .profile-orbit-svg {
+  stroke: #B45309;
+  animation-duration: 8s;
+}
+
+body[data-theme="durga_puja"] .profile-initials-avatar {
+  background: linear-gradient(135deg, #7F1D1D, #92400E);
+}
+
+body[data-theme="diwali"] .profile-orbit-svg {
+  stroke: #92400E;
+  animation-duration: 6s;
+  filter: drop-shadow(0 0 4px rgba(146, 64, 14, 0.7));
+}
+
+body[data-theme="diwali"] .profile-initials-avatar {
+  background: linear-gradient(135deg, #3B0764, #92400E);
+  color: #F5D78A;
+}
+
+body[data-theme="winter"] .profile-orbit-svg {
+  stroke: #3B82F6;
+  animation-duration: 14s;
+}
+
+body[data-theme="winter"] .profile-initials-avatar {
+  background: linear-gradient(135deg, #0C1E2C, #1E3A5F);
+}
+
+body[data-theme="christmas"] .profile-orbit-svg {
+  stroke: #92400E;
+  animation-duration: 12s;
+}
+
+body[data-theme="christmas"] .profile-initials-avatar {
+  background: linear-gradient(135deg, #14532D, #0F3D1F);
+}
+
+body[data-theme="freedom"] .profile-orbit-svg {
+  stroke: #78350F;
+  animation-duration: 20s;
+  animation-timing-function: steps(24, end);
+}
+
+body[data-theme="freedom"] .profile-initials-avatar {
+  background: linear-gradient(135deg, #0F172A, #1E3A8A);
+}
+
+body[data-theme="summer"] .profile-orbit-svg {
+  stroke: #B45309;
+  animation-duration: 7s;
+  animation-direction: reverse;
+}
+
+body[data-theme="summer"] .profile-initials-avatar {
+  background: linear-gradient(135deg, #451A03, #78350F);
+}
+
+/* ==========================================================================
+   FULL PAGE SVG BACKGROUND PATTERNS — Premium woven textile motifs
+   These render as a subtle repeating CSS background via SVG data URIs.
+   They appear like woven fabric textures — no emojis, pure SVG geometry.
+   ========================================================================== */
+
+/* DURGA PUJA: Kash Phool + Marigold geometric weave */
+body[data-theme="durga_puja"] {
+  background-color: #FDF6EC !important;
+  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23B45309' stroke-width='0.6' opacity='0.12'%3E%3C!-- Kash Phool stalk --%3E%3Cline x1='40' y1='60' x2='40' y2='20'/%3E%3C!-- Kash Phool feathery head petals --%3E%3Cellipse cx='40' cy='18' rx='6' ry='3' transform='rotate(-20 40 18)' fill='%23B45309' fill-opacity='0.08'/%3E%3Cellipse cx='40' cy='18' rx='5' ry='2.5' transform='rotate(10 40 18)' fill='%23B45309' fill-opacity='0.06'/%3E%3Cellipse cx='40' cy='18' rx='4' ry='2' transform='rotate(35 40 18)' fill='%23B45309' fill-opacity='0.06'/%3E%3C!-- Corner motif --%3E%3Ccircle cx='10' cy='10' r='4' stroke-width='0.5'/%3E%3Ccircle cx='70' cy='10' r='4' stroke-width='0.5'/%3E%3Ccircle cx='10' cy='70' r='4' stroke-width='0.5'/%3E%3Ccircle cx='70' cy='70' r='4' stroke-width='0.5'/%3E%3Cline x1='14' y1='10' x2='66' y2='10' stroke-dasharray='2 6'/%3E%3Cline x1='14' y1='70' x2='66' y2='70' stroke-dasharray='2 6'/%3E%3C/g%3E%3C/svg%3E") !important;
+  background-size: 80px 80px !important;
+}
+
+/* DIWALI: Rangoli geometric star-diamond pattern */
+body[data-theme="diwali"] {
+  background-color: #0D0116 !important;
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%2392400E' stroke-width='0.5' opacity='0.18'%3E%3C!-- Diamond --%3E%3Cpolygon points='50,10 90,50 50,90 10,50'/%3E%3C!-- Inner diamond --%3E%3Cpolygon points='50,28 72,50 50,72 28,50' stroke-width='0.35'/%3E%3C!-- 8 petal rangoli dots --%3E%3Ccircle cx='50' cy='10' r='2' fill='%2392400E' fill-opacity='0.2'/%3E%3Ccircle cx='90' cy='50' r='2' fill='%2392400E' fill-opacity='0.2'/%3E%3Ccircle cx='50' cy='90' r='2' fill='%2392400E' fill-opacity='0.2'/%3E%3Ccircle cx='10' cy='50' r='2' fill='%2392400E' fill-opacity='0.2'/%3E%3Ccircle cx='50' cy='50' r='3' fill='%236D28D9' fill-opacity='0.15'/%3E%3C/g%3E%3C/svg%3E") !important;
+  background-size: 100px 100px !important;
+}
+
+/* WINTER: Hexagonal snowflake lattice */
+body[data-theme="winter"] {
+  background-color: #EBF3FA !important;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%233B82F6' stroke-width='0.5' opacity='0.12'%3E%3C!-- Snowflake arms --%3E%3Cline x1='30' y1='5' x2='30' y2='55'/%3E%3Cline x1='5' y1='30' x2='55' y2='30'/%3E%3Cline x1='9.4' y1='9.4' x2='50.6' y2='50.6'/%3E%3Cline x1='50.6' y1='9.4' x2='9.4' y2='50.6'/%3E%3C!-- Crystal tips --%3E%3Cpolyline points='30,5 26,12 30,5 34,12'/%3E%3Cpolyline points='30,55 26,48 30,55 34,48'/%3E%3Cpolyline points='5,30 12,26 5,30 12,34'/%3E%3Cpolyline points='55,30 48,26 55,30 48,34'/%3E%3C!-- Center --%3E%3Ccircle cx='30' cy='30' r='3' fill='%233B82F6' fill-opacity='0.1'/%3E%3C/g%3E%3C/svg%3E") !important;
+  background-size: 60px 60px !important;
+}
+
+/* CHRISTMAS: Pine needle + star dot lattice */
+body[data-theme="christmas"] {
+  background-color: #F0F7F2 !important;
+  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%2314532D' stroke-width='0.6' opacity='0.1'%3E%3C!-- Pine branch left --%3E%3Cline x1='20' y1='20' x2='60' y2='60'/%3E%3Cline x1='20' y1='20' x2='10' y2='35'/%3E%3Cline x1='30' y1='30' x2='15' y2='42'/%3E%3Cline x1='40' y1='40' x2='22' y2='50'/%3E%3C!-- Pine branch right --%3E%3Cline x1='60' y1='20' x2='20' y2='60'/%3E%3Cline x1='60' y1='20' x2='70' y2='35'/%3E%3Cline x1='50' y1='30' x2='65' y2='42'/%3E%3C!-- Star accent --%3E%3Ccircle cx='40' cy='8' r='2' fill='%2392400E' fill-opacity='0.15' stroke='none'/%3E%3Ccircle cx='8' cy='40' r='1.5' fill='%2392400E' fill-opacity='0.12' stroke='none'/%3E%3Ccircle cx='72' cy='40' r='1.5' fill='%2392400E' fill-opacity='0.12' stroke='none'/%3E%3C/g%3E%3C/svg%3E") !important;
+  background-size: 80px 80px !important;
+}
+
+/* FREEDOM: Ashoka Chakra spokes lattice */
+body[data-theme="freedom"] {
+  background-color: #F8F9FC !important;
+  background-image: url("data:image/svg+xml,%3Csvg width='90' height='90' viewBox='0 0 90 90' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%231E3A8A' stroke-width='0.5' opacity='0.08'%3E%3Ccircle cx='45' cy='45' r='30'/%3E%3Ccircle cx='45' cy='45' r='5' fill='%231E3A8A' fill-opacity='0.08'/%3E%3C!-- 24 Ashoka Chakra spokes --%3E%3Cline x1='45' y1='15' x2='45' y2='75'/%3E%3Cline x1='15' y1='45' x2='75' y2='45'/%3E%3Cline x1='23.7' y1='23.7' x2='66.3' y2='66.3'/%3E%3Cline x1='66.3' y1='23.7' x2='23.7' y2='66.3'/%3E%3Cline x1='22' y1='37' x2='68' y2='53'/%3E%3Cline x1='22' y1='53' x2='68' y2='37'/%3E%3Cline x1='37' y1='22' x2='53' y2='68'/%3E%3Cline x1='53' y1='22' x2='37' y2='68'/%3E%3C/g%3E%3C/svg%3E") !important;
+  background-size: 90px 90px !important;
+}
+
+/* SUMMER: Mediterranean wave ripple pattern */
+body[data-theme="summer"] {
+  background-color: #FFF8F0 !important;
+  background-image: url("data:image/svg+xml,%3Csvg width='80' height='40' viewBox='0 0 80 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23B45309' stroke-width='0.6' opacity='0.1'%3E%3Cpath d='M0 20 Q20 5 40 20 Q60 35 80 20'/%3E%3Cpath d='M0 30 Q20 15 40 30 Q60 45 80 30' stroke-dasharray='4 4'/%3E%3Cpath d='M0 10 Q20 -5 40 10 Q60 25 80 10' stroke-dasharray='2 6'/%3E%3C/g%3E%3C/svg%3E") !important;
+  background-size: 80px 40px !important;
+}
+
+/* ==========================================================================
+   LOADER CSS
+   ========================================================================== */
+.loader-logo-ring {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.4rem;
+}
+
+.loader-ring-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+  animation: loaderRingRotate 8s linear infinite;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+body[data-theme="durga_puja"] .loader-ring-svg  { color: rgba(180, 83, 9, 0.6); }
+body[data-theme="diwali"] .loader-ring-svg      { color: rgba(146, 64, 14, 0.7); }
+body[data-theme="winter"] .loader-ring-svg      { color: rgba(59, 130, 246, 0.55); }
+body[data-theme="christmas"] .loader-ring-svg   { color: rgba(146, 64, 14, 0.55); }
+body[data-theme="freedom"] .loader-ring-svg     { color: rgba(120, 53, 15, 0.5); }
+body[data-theme="summer"] .loader-ring-svg      { color: rgba(180, 83, 9, 0.6); }
+
+@keyframes loaderRingRotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.loader-logo-img {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  object-fit: cover;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+}
+
+
+
+/* ==========================================================================
+   CSS NOISE GRAIN UTILITY (Luxury material texture — used by high-end fashion)
+   Applied via ::before on sections for subtle paper/textile feel
+   ========================================================================== */
+.theme-grain-overlay::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 99999;
+  opacity: 0.6;
+}
+
+/* ==========================================================================
+   1. DEFAULT THEME: Obsidian Streetwear
    ========================================================================== */
 body[data-theme="default"],
 body:not([data-theme]) {
-  --theme-primary: #0F172A;
-  --theme-secondary: #1E3A8A;
-  --theme-accent: #2563EB;
-  --theme-bg: #F4F6FB;
-  --theme-surface: rgba(255, 255, 255, 0.82);
+  --theme-primary:      #0F172A;
+  --theme-secondary:    #1E3A8A;
+  --theme-accent:       #2563EB;
+  --theme-bg:           #F4F6FB;
+  --theme-surface:      rgba(255, 255, 255, 0.82);
   --theme-glass-border: rgba(255, 255, 255, 0.85);
-  --theme-glass-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.07), 0 0 0 1px rgba(255, 255, 255, 0.9) inset;
-  --theme-badge-bg: #0F172A;
-  --theme-badge-text: #FFFFFF;
-  --theme-hero-glow: rgba(37, 99, 235, 0.15);
+  --theme-glass-shadow: 0 16px 36px -10px rgba(0,0,0,0.07), 0 0 0 1px rgba(255,255,255,0.9) inset;
+  --theme-badge-bg:     #0F172A;
+  --theme-badge-text:   #FFFFFF;
+  --theme-hero-glow:    rgba(37, 99, 235, 0.15);
+  --theme-accent-rgb:   37, 99, 235;
 }
 
 /* ==========================================================================
-   2. WINTER THEME: Frost & Blizzard (Icy Cyan & Arctic Blue)
+   2. DURGA PUJA THEME: Sacred Opulence
+   Palette: Deep Vermillion · Oxidized Gold · Warm Cream
+   Mood: A luxury Puja pandal — silk, marigold, incense, candlelight
    ========================================================================== */
-body[data-theme="winter"] {
-  --theme-primary: #0369A1;
-  --theme-secondary: #0284C7;
-  --theme-accent: #38BDF8;
-  --theme-bg: linear-gradient(160deg, #E0F2FE 0%, #F0F9FF 40%, #E8F4FE 100%);
-  --theme-surface: rgba(240, 249, 255, 0.90);
-  --theme-glass-border: rgba(186, 230, 253, 0.85);
-  --theme-glass-shadow: 0 16px 36px -10px rgba(2, 132, 199, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.95) inset;
-  --theme-badge-bg: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
-  --theme-badge-text: #FFFFFF;
-  --theme-hero-glow: rgba(56, 189, 248, 0.3);
-  --brand-blue: #0284C7;
-  --brand-blue-hover: #0369A1;
+body[data-theme="durga_puja"] {
+  --theme-primary:      #7F1D1D;
+  --theme-secondary:    #92400E;
+  --theme-accent:       #B45309;
+  --theme-bg:           #FDF6EC;
+  --theme-surface:      rgba(253, 246, 236, 0.94);
+  --theme-glass-border: rgba(180, 83, 9, 0.18);
+  --theme-glass-shadow: 0 16px 40px -12px rgba(127, 29, 29, 0.15), 0 0 0 1px rgba(255,255,255,0.9) inset;
+  --theme-badge-bg:     #7F1D1D;
+  --theme-badge-text:   #FEF3C7;
+  --theme-hero-glow:    rgba(180, 83, 9, 0.25);
+  --theme-accent-rgb:   180, 83, 9;
+  --brand-blue:         #7F1D1D;
+  --brand-blue-hover:   #92400E;
 }
 
-body[data-theme="winter"] {
-  background: linear-gradient(160deg, #E0F2FE 0%, #F0F9FF 40%, #DBEAFE 100%) !important;
+/* Warm ivory atmospheric tint across the page */
+body[data-theme="durga_puja"] {
+  background-color: #FDF6EC !important;
 }
 
-body[data-theme="winter"] .main-header {
-  background: rgba(224, 242, 254, 0.88) !important;
-  backdrop-filter: blur(20px) !important;
-  border-bottom: 2px solid rgba(56, 189, 248, 0.5) !important;
-  box-shadow: 0 4px 20px rgba(2, 132, 199, 0.1), 0 1px 0 rgba(186, 230, 253, 0.6) !important;
-}
-
-body[data-theme="winter"] .top-announcement {
-  background: linear-gradient(90deg, #082F49 0%, #0C4A6E 50%, #0369A1 100%) !important;
-  color: #E0F2FE !important;
-  border-bottom: 2px solid #38BDF8 !important;
-  text-shadow: 0 0 10px rgba(56, 189, 248, 0.6) !important;
-}
-
-body[data-theme="winter"] .product-card {
-  background: rgba(224, 242, 254, 0.85) !important;
-  border: 1.5px solid rgba(186, 230, 253, 0.8) !important;
-}
-
-body[data-theme="winter"] .product-card:hover {
-  border-color: #38BDF8 !important;
-  box-shadow: 0 20px 50px -10px rgba(2, 132, 199, 0.25), 0 0 0 2px #BAE6FD inset, 0 0 25px rgba(56, 189, 248, 0.15) !important;
-  transform: translateY(-6px) !important;
-}
-
-body[data-theme="winter"] .btn-icon-badge.badge-blue,
-body[data-theme="winter"] .btn-fintech-pill {
-  background: linear-gradient(135deg, #0284C7, #0369A1) !important;
-  border-color: #38BDF8 !important;
-  box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35) !important;
-}
-
-/* Icicle drip top decoration */
-body[data-theme="winter"] .theme-top-decoration {
-  display: block !important;
-  background: linear-gradient(180deg, #BAE6FD 0%, #E0F2FE 70%, transparent 100%);
-  height: 6px;
-}
-
-body[data-theme="winter"] .theme-top-decoration::after {
-  content: "❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄";
-  display: block;
-  text-align: center;
-  font-size: 0.7rem;
-  color: rgba(56, 189, 248, 0.7);
-  letter-spacing: 4px;
-  padding: 2px 0;
-  animation: snowflakeDrift 8s linear infinite;
-}
-
-@keyframes snowflakeDrift {
-  0% { letter-spacing: 4px; opacity: 0.5; }
-  50% { letter-spacing: 6px; opacity: 1; }
-  100% { letter-spacing: 4px; opacity: 0.5; }
-}
-
-/* Winter section styling */
-body[data-theme="winter"] .hero-section {
-  background: linear-gradient(135deg, #0C4A6E 0%, #075985 40%, #0369A1 100%) !important;
-  box-shadow: 0 8px 40px rgba(2, 132, 199, 0.4) !important;
-}
-
-body[data-theme="winter"] section,
-body[data-theme="winter"] .section-wrapper {
-  position: relative;
-}
-
-body[data-theme="winter"] .section-heading,
-body[data-theme="winter"] .section-title {
-  color: #0369A1 !important;
-  text-shadow: 0 0 20px rgba(56, 189, 248, 0.3) !important;
-}
-
-body[data-theme="winter"] footer {
-  background: linear-gradient(135deg, #082F49 0%, #0C4A6E 100%) !important;
-  border-top: 3px solid #38BDF8 !important;
-}
-
-/* ==========================================================================
-   3. SUMMER THEME: Solar Wave & Sunset Glow (Amber & Coral)
-   ========================================================================== */
-body[data-theme="summer"] {
-  --theme-primary: #C2410C;
-  --theme-secondary: #EA580C;
-  --theme-accent: #F59E0B;
-  --theme-bg: linear-gradient(160deg, #FFF7ED 0%, #FFFBEB 50%, #FEF3C7 100%);
-  --theme-surface: rgba(255, 251, 235, 0.92);
-  --theme-glass-border: rgba(254, 215, 170, 0.9);
-  --theme-glass-shadow: 0 16px 36px -10px rgba(234, 88, 12, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.95) inset;
-  --theme-badge-bg: linear-gradient(135deg, #EA580C 0%, #D97706 100%);
-  --theme-badge-text: #FFFFFF;
-  --theme-hero-glow: rgba(245, 158, 11, 0.3);
-  --brand-blue: #EA580C;
-  --brand-blue-hover: #C2410C;
-}
-
-body[data-theme="summer"] {
-  background: linear-gradient(160deg, #FFF7ED 0%, #FFFBEB 50%, #FEF3C7 100%) !important;
-}
-
-body[data-theme="summer"] .main-header {
-  background: rgba(255, 251, 235, 0.88) !important;
-  backdrop-filter: blur(20px) !important;
-  border-bottom: 2px solid rgba(245, 158, 11, 0.5) !important;
-  box-shadow: 0 4px 20px rgba(234, 88, 12, 0.1), 0 1px 0 rgba(254, 215, 170, 0.6) !important;
-}
-
-body[data-theme="summer"] .top-announcement {
-  background: linear-gradient(90deg, #431407 0%, #7C2D12 50%, #C2410C 100%) !important;
-  color: #FEF3C7 !important;
-  border-bottom: 2px solid #F59E0B !important;
-  text-shadow: 0 0 10px rgba(245, 158, 11, 0.5) !important;
-}
-
-body[data-theme="summer"] .product-card {
-  background: rgba(255, 251, 235, 0.9) !important;
-  border: 1.5px solid rgba(254, 215, 170, 0.8) !important;
-}
-
-body[data-theme="summer"] .product-card:hover {
-  border-color: #F59E0B !important;
-  box-shadow: 0 20px 50px -10px rgba(234, 88, 12, 0.25), 0 0 0 2px #FED7AA inset, 0 0 30px rgba(245, 158, 11, 0.15) !important;
-  transform: translateY(-6px) !important;
-}
-
-body[data-theme="summer"] .btn-icon-badge.badge-blue,
-body[data-theme="summer"] .btn-fintech-pill {
-  background: linear-gradient(135deg, #EA580C, #C2410C) !important;
-  border-color: #F59E0B !important;
-  box-shadow: 0 4px 15px rgba(234, 88, 12, 0.4) !important;
-}
-
-body[data-theme="summer"] .hero-section {
-  background: linear-gradient(135deg, #431407 0%, #7C2D12 40%, #C2410C 100%) !important;
-  box-shadow: 0 8px 40px rgba(234, 88, 12, 0.4) !important;
-}
-
-/* Summer sun pulse behind hero */
-body[data-theme="summer"] .hero-section::before {
+/* Subtle warm grain atmospheric overlay */
+body[data-theme="durga_puja"]::after {
   content: "";
-  position: absolute;
-  top: -60px;
-  right: -60px;
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.5) 0%, transparent 70%);
-  border-radius: 50%;
-  animation: sunPulse 3s ease-in-out infinite;
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(160deg, rgba(180, 83, 9, 0.03) 0%, transparent 60%, rgba(127, 29, 29, 0.04) 100%);
   pointer-events: none;
-}
-
-@keyframes sunPulse {
-  0%, 100% { transform: scale(1); opacity: 0.7; }
-  50% { transform: scale(1.3); opacity: 1; }
-}
-
-body[data-theme="summer"] .section-heading,
-body[data-theme="summer"] .section-title {
-  color: #C2410C !important;
-  text-shadow: 0 0 20px rgba(245, 158, 11, 0.25) !important;
-}
-
-body[data-theme="summer"] footer {
-  background: linear-gradient(135deg, #431407 0%, #7C2D12 100%) !important;
-  border-top: 3px solid #F59E0B !important;
-}
-
-/* Summer wave footer top */
-body[data-theme="summer"] footer::before {
-  content: "";
-  display: block;
-  height: 30px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 30'%3E%3Cpath d='M0,15 C200,30 400,0 600,15 C800,30 1000,0 1200,15 L1200,30 L0,30 Z' fill='%237C2D12'/%3E%3C/svg%3E") no-repeat bottom center / cover;
-  margin-top: -1px;
-}
-
-/* ==========================================================================
-   4. DURGA PUJA THEME: Pujor Mahotsav & Agomoni (Vermillion Red & Festive Gold)
-   ========================================================================== */
-body[data-theme="durga_puja"] {
-  --theme-primary: #991B1B;
-  --theme-secondary: #DC2626;
-  --theme-accent: #D97706;
-  --theme-bg: linear-gradient(160deg, #FFF7ED 0%, #FEF3C7 50%, #FFF1F2 100%);
-  --theme-surface: rgba(255, 247, 237, 0.92);
-  --theme-glass-border: rgba(254, 202, 202, 0.85);
-  --theme-glass-shadow: 0 16px 36px -10px rgba(220, 38, 38, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.95) inset;
-  --theme-badge-bg: linear-gradient(135deg, #DC2626 0%, #D97706 100%);
-  --theme-badge-text: #FFFFFF;
-  --theme-hero-glow: rgba(220, 38, 38, 0.28);
-  --brand-blue: #DC2626;
-  --brand-blue-hover: #991B1B;
-}
-
-body[data-theme="durga_puja"] {
-  background: linear-gradient(160deg, #FFF7ED 0%, #FEF3C7 50%, #FFF1F2 100%) !important;
-  /* Subtle rangoli pattern overlay via box-shadow on pseudo-element not possible directly; handled via header decoration */
+  z-index: 0;
 }
 
 body[data-theme="durga_puja"] .main-header {
-  background: rgba(255, 247, 237, 0.92) !important;
-  backdrop-filter: blur(20px) !important;
-  border-bottom: 3px solid #D97706 !important;
-  box-shadow: 0 4px 25px rgba(220, 38, 38, 0.12), 0 1px 0 rgba(254, 202, 202, 0.7) !important;
+  background: rgba(253, 246, 236, 0.94) !important;
+  backdrop-filter: blur(24px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
+  border-bottom: 1px solid rgba(180, 83, 9, 0.2) !important;
+  box-shadow: 0 1px 0 rgba(180, 83, 9, 0.08), 0 4px 24px rgba(127, 29, 29, 0.06) !important;
 }
 
 body[data-theme="durga_puja"] .top-announcement {
-  background: linear-gradient(90deg, #7F1D1D 0%, #991B1B 45%, #D97706 100%) !important;
-  color: #FEF08A !important;
-  font-weight: 800 !important;
-  border-bottom: 2px solid #FDE047 !important;
-  letter-spacing: 0.5px !important;
-  text-shadow: 0 0 12px rgba(220, 38, 38, 0.8) !important;
-}
-
-/* Durga Puja section headings in Bengali feel font */
-body[data-theme="durga_puja"] .section-heading,
-body[data-theme="durga_puja"] .section-title,
-body[data-theme="durga_puja"] h2,
-body[data-theme="durga_puja"] h3 {
-  color: #991B1B !important;
-  text-shadow: 0 2px 10px rgba(217, 119, 6, 0.3) !important;
-}
-
-body[data-theme="durga_puja"] .product-card {
-  background: rgba(255, 247, 237, 0.92) !important;
-  border: 1.5px solid rgba(254, 202, 202, 0.8) !important;
-}
-
-body[data-theme="durga_puja"] .product-card:hover {
-  border-color: #DC2626 !important;
-  box-shadow: 0 20px 50px -10px rgba(220, 38, 38, 0.28), 0 0 0 2px #FCA5A5 inset, 0 0 30px rgba(217, 119, 6, 0.2) !important;
-  transform: translateY(-6px) !important;
-}
-
-body[data-theme="durga_puja"] .product-card::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #DC2626, #D97706, #DC2626);
-  background-size: 200% auto;
-  animation: goldShimmer 2.5s linear infinite;
-  border-radius: 0 0 12px 12px;
-}
-
-@keyframes goldShimmer {
-  0% { background-position: 0% center; }
-  100% { background-position: 200% center; }
-}
-
-body[data-theme="durga_puja"] .btn-icon-badge.badge-blue,
-body[data-theme="durga_puja"] .btn-fintech-pill {
-  background: linear-gradient(135deg, #DC2626, #D97706) !important;
-  border-color: #FDE047 !important;
-  box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4) !important;
+  background: #3D0A0A !important;
+  color: #F5D78A !important;
+  letter-spacing: 1.5px !important;
+  font-weight: 700 !important;
+  border-bottom: 1px solid rgba(180, 83, 9, 0.4) !important;
 }
 
 body[data-theme="durga_puja"] .hero-section {
-  background: linear-gradient(135deg, #7F1D1D 0%, #991B1B 40%, #B45309 100%) !important;
-  box-shadow: 0 8px 40px rgba(220, 38, 38, 0.4) !important;
+  background: linear-gradient(135deg, #1C0000 0%, #3D0A0A 35%, #7F1D1D 70%, #92400E 100%) !important;
   position: relative !important;
   overflow: hidden !important;
 }
 
-/* Diya glow radial behind hero */
-body[data-theme="durga_puja"] .hero-section::before {
+/* Cinematic warm light leak on hero */
+body[data-theme="durga_puja"] .hero-section::after {
   content: "";
   position: absolute;
-  bottom: -40px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 300px;
-  height: 150px;
-  background: radial-gradient(ellipse, rgba(217, 119, 6, 0.45) 0%, transparent 70%);
-  animation: diyaGlowHero 2s ease-in-out infinite alternate;
+  bottom: -80px;
+  right: -80px;
+  width: 340px;
+  height: 340px;
+  background: radial-gradient(circle, rgba(180, 83, 9, 0.28) 0%, transparent 70%);
   pointer-events: none;
 }
 
-@keyframes diyaGlowHero {
-  0% { opacity: 0.6; transform: translateX(-50%) scale(1); }
-  100% { opacity: 1; transform: translateX(-50%) scale(1.15); }
+body[data-theme="durga_puja"] .product-card {
+  background: rgba(253, 246, 236, 0.95) !important;
+  border: 1px solid rgba(180, 83, 9, 0.12) !important;
 }
 
-body[data-theme="durga_puja"] footer {
-  background: linear-gradient(135deg, #7F1D1D 0%, #991B1B 100%) !important;
-  border-top: 4px solid #D97706 !important;
-  box-shadow: 0 -4px 20px rgba(217, 119, 6, 0.3) !important;
+body[data-theme="durga_puja"] .product-card:hover {
+  border-color: rgba(180, 83, 9, 0.4) !important;
+  box-shadow: 0 24px 48px -12px rgba(127, 29, 29, 0.18), 0 0 0 1px rgba(180, 83, 9, 0.25) inset !important;
+  transform: translateY(-5px) !important;
+}
+
+body[data-theme="durga_puja"] .btn-fintech-pill {
+  background: linear-gradient(135deg, #7F1D1D 0%, #92400E 100%) !important;
+  border-color: rgba(180, 83, 9, 0.5) !important;
+  box-shadow: 0 4px 16px rgba(127, 29, 29, 0.3) !important;
+}
+
+body[data-theme="durga_puja"] .section-heading,
+body[data-theme="durga_puja"] .section-title {
+  color: #7F1D1D !important;
+  letter-spacing: 0.5px !important;
 }
 
 body[data-theme="durga_puja"] .nav-brand-title {
-  color: #991B1B !important;
-  text-shadow: 0 0 15px rgba(217, 119, 6, 0.4) !important;
+  color: #7F1D1D !important;
+}
+
+body[data-theme="durga_puja"] footer {
+  background: linear-gradient(180deg, #1C0000 0%, #3D0A0A 100%) !important;
+  border-top: 1px solid rgba(180, 83, 9, 0.3) !important;
 }
 
 /* ==========================================================================
-   5. FREEDOM THEME: Tiranga Spirit (Saffron, White, Emerald Green & Ashoka Navy)
-   ========================================================================== */
-body[data-theme="freedom"] {
-  --theme-primary: #1E3A8A;
-  --theme-secondary: #EA580C;
-  --theme-accent: #15803D;
-  --theme-bg: linear-gradient(160deg, #FFF7ED 0%, #F8FAFC 50%, #F0FDF4 100%);
-  --theme-surface: rgba(255, 255, 255, 0.92);
-  --theme-glass-border: rgba(254, 215, 170, 0.8);
-  --theme-glass-shadow: 0 16px 36px -10px rgba(30, 58, 138, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.95) inset;
-  --theme-badge-bg: linear-gradient(135deg, #EA580C 0%, #FFFFFF 50%, #15803D 100%);
-  --theme-badge-text: #0F172A;
-  --theme-hero-glow: rgba(30, 58, 138, 0.25);
-  --brand-blue: #1E3A8A;
-  --brand-blue-hover: #15803D;
-}
-
-body[data-theme="freedom"] {
-  background: linear-gradient(160deg, #FFF7ED 0%, #F8FAFC 50%, #F0FDF4 100%) !important;
-}
-
-body[data-theme="freedom"] .main-header {
-  background: rgba(255, 255, 255, 0.92) !important;
-  backdrop-filter: blur(20px) !important;
-  border-bottom: 3px solid;
-  border-image: linear-gradient(90deg, #EA580C 0%, #FFFFFF 50%, #15803D 100%) 1 !important;
-  box-shadow: 0 4px 20px rgba(30, 58, 138, 0.08) !important;
-}
-
-body[data-theme="freedom"] .top-announcement {
-  background: linear-gradient(90deg, #EA580C 0%, #1E3A8A 50%, #15803D 100%) !important;
-  color: #FFFFFF !important;
-  font-weight: 800 !important;
-  border-bottom: 2px solid #FFFFFF !important;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.3) !important;
-}
-
-body[data-theme="freedom"] .product-card {
-  background: rgba(255, 255, 255, 0.92) !important;
-  border: 1.5px solid rgba(254, 215, 170, 0.7) !important;
-}
-
-body[data-theme="freedom"] .product-card:hover {
-  border-color: #1E3A8A !important;
-  box-shadow: 0 20px 50px -10px rgba(30, 58, 138, 0.2), 0 0 0 2px #BFDBFE inset !important;
-  transform: translateY(-6px) !important;
-}
-
-/* Tricolor bottom bar on cards */
-body[data-theme="freedom"] .product-card::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #EA580C 33%, #FFFFFF 33% 66%, #15803D 66%);
-  border-radius: 0 0 12px 12px;
-}
-
-body[data-theme="freedom"] .btn-icon-badge.badge-blue,
-body[data-theme="freedom"] .btn-fintech-pill {
-  background: linear-gradient(135deg, #1E3A8A, #15803D) !important;
-  border-color: #EA580C !important;
-  box-shadow: 0 4px 15px rgba(30, 58, 138, 0.35) !important;
-}
-
-body[data-theme="freedom"] .hero-section {
-  background: linear-gradient(135deg, #EA580C 0%, #1E3A8A 50%, #15803D 100%) !important;
-  box-shadow: 0 8px 40px rgba(30, 58, 138, 0.4) !important;
-  position: relative !important;
-  overflow: hidden !important;
-}
-
-/* Ashoka Chakra spin in hero background */
-body[data-theme="freedom"] .hero-section::before {
-  content: "☸";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 18rem;
-  color: rgba(255, 255, 255, 0.04);
-  animation: chakraSpin 20s linear infinite;
-  pointer-events: none;
-  line-height: 1;
-}
-
-@keyframes chakraSpin {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-body[data-theme="freedom"] .section-heading,
-body[data-theme="freedom"] .section-title {
-  color: #1E3A8A !important;
-}
-
-body[data-theme="freedom"] footer {
-  background: linear-gradient(135deg, #1E3A8A 0%, #0F172A 100%) !important;
-  border-top: 4px solid;
-  border-image: linear-gradient(90deg, #EA580C 33%, #FFFFFF 33% 66%, #15803D 66%) 1 !important;
-}
-
-/* ==========================================================================
-   6. DIWALI THEME: Festival of Lights & Diyas (Midnight Purple & Golden Sparks)
+   3. DIWALI THEME: Royal Nocturne
+   Palette: Jewel Midnight · Deep Amethyst · Burnished Gold
+   Mood: A luxury Diwali — Oberoi Hotel lobby, jewel tones, candelabras
    ========================================================================== */
 body[data-theme="diwali"] {
-  --theme-primary: #4C1D95;
-  --theme-secondary: #6D28D9;
-  --theme-accent: #F59E0B;
-  --theme-bg: linear-gradient(160deg, #1E1030 0%, #2E1065 40%, #1E1030 100%);
-  --theme-surface: rgba(46, 16, 101, 0.65);
-  --theme-glass-border: rgba(233, 213, 255, 0.25);
-  --theme-glass-shadow: 0 16px 36px -10px rgba(109, 40, 217, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.12) inset;
-  --theme-badge-bg: linear-gradient(135deg, #7C3AED 0%, #F59E0B 100%);
-  --theme-badge-text: #FFFFFF;
-  --theme-hero-glow: rgba(245, 158, 11, 0.4);
-  --brand-blue: #7C3AED;
-  --brand-blue-hover: #4C1D95;
+  --theme-primary:      #3B0764;
+  --theme-secondary:    #4C1D95;
+  --theme-accent:       #92400E;
+  --theme-bg:           #0D0116;
+  --theme-surface:      rgba(27, 5, 48, 0.88);
+  --theme-glass-border: rgba(146, 64, 14, 0.25);
+  --theme-glass-shadow: 0 16px 40px -12px rgba(59, 7, 100, 0.4), 0 0 0 1px rgba(255,255,255,0.06) inset;
+  --theme-badge-bg:     #3B0764;
+  --theme-badge-text:   #F5D78A;
+  --theme-hero-glow:    rgba(146, 64, 14, 0.4);
+  --theme-accent-rgb:   146, 64, 14;
+  --brand-blue:         #6D28D9;
+  --brand-blue-hover:   #4C1D95;
 }
 
+/* Full dark atmospheric background */
 body[data-theme="diwali"] {
-  background: linear-gradient(160deg, #1E1030 0%, #2E1065 40%, #1E1030 100%) !important;
-  color: #F3E8FF !important;
+  background-color: #0D0116 !important;
 }
 
-/* Text contrast fix for dark bg */
+/* All base text adapts to dark background */
+body[data-theme="diwali"],
 body[data-theme="diwali"] p,
 body[data-theme="diwali"] span,
 body[data-theme="diwali"] li,
-body[data-theme="diwali"] td,
+body[data-theme="diwali"] a,
 body[data-theme="diwali"] label {
-  color: #E9D5FF !important;
+  color: #D4B8E8 !important;
 }
 
 body[data-theme="diwali"] h1,
 body[data-theme="diwali"] h2,
 body[data-theme="diwali"] h3,
 body[data-theme="diwali"] h4,
+body[data-theme="diwali"] h5,
 body[data-theme="diwali"] .section-heading,
 body[data-theme="diwali"] .section-title {
-  color: #FDE68A !important;
-  text-shadow: 0 0 20px rgba(245, 158, 11, 0.5), 0 0 40px rgba(124, 58, 237, 0.3) !important;
+  color: #F5D78A !important;
+  letter-spacing: 0.5px !important;
 }
 
 body[data-theme="diwali"] .main-header {
-  background: rgba(30, 16, 48, 0.92) !important;
-  backdrop-filter: blur(24px) !important;
-  border-bottom: 2px solid rgba(245, 158, 11, 0.5) !important;
-  box-shadow: 0 4px 25px rgba(109, 40, 217, 0.2), 0 0 40px rgba(245, 158, 11, 0.1) !important;
+  background: rgba(13, 1, 22, 0.96) !important;
+  backdrop-filter: blur(24px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(120%) !important;
+  border-bottom: 1px solid rgba(146, 64, 14, 0.3) !important;
+  box-shadow: 0 1px 0 rgba(146, 64, 14, 0.12), 0 8px 32px rgba(0, 0, 0, 0.5) !important;
 }
 
 body[data-theme="diwali"] .nav-brand-title {
-  color: #FDE68A !important;
-  text-shadow: 0 0 15px rgba(245, 158, 11, 0.6) !important;
+  color: #F5D78A !important;
 }
 
 body[data-theme="diwali"] .top-announcement {
-  background: linear-gradient(90deg, #2E1065 0%, #4C1D95 50%, #78350F 100%) !important;
-  color: #FDE68A !important;
-  font-weight: 800 !important;
-  border-bottom: 2px solid #FBBF24 !important;
-  text-shadow: 0 0 12px rgba(245, 158, 11, 0.8) !important;
-}
-
-body[data-theme="diwali"] .product-card {
-  background: rgba(46, 16, 101, 0.75) !important;
-  border: 1.5px solid rgba(245, 158, 11, 0.35) !important;
-  backdrop-filter: blur(10px) !important;
-}
-
-body[data-theme="diwali"] .product-card:hover {
-  border-color: #F59E0B !important;
-  box-shadow: 0 20px 50px -10px rgba(109, 40, 217, 0.4), 0 0 0 2px rgba(245, 158, 11, 0.5) inset, 0 0 40px rgba(245, 158, 11, 0.2) !important;
-  transform: translateY(-6px) !important;
-}
-
-/* Diwali gold shimmer bar on cards */
-body[data-theme="diwali"] .product-card::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #7C3AED, #F59E0B, #7C3AED);
-  background-size: 200% auto;
-  animation: goldShimmer 2s linear infinite;
-  border-radius: 0 0 12px 12px;
-}
-
-body[data-theme="diwali"] .product-name {
-  color: #F3E8FF !important;
-}
-
-body[data-theme="diwali"] .product-price {
-  color: #FDE68A !important;
-}
-
-body[data-theme="diwali"] .btn-icon-badge.badge-blue,
-body[data-theme="diwali"] .btn-fintech-pill {
-  background: linear-gradient(135deg, #7C3AED, #F59E0B) !important;
-  border-color: #FBBF24 !important;
-  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.5) !important;
+  background: #18072E !important;
+  color: #F5D78A !important;
+  letter-spacing: 1.5px !important;
+  font-weight: 700 !important;
+  border-bottom: 1px solid rgba(146, 64, 14, 0.35) !important;
 }
 
 body[data-theme="diwali"] .hero-section {
-  background: linear-gradient(135deg, #1E1030 0%, #4C1D95 50%, #78350F 100%) !important;
-  box-shadow: 0 8px 50px rgba(245, 158, 11, 0.4) !important;
+  background: linear-gradient(135deg, #050008 0%, #18072E 40%, #2E1065 75%, #3B0764 100%) !important;
   position: relative !important;
   overflow: hidden !important;
 }
 
-/* Diwali mandala glow behind hero */
-body[data-theme="diwali"] .hero-section::before {
+/* Deep jewel radial glow on hero */
+body[data-theme="diwali"] .hero-section::after {
   content: "";
   position: absolute;
-  top: 50%;
+  top: 30%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, rgba(124, 58, 237, 0.08) 40%, transparent 70%);
-  border-radius: 50%;
-  animation: mandalaPulse 4s ease-in-out infinite;
+  width: 500px;
+  height: 300px;
+  background: radial-gradient(ellipse, rgba(146, 64, 14, 0.22) 0%, transparent 70%);
   pointer-events: none;
 }
 
-@keyframes mandalaPulse {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
-  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+body[data-theme="diwali"] .product-card {
+  background: rgba(27, 5, 48, 0.85) !important;
+  border: 1px solid rgba(146, 64, 14, 0.2) !important;
+  backdrop-filter: blur(12px) !important;
+}
+
+body[data-theme="diwali"] .product-card:hover {
+  border-color: rgba(146, 64, 14, 0.55) !important;
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(146, 64, 14, 0.35) inset, 0 0 60px -20px rgba(146, 64, 14, 0.2) !important;
+  transform: translateY(-5px) !important;
+}
+
+body[data-theme="diwali"] .product-name {
+  color: #E9D5FF !important;
+}
+
+body[data-theme="diwali"] .product-price {
+  color: #F5D78A !important;
+}
+
+body[data-theme="diwali"] .btn-fintech-pill {
+  background: linear-gradient(135deg, #4C1D95 0%, #92400E 100%) !important;
+  border-color: rgba(146, 64, 14, 0.5) !important;
+  box-shadow: 0 4px 20px rgba(59, 7, 100, 0.4) !important;
 }
 
 body[data-theme="diwali"] footer {
-  background: linear-gradient(135deg, #1E1030 0%, #2E1065 100%) !important;
-  border-top: 3px solid #F59E0B !important;
-  box-shadow: 0 -6px 30px rgba(245, 158, 11, 0.2) !important;
+  background: linear-gradient(180deg, #0D0116 0%, #050008 100%) !important;
+  border-top: 1px solid rgba(146, 64, 14, 0.25) !important;
 }
 
 /* ==========================================================================
-   7. CHRISTMAS THEME: Yuletide Noel & Holiday Cheer (Pine Green & Velvet Crimson)
+   4. WINTER THEME: Nordic Editorial
+   Palette: Arctic Charcoal · Deep Steel · Frost Silver
+   Mood: A Scandinavia lookbook — Acne Studios, A.P.C. Winter — cold precision
    ========================================================================== */
-body[data-theme="christmas"] {
-  --theme-primary: #15803D;
-  --theme-secondary: #DC2626;
-  --theme-accent: #EAB308;
-  --theme-bg: linear-gradient(160deg, #DCFCE7 0%, #F0FDF4 50%, #FEF2F2 100%);
-  --theme-surface: rgba(240, 253, 244, 0.92);
-  --theme-glass-border: rgba(187, 247, 208, 0.85);
-  --theme-glass-shadow: 0 16px 36px -10px rgba(21, 128, 61, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.95) inset;
-  --theme-badge-bg: linear-gradient(135deg, #15803D 0%, #DC2626 100%);
-  --theme-badge-text: #FFFFFF;
-  --theme-hero-glow: rgba(21, 128, 61, 0.3);
-  --brand-blue: #15803D;
-  --brand-blue-hover: #DC2626;
+body[data-theme="winter"] {
+  --theme-primary:      #0C1E2C;
+  --theme-secondary:    #1E3A5F;
+  --theme-accent:       #3B82F6;
+  --theme-bg:           #EBF3FA;
+  --theme-surface:      rgba(235, 243, 250, 0.96);
+  --theme-glass-border: rgba(59, 130, 246, 0.15);
+  --theme-glass-shadow: 0 16px 40px -12px rgba(12, 30, 44, 0.12), 0 0 0 1px rgba(255,255,255,0.92) inset;
+  --theme-badge-bg:     #0C1E2C;
+  --theme-badge-text:   #E0F2FE;
+  --theme-hero-glow:    rgba(59, 130, 246, 0.2);
+  --theme-accent-rgb:   59, 130, 246;
+  --brand-blue:         #1E3A5F;
+  --brand-blue-hover:   #0C1E2C;
 }
 
-body[data-theme="christmas"] {
-  background: linear-gradient(160deg, #DCFCE7 0%, #F0FDF4 50%, #FEF2F2 100%) !important;
+body[data-theme="winter"] {
+  background-color: #EBF3FA !important;
 }
 
-body[data-theme="christmas"] .main-header {
-  background: rgba(240, 253, 244, 0.92) !important;
-  backdrop-filter: blur(20px) !important;
-  border-bottom: 2px solid #DC2626 !important;
-  box-shadow: 0 4px 20px rgba(21, 128, 61, 0.12), 0 1px 0 rgba(187, 247, 208, 0.7) !important;
+/* Cool silver-blue atmospheric tint */
+body[data-theme="winter"]::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(160deg, rgba(59, 130, 246, 0.03) 0%, transparent 50%, rgba(12, 30, 44, 0.04) 100%);
+  pointer-events: none;
+  z-index: 0;
 }
 
-body[data-theme="christmas"] .top-announcement {
-  background: linear-gradient(90deg, #14532D 0%, #15803D 50%, #991B1B 100%) !important;
-  color: #FEF08A !important;
-  font-weight: 800 !important;
-  border-bottom: 2px solid #EAB308 !important;
-  text-shadow: 0 0 10px rgba(234, 179, 8, 0.5) !important;
+body[data-theme="winter"] .main-header {
+  background: rgba(235, 243, 250, 0.95) !important;
+  backdrop-filter: blur(24px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(120%) !important;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.15) !important;
+  box-shadow: 0 1px 0 rgba(59, 130, 246, 0.08), 0 4px 24px rgba(12, 30, 44, 0.06) !important;
 }
 
-body[data-theme="christmas"] .product-card {
-  background: rgba(240, 253, 244, 0.92) !important;
-  border: 1.5px solid rgba(187, 247, 208, 0.85) !important;
+body[data-theme="winter"] .top-announcement {
+  background: #0C1E2C !important;
+  color: #BAE6FD !important;
+  letter-spacing: 1.5px !important;
+  font-weight: 700 !important;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.3) !important;
 }
 
-body[data-theme="christmas"] .product-card:hover {
-  border-color: #DC2626 !important;
-  box-shadow: 0 20px 50px -10px rgba(21, 128, 61, 0.25), 0 0 0 2px #BBF7D0 inset, 0 0 25px rgba(234, 179, 8, 0.1) !important;
-  transform: translateY(-6px) !important;
+body[data-theme="winter"] .hero-section {
+  background: linear-gradient(135deg, #020D18 0%, #0C1E2C 35%, #1E3A5F 70%, #164E76 100%) !important;
+  position: relative !important;
+  overflow: hidden !important;
 }
 
-/* Christmas candy cane bottom bar on cards */
-body[data-theme="christmas"] .product-card::after {
+/* Aurora cool light on hero */
+body[data-theme="winter"] .hero-section::after {
+  content: "";
+  position: absolute;
+  top: -60px;
+  left: -60px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(99, 190, 255, 0.08) 40%, transparent 70%);
+  pointer-events: none;
+  animation: winterAurora 8s ease-in-out infinite alternate;
+}
+
+@keyframes winterAurora {
+  0%   { transform: translate(0, 0) scale(1); opacity: 0.7; }
+  100% { transform: translate(40px, 20px) scale(1.2); opacity: 1; }
+}
+
+body[data-theme="winter"] .product-card {
+  background: rgba(235, 243, 250, 0.97) !important;
+  border: 1px solid rgba(59, 130, 246, 0.1) !important;
+}
+
+body[data-theme="winter"] .product-card:hover {
+  border-color: rgba(59, 130, 246, 0.35) !important;
+  box-shadow: 0 24px 48px -12px rgba(12, 30, 44, 0.16), 0 0 0 1px rgba(59, 130, 246, 0.2) inset !important;
+  transform: translateY(-5px) !important;
+}
+
+body[data-theme="winter"] .btn-fintech-pill {
+  background: linear-gradient(135deg, #0C1E2C 0%, #1E3A5F 100%) !important;
+  border-color: rgba(59, 130, 246, 0.4) !important;
+  box-shadow: 0 4px 16px rgba(12, 30, 44, 0.25) !important;
+}
+
+body[data-theme="winter"] .section-heading,
+body[data-theme="winter"] .section-title {
+  color: #0C1E2C !important;
+  letter-spacing: 0.5px !important;
+}
+
+body[data-theme="winter"] footer {
+  background: linear-gradient(180deg, #0C1E2C 0%, #020D18 100%) !important;
+  border-top: 1px solid rgba(59, 130, 246, 0.2) !important;
+}
+
+/* ==========================================================================
+   5. FREEDOM THEME: Republic Authority
+   Palette: Deep Navy · Matte Saffron Amber · Sage Green
+   Mood: Air India rebrand meets Republic Day — dignified, powerful, proud
+   ========================================================================== */
+body[data-theme="freedom"] {
+  --theme-primary:      #0F172A;
+  --theme-secondary:    #1E3A8A;
+  --theme-accent:       #78350F;
+  --theme-bg:           #F8F9FC;
+  --theme-surface:      rgba(248, 249, 252, 0.96);
+  --theme-glass-border: rgba(78, 53, 15, 0.15);
+  --theme-glass-shadow: 0 16px 40px -12px rgba(15, 23, 42, 0.1), 0 0 0 1px rgba(255,255,255,0.92) inset;
+  --theme-badge-bg:     #0F172A;
+  --theme-badge-text:   #FFFFFF;
+  --theme-hero-glow:    rgba(30, 58, 138, 0.25);
+  --theme-accent-rgb:   120, 53, 15;
+  --brand-blue:         #1E3A8A;
+  --brand-blue-hover:   #0F172A;
+}
+
+body[data-theme="freedom"] {
+  background-color: #F8F9FC !important;
+}
+
+body[data-theme="freedom"] .main-header {
+  background: rgba(248, 249, 252, 0.96) !important;
+  backdrop-filter: blur(24px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
+  border-bottom: 1px solid transparent !important;
+  border-image: linear-gradient(90deg, rgba(120, 53, 15, 0.6) 0%, rgba(30, 58, 138, 0.3) 50%, rgba(20, 83, 45, 0.6) 100%) 1 !important;
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06) !important;
+}
+
+body[data-theme="freedom"] .top-announcement {
+  background: #0F172A !important;
+  color: #FED7AA !important;
+  letter-spacing: 1.5px !important;
+  font-weight: 700 !important;
+  border-bottom: 1px solid rgba(120, 53, 15, 0.4) !important;
+}
+
+body[data-theme="freedom"] .hero-section {
+  background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 50%, #14532D 100%) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Subtle Tiranga color-grade depth on hero */
+body[data-theme="freedom"] .hero-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(120, 53, 15, 0.12) 0%, transparent 30%, transparent 70%, rgba(20, 83, 45, 0.12) 100%);
+  pointer-events: none;
+}
+
+body[data-theme="freedom"] .product-card {
+  background: rgba(248, 249, 252, 0.97) !important;
+  border: 1px solid rgba(30, 58, 138, 0.1) !important;
+}
+
+body[data-theme="freedom"] .product-card:hover {
+  border-color: rgba(30, 58, 138, 0.3) !important;
+  box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.14), 0 0 0 1px rgba(30, 58, 138, 0.18) inset !important;
+  transform: translateY(-5px) !important;
+}
+
+/* Tricolor precision underline on card hover */
+body[data-theme="freedom"] .product-card::after {
   content: "";
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 4px;
-  background: repeating-linear-gradient(90deg, #DC2626 0px, #DC2626 12px, #FFFFFF 12px, #FFFFFF 24px);
+  height: 2px;
+  background: linear-gradient(90deg, #78350F 33.3%, #F5F5F5 33.3% 66.6%, #14532D 66.6%);
   border-radius: 0 0 12px 12px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
 
-body[data-theme="christmas"] .btn-icon-badge.badge-blue,
-body[data-theme="christmas"] .btn-fintech-pill {
-  background: linear-gradient(135deg, #15803D, #DC2626) !important;
-  border-color: #EAB308 !important;
-  box-shadow: 0 4px 15px rgba(21, 128, 61, 0.4) !important;
+body[data-theme="freedom"] .product-card:hover::after {
+  opacity: 1;
+}
+
+body[data-theme="freedom"] .btn-fintech-pill {
+  background: linear-gradient(135deg, #1E3A8A 0%, #0F172A 100%) !important;
+  border-color: rgba(120, 53, 15, 0.4) !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.3) !important;
+}
+
+body[data-theme="freedom"] .section-heading,
+body[data-theme="freedom"] .section-title {
+  color: #0F172A !important;
+}
+
+body[data-theme="freedom"] footer {
+  background: linear-gradient(180deg, #0F172A 0%, #030712 100%) !important;
+  border-top: 2px solid;
+  border-image: linear-gradient(90deg, #78350F 33%, #FFFFFF 33% 66%, #14532D 66%) 1 !important;
+}
+
+/* ==========================================================================
+   6. CHRISTMAS THEME: Harrods Luxury Christmas
+   Palette: Forest Night · Deep Ruby · Champagne Gold
+   Mood: Harrods Christmas 2025 — dark pine, warm brass, black velvet
+   ========================================================================== */
+body[data-theme="christmas"] {
+  --theme-primary:      #14532D;
+  --theme-secondary:    #166534;
+  --theme-accent:       #92400E;
+  --theme-bg:           #F0F7F2;
+  --theme-surface:      rgba(240, 247, 242, 0.96);
+  --theme-glass-border: rgba(20, 83, 45, 0.15);
+  --theme-glass-shadow: 0 16px 40px -12px rgba(20, 83, 45, 0.12), 0 0 0 1px rgba(255,255,255,0.92) inset;
+  --theme-badge-bg:     #14532D;
+  --theme-badge-text:   #F5D78A;
+  --theme-hero-glow:    rgba(20, 83, 45, 0.3);
+  --theme-accent-rgb:   146, 64, 14;
+  --brand-blue:         #14532D;
+  --brand-blue-hover:   #166534;
+}
+
+body[data-theme="christmas"] {
+  background-color: #F0F7F2 !important;
+}
+
+body[data-theme="christmas"]::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(160deg, rgba(20, 83, 45, 0.03) 0%, transparent 60%, rgba(146, 64, 14, 0.03) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body[data-theme="christmas"] .main-header {
+  background: rgba(240, 247, 242, 0.96) !important;
+  backdrop-filter: blur(24px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
+  border-bottom: 1px solid rgba(20, 83, 45, 0.18) !important;
+  box-shadow: 0 1px 0 rgba(20, 83, 45, 0.08), 0 4px 24px rgba(20, 83, 45, 0.06) !important;
+}
+
+body[data-theme="christmas"] .top-announcement {
+  background: #071A0D !important;
+  color: #F5D78A !important;
+  letter-spacing: 1.5px !important;
+  font-weight: 700 !important;
+  border-bottom: 1px solid rgba(146, 64, 14, 0.35) !important;
 }
 
 body[data-theme="christmas"] .hero-section {
-  background: linear-gradient(135deg, #14532D 0%, #15803D 40%, #991B1B 100%) !important;
-  box-shadow: 0 8px 40px rgba(21, 128, 61, 0.4) !important;
+  background: linear-gradient(135deg, #030D07 0%, #071A0D 35%, #14532D 70%, #1A5E33 100%) !important;
   position: relative !important;
   overflow: hidden !important;
 }
 
-/* Star glow in hero */
-body[data-theme="christmas"] .hero-section::before {
-  content: "★";
+/* Champagne gold light leak bottom-right */
+body[data-theme="christmas"] .hero-section::after {
+  content: "";
   position: absolute;
-  top: 10px;
-  right: 20px;
-  font-size: 3rem;
-  color: rgba(234, 179, 8, 0.6);
-  animation: starTwinkle 1.5s ease-in-out infinite alternate;
+  bottom: -60px;
+  right: -40px;
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(146, 64, 14, 0.25) 0%, transparent 70%);
   pointer-events: none;
 }
 
-@keyframes starTwinkle {
-  0% { opacity: 0.4; transform: scale(1) rotate(0deg); }
-  100% { opacity: 1; transform: scale(1.2) rotate(15deg); filter: drop-shadow(0 0 12px #EAB308); }
+body[data-theme="christmas"] .product-card {
+  background: rgba(240, 247, 242, 0.97) !important;
+  border: 1px solid rgba(20, 83, 45, 0.12) !important;
+}
+
+body[data-theme="christmas"] .product-card:hover {
+  border-color: rgba(20, 83, 45, 0.35) !important;
+  box-shadow: 0 24px 48px -12px rgba(20, 83, 45, 0.18), 0 0 0 1px rgba(146, 64, 14, 0.15) inset !important;
+  transform: translateY(-5px) !important;
+}
+
+body[data-theme="christmas"] .btn-fintech-pill {
+  background: linear-gradient(135deg, #14532D 0%, #0F3D1F 100%) !important;
+  border-color: rgba(146, 64, 14, 0.45) !important;
+  box-shadow: 0 4px 16px rgba(20, 83, 45, 0.28) !important;
 }
 
 body[data-theme="christmas"] .section-heading,
 body[data-theme="christmas"] .section-title {
-  color: #15803D !important;
-  text-shadow: 0 0 15px rgba(21, 128, 61, 0.3) !important;
+  color: #14532D !important;
 }
 
 body[data-theme="christmas"] footer {
-  background: linear-gradient(135deg, #14532D 0%, #15803D 100%) !important;
-  border-top: 3px solid #DC2626 !important;
+  background: linear-gradient(180deg, #071A0D 0%, #030D07 100%) !important;
+  border-top: 1px solid rgba(146, 64, 14, 0.3) !important;
 }
 
 /* ==========================================================================
-   THEME PARTICLES CANVAS
+   7. SUMMER THEME: Mediterranean Dusk
+   Palette: Desert Night · Terracotta · Warm Sand
+   Mood: A Positano editorial — Jacquemus, warm stone, long shadows
+   ========================================================================== */
+body[data-theme="summer"] {
+  --theme-primary:      #451A03;
+  --theme-secondary:    #78350F;
+  --theme-accent:       #B45309;
+  --theme-bg:           #FFF8F0;
+  --theme-surface:      rgba(255, 248, 240, 0.96);
+  --theme-glass-border: rgba(120, 53, 15, 0.15);
+  --theme-glass-shadow: 0 16px 40px -12px rgba(69, 26, 3, 0.12), 0 0 0 1px rgba(255,255,255,0.92) inset;
+  --theme-badge-bg:     #451A03;
+  --theme-badge-text:   #FEF3C7;
+  --theme-hero-glow:    rgba(180, 83, 9, 0.3);
+  --theme-accent-rgb:   180, 83, 9;
+  --brand-blue:         #78350F;
+  --brand-blue-hover:   #451A03;
+}
+
+body[data-theme="summer"] {
+  background-color: #FFF8F0 !important;
+}
+
+body[data-theme="summer"]::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(160deg, rgba(180, 83, 9, 0.04) 0%, transparent 50%, rgba(69, 26, 3, 0.04) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body[data-theme="summer"] .main-header {
+  background: rgba(255, 248, 240, 0.95) !important;
+  backdrop-filter: blur(24px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
+  border-bottom: 1px solid rgba(120, 53, 15, 0.18) !important;
+  box-shadow: 0 1px 0 rgba(120, 53, 15, 0.08), 0 4px 24px rgba(69, 26, 3, 0.06) !important;
+}
+
+body[data-theme="summer"] .top-announcement {
+  background: #1C0A00 !important;
+  color: #FED7AA !important;
+  letter-spacing: 1.5px !important;
+  font-weight: 700 !important;
+  border-bottom: 1px solid rgba(180, 83, 9, 0.35) !important;
+}
+
+body[data-theme="summer"] .hero-section {
+  background: linear-gradient(135deg, #0D0400 0%, #1C0A00 35%, #451A03 70%, #78350F 100%) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Warm terracotta dusk bloom on hero */
+body[data-theme="summer"] .hero-section::after {
+  content: "";
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 360px;
+  height: 360px;
+  background: radial-gradient(circle, rgba(180, 83, 9, 0.22) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+body[data-theme="summer"] .product-card {
+  background: rgba(255, 248, 240, 0.97) !important;
+  border: 1px solid rgba(120, 53, 15, 0.12) !important;
+}
+
+body[data-theme="summer"] .product-card:hover {
+  border-color: rgba(120, 53, 15, 0.38) !important;
+  box-shadow: 0 24px 48px -12px rgba(69, 26, 3, 0.18), 0 0 0 1px rgba(180, 83, 9, 0.2) inset !important;
+  transform: translateY(-5px) !important;
+}
+
+body[data-theme="summer"] .btn-fintech-pill {
+  background: linear-gradient(135deg, #451A03 0%, #78350F 100%) !important;
+  border-color: rgba(180, 83, 9, 0.45) !important;
+  box-shadow: 0 4px 16px rgba(69, 26, 3, 0.28) !important;
+}
+
+body[data-theme="summer"] .section-heading,
+body[data-theme="summer"] .section-title {
+  color: #78350F !important;
+}
+
+body[data-theme="summer"] footer {
+  background: linear-gradient(180deg, #1C0A00 0%, #0D0400 100%) !important;
+  border-top: 1px solid rgba(180, 83, 9, 0.25) !important;
+}
+
+/* ==========================================================================
+   PARTICLE CANVAS (Non-intrusive)
    ========================================================================== */
 #theme-particles-canvas {
   position: fixed;
@@ -698,648 +901,200 @@ body[data-theme="christmas"] footer {
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 1;
+  opacity: 0.7;
 }
 
 /* ==========================================================================
-   FESTIVE BRAND LOADER MOTIFS & ANIMATIONS
-   (Pradip, Dhak, Kash Ful, Sparks, Stars, Snowflakes, Tiranga)
+   BRAND LOADER — MINIMAL PREMIUM
+   A clean, typographic loader. No emojis, no motifs — just the brand.
    ========================================================================== */
-
-.loader-festive-motif {
+#brand-loader {
+  position: fixed;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.85rem;
-  margin-bottom: 0.8rem;
+  z-index: 999998;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
 }
 
-/* ---- DURGA PUJA Loader ---- */
-.motif-durga-puja .motif-pradip-wrap {
-  position: relative;
-  display: inline-flex;
+/* Default loader */
+body[data-theme="default"] #brand-loader,
+body:not([data-theme]) #brand-loader {
+  background: #0F172A;
+}
+
+/* Themed loader backgrounds */
+body[data-theme="durga_puja"] #brand-loader  { background: #1C0000; }
+body[data-theme="diwali"] #brand-loader      { background: #050008; }
+body[data-theme="winter"] #brand-loader      { background: #020D18; }
+body[data-theme="christmas"] #brand-loader   { background: #030D07; }
+body[data-theme="freedom"] #brand-loader     { background: #0F172A; }
+body[data-theme="summer"] #brand-loader      { background: #0D0400; }
+
+#brand-loader.fade-out {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.loader-brand-box {
+  display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 2rem;
 }
 
-.motif-durga-puja .pradip-flame {
-  font-size: 1.6rem;
-  margin-bottom: -10px;
-  animation: pradipFlicker 0.6s infinite alternate ease-in-out;
-  display: inline-block;
-  filter: drop-shadow(0 0 8px #F59E0B);
-}
-
-.motif-durga-puja .pradip-base {
-  font-size: 1.8rem;
-  filter: drop-shadow(0 4px 12px rgba(217, 119, 6, 0.6));
-  animation: pradipBasePulse 2s infinite ease-in-out;
-}
-
-@keyframes pradipBasePulse {
-  0%, 100% { filter: drop-shadow(0 4px 12px rgba(217, 119, 6, 0.6)); }
-  50% { filter: drop-shadow(0 4px 20px rgba(220, 38, 38, 0.7)); }
-}
-
-.motif-durga-puja .motif-dhak-center {
-  font-size: 2rem;
-  animation: dhakBeat 0.75s infinite ease-in-out;
-  display: inline-block;
-  transform-origin: center bottom;
-  filter: drop-shadow(0 3px 8px rgba(153, 27, 27, 0.5));
-}
-
-.motif-durga-puja .motif-kash-left {
-  font-size: 1.7rem;
-  animation: kashSwayLeft 2s infinite ease-in-out;
-  display: inline-block;
-  transform-origin: bottom center;
-  filter: drop-shadow(0 2px 6px rgba(255, 255, 255, 0.4));
-}
-
-.motif-durga-puja .motif-kash-right {
-  font-size: 1.7rem;
-  animation: kashSwayRight 2s infinite ease-in-out;
-  display: inline-block;
-  transform-origin: bottom center;
-  filter: drop-shadow(0 2px 6px rgba(255, 255, 255, 0.4));
-}
-
-@keyframes pradipFlicker {
-  0% { transform: scale(1) translateY(0); filter: drop-shadow(0 0 6px #F59E0B); }
-  30% { transform: scale(1.2, 0.85) translateY(-3px) rotate(3deg); filter: drop-shadow(0 0 18px #DC2626); }
-  60% { transform: scale(0.9, 1.15) translateY(-1px) rotate(-3deg); filter: drop-shadow(0 0 12px #FBBF24); }
-  100% { transform: scale(1.15, 1.05) translateY(-2px); filter: drop-shadow(0 0 22px #D97706); }
-}
-
-@keyframes dhakBeat {
-  0%, 100% { transform: scale(1) rotate(0deg); }
-  15% { transform: scale(1.3) rotate(-8deg); }
-  35% { transform: scale(0.9) rotate(6deg); }
-  55% { transform: scale(1.2) rotate(-4deg); }
-  75% { transform: scale(0.95) rotate(3deg); }
-}
-
-@keyframes kashSwayLeft {
-  0%, 100% { transform: rotate(-12deg); }
-  50% { transform: rotate(8deg); }
-}
-
-@keyframes kashSwayRight {
-  0%, 100% { transform: rotate(12deg); }
-  50% { transform: rotate(-8deg); }
-}
-
-/* ---- DIWALI Loader ---- */
-.motif-diwali .motif-pradip-glow {
-  font-size: 1.8rem;
-  animation: diyaGlow 1.2s ease-in-out infinite alternate;
-  display: inline-block;
-  filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.9));
-}
-
-.motif-diwali .diwali-sparkle {
-  font-size: 1.5rem;
-  animation: sparkleRotate 2s linear infinite;
-  display: inline-block;
-  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.8));
-}
-
-.motif-diwali .diwali-firework {
-  font-size: 1.8rem;
-  animation: fireworkBurst 1.5s ease-in-out infinite;
-  display: inline-block;
-}
-
-@keyframes diyaGlow {
-  0% { transform: scale(1); filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.7)); }
-  100% { transform: scale(1.15); filter: drop-shadow(0 0 20px rgba(245, 158, 11, 1)); }
-}
-
-@keyframes sparkleRotate {
-  0% { transform: rotate(0deg) scale(1); opacity: 0.7; }
-  50% { transform: rotate(180deg) scale(1.25); opacity: 1; }
-  100% { transform: rotate(360deg) scale(1); opacity: 0.7; }
-}
-
-@keyframes fireworkBurst {
-  0%, 100% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(1.3); opacity: 1; filter: drop-shadow(0 0 15px rgba(245, 158, 11, 0.8)); }
-}
-
-/* ---- WINTER Loader ---- */
-.motif-winter .winter-flake {
-  font-size: 1.8rem;
-  animation: snowSpin 4s linear infinite;
-  display: inline-block;
-  filter: drop-shadow(0 0 10px rgba(186, 230, 253, 0.9));
-}
-
-.motif-winter .winter-frost {
-  font-size: 1.6rem;
-  animation: frostPulse 2s ease-in-out infinite;
-  display: inline-block;
-}
-
-@keyframes snowSpin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes frostPulse {
-  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.6)); }
-  50% { transform: scale(1.1); filter: drop-shadow(0 0 16px rgba(56, 189, 248, 1)); }
-}
-
-/* ---- CHRISTMAS Loader ---- */
-.motif-christmas .noel-bell {
-  font-size: 1.8rem;
-  animation: bellRing 1s ease-in-out infinite;
-  display: inline-block;
-  transform-origin: top center;
-  filter: drop-shadow(0 0 10px rgba(234, 179, 8, 0.8));
-}
-
-.motif-christmas .noel-santa {
-  font-size: 2rem;
-  animation: santaBounce 2s ease-in-out infinite;
-  display: inline-block;
-}
-
-.motif-christmas .noel-tree {
-  font-size: 1.8rem;
-  animation: treeTwinkle 1.5s ease-in-out infinite alternate;
-  display: inline-block;
-  filter: drop-shadow(0 0 8px rgba(21, 128, 61, 0.8));
-}
-
-@keyframes bellRing {
-  0%, 100% { transform: rotate(0deg); }
-  20% { transform: rotate(15deg); }
-  40% { transform: rotate(-15deg); }
-  60% { transform: rotate(10deg); }
-  80% { transform: rotate(-10deg); }
-}
-
-@keyframes santaBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-
-@keyframes treeTwinkle {
-  0% { filter: drop-shadow(0 0 6px rgba(21, 128, 61, 0.6)); }
-  100% { filter: drop-shadow(0 0 18px rgba(234, 179, 8, 0.8)); }
-}
-
-/* ---- FREEDOM Loader ---- */
-.motif-freedom .tiranga-flag {
-  font-size: 2rem;
-  animation: flagWave 2s ease-in-out infinite;
-  display: inline-block;
-  transform-origin: left center;
-  filter: drop-shadow(0 2px 8px rgba(30, 58, 138, 0.4));
-}
-
-.motif-freedom .tiranga-chakra {
-  font-size: 1.8rem;
-  animation: chakraSpinLoader 3s linear infinite;
-  display: inline-block;
-  filter: drop-shadow(0 0 8px rgba(30, 58, 138, 0.7));
-}
-
-@keyframes flagWave {
-  0%, 100% { transform: skewY(0deg) scaleX(1); }
-  25% { transform: skewY(2deg) scaleX(1.05); }
-  75% { transform: skewY(-2deg) scaleX(0.95); }
-}
-
-@keyframes chakraSpinLoader {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* ---- SUMMER Loader ---- */
-.motif-summer .summer-sun {
-  font-size: 2rem;
-  animation: sunRotate 4s linear infinite;
-  display: inline-block;
-  filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.9));
-}
-
-.motif-summer .summer-wave {
-  font-size: 1.8rem;
-  animation: waveRoll 1.5s ease-in-out infinite;
-  display: inline-block;
-  filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.6));
-}
-
-@keyframes sunRotate {
-  0% { transform: rotate(0deg) scale(1); filter: drop-shadow(0 0 8px #F59E0B); }
-  50% { transform: rotate(180deg) scale(1.2); filter: drop-shadow(0 0 20px #EA580C); }
-  100% { transform: rotate(360deg) scale(1); filter: drop-shadow(0 0 8px #F59E0B); }
-}
-
-@keyframes waveRoll {
-  0%, 100% { transform: translateX(-4px) scaleX(1); }
-  50% { transform: translateX(4px) scaleX(1.05); }
-}
-
-/* ==========================================================================
-   GLOWING SUBTITLE TYPOGRAPHY - LOADER
-   ========================================================================== */
-.loader-theme-subtitle {
-  font-size: clamp(0.7rem, 3.5vw, 0.84rem) !important;
-  font-weight: 900 !important;
-  letter-spacing: clamp(0.5px, 0.4vw, 1.4px) !important;
-  margin-top: 0.4rem !important;
-  text-align: center !important;
-}
-
-.durga-gold-glow {
-  color: #FEF08A !important;
-  text-shadow: 0 0 15px rgba(220, 38, 38, 0.9), 0 0 30px rgba(217, 119, 6, 0.7), 0 0 60px rgba(220, 38, 38, 0.3) !important;
-  animation: goldGlowPulse 2s ease-in-out infinite !important;
-}
-
-@keyframes goldGlowPulse {
-  0%, 100% { text-shadow: 0 0 12px rgba(220, 38, 38, 0.8), 0 0 25px rgba(217, 119, 6, 0.6); }
-  50% { text-shadow: 0 0 20px rgba(220, 38, 38, 1), 0 0 40px rgba(217, 119, 6, 0.9), 0 0 70px rgba(220, 38, 38, 0.4); }
-}
-
-.diwali-gold-glow {
-  color: #FDE68A !important;
-  text-shadow: 0 0 15px rgba(124, 58, 237, 0.9), 0 0 30px rgba(245, 158, 11, 0.8) !important;
-  animation: diwaliGlowPulse 2s ease-in-out infinite !important;
-}
-
-@keyframes diwaliGlowPulse {
-  0%, 100% { text-shadow: 0 0 12px rgba(124, 58, 237, 0.8), 0 0 25px rgba(245, 158, 11, 0.7); }
-  50% { text-shadow: 0 0 25px rgba(124, 58, 237, 1), 0 0 50px rgba(245, 158, 11, 1); }
-}
-
-.winter-cyan-glow {
-  color: #BAE6FD !important;
-  text-shadow: 0 0 15px rgba(2, 132, 199, 0.9), 0 0 30px rgba(56, 189, 248, 0.7) !important;
-}
-
-.christmas-red-glow {
-  color: #FEF08A !important;
-  text-shadow: 0 0 15px rgba(220, 38, 38, 0.9), 0 0 30px rgba(21, 128, 61, 0.7) !important;
-}
-
-.freedom-tricolor-glow {
-  color: #FFFFFF !important;
-  text-shadow: 0 0 12px #EA580C, 0 0 25px #15803D !important;
-  animation: tricolorGlow 3s linear infinite !important;
-}
-
-@keyframes tricolorGlow {
-  0% { text-shadow: 0 0 12px #EA580C, 0 0 25px rgba(0,0,0,0.2); }
-  33% { text-shadow: 0 0 12px rgba(255,255,255,0.8), 0 0 25px rgba(30, 58, 138, 0.5); }
-  66% { text-shadow: 0 0 12px #15803D, 0 0 25px rgba(0,0,0,0.2); }
-  100% { text-shadow: 0 0 12px #EA580C, 0 0 25px rgba(0,0,0,0.2); }
-}
-
-.summer-amber-glow {
-  color: #FEF3C7 !important;
-  text-shadow: 0 0 15px rgba(234, 88, 12, 0.9), 0 0 30px rgba(245, 158, 11, 0.7) !important;
-}
-
-/* ==========================================================================
-   THEME TOP DECORATION BAR (Seasonal: Garland, Icicles, Holly, Tricolor)
-   ========================================================================== */
-.theme-top-decoration {
-  display: none; /* Hidden by default - only shown when theme active */
-  width: 100%;
+.loader-brand-wordmark {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1.4rem, 5vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: clamp(6px, 2vw, 14px);
+  text-transform: uppercase;
+  color: #FFFFFF;
   text-align: center;
+}
+
+/* Themed wordmark accent color */
+body[data-theme="durga_puja"] .loader-brand-wordmark  { color: #F5D78A; }
+body[data-theme="diwali"] .loader-brand-wordmark       { color: #F5D78A; }
+body[data-theme="winter"] .loader-brand-wordmark       { color: #BAE6FD; }
+body[data-theme="christmas"] .loader-brand-wordmark    { color: #F5D78A; }
+body[data-theme="freedom"] .loader-brand-wordmark      { color: #FFFFFF; }
+body[data-theme="summer"] .loader-brand-wordmark       { color: #FED7AA; }
+
+.loader-brand-sub {
+  font-size: clamp(0.6rem, 2vw, 0.72rem);
+  font-weight: 700;
+  letter-spacing: clamp(2px, 1vw, 4px);
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: -1.6rem;
+}
+
+/* Themed subtitles */
+body[data-theme="durga_puja"] .loader-brand-sub  { color: rgba(245, 215, 138, 0.5); }
+body[data-theme="diwali"] .loader-brand-sub      { color: rgba(245, 215, 138, 0.5); }
+body[data-theme="winter"] .loader-brand-sub      { color: rgba(186, 230, 253, 0.5); }
+body[data-theme="christmas"] .loader-brand-sub   { color: rgba(245, 215, 138, 0.5); }
+body[data-theme="summer"] .loader-brand-sub      { color: rgba(254, 215, 170, 0.5); }
+
+.loader-progress-line {
+  width: clamp(80px, 20vw, 160px);
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1px;
   overflow: hidden;
-  line-height: 1;
-  z-index: 1001;
   position: relative;
 }
 
-/* Durga Puja - Marigold Garland */
-body[data-theme="durga_puja"] .theme-top-decoration {
-  display: block !important;
-  background: linear-gradient(90deg, #7F1D1D, #B45309, #7F1D1D) !important;
-  padding: 4px 0 2px;
-  font-size: 1.1rem;
-  letter-spacing: 2px;
-  animation: garlandSway 4s ease-in-out infinite;
-}
-
-@keyframes garlandSway {
-  0%, 100% { letter-spacing: 2px; }
-  50% { letter-spacing: 3px; }
-}
-
-/* Diwali - Lantern String */
-body[data-theme="diwali"] .theme-top-decoration {
-  display: block !important;
-  background: linear-gradient(90deg, #2E1065, #4C1D95, #78350F) !important;
-  padding: 4px 0 2px;
-  font-size: 1.1rem;
-  letter-spacing: 4px;
-  animation: lanternSwing 2s ease-in-out infinite;
-}
-
-@keyframes lanternSwing {
-  0%, 100% { filter: drop-shadow(0 0 3px rgba(245, 158, 11, 0.5)); }
-  50% { filter: drop-shadow(0 0 8px rgba(245, 158, 11, 1)); }
-}
-
-/* Winter - Snowflake Row */
-body[data-theme="winter"] .theme-top-decoration {
-  display: block !important;
-  background: linear-gradient(90deg, #082F49, #0C4A6E, #082F49) !important;
-  padding: 4px 0 2px;
-  font-size: 0.9rem;
-  letter-spacing: 5px;
-  color: rgba(186, 230, 253, 0.9) !important;
-  animation: snowDrift 6s linear infinite;
-}
-
-@keyframes snowDrift {
-  0% { letter-spacing: 4px; }
-  50% { letter-spacing: 8px; }
-  100% { letter-spacing: 4px; }
-}
-
-/* Christmas - Holly Row */
-body[data-theme="christmas"] .theme-top-decoration {
-  display: block !important;
-  background: linear-gradient(90deg, #14532D, #15803D, #991B1B) !important;
-  padding: 4px 0 2px;
-  font-size: 1rem;
-  letter-spacing: 3px;
-  animation: hollyTwinkle 2s ease-in-out infinite;
-}
-
-@keyframes hollyTwinkle {
-  0%, 100% { opacity: 0.9; }
-  50% { opacity: 1; filter: brightness(1.1); }
-}
-
-/* Freedom - Tricolor Stripe */
-body[data-theme="freedom"] .theme-top-decoration {
-  display: block !important;
-  background: linear-gradient(90deg, #EA580C 0%, #EA580C 33.3%, #FFFFFF 33.3%, #FFFFFF 66.6%, #15803D 66.6%) !important;
-  height: 6px !important;
-  padding: 0 !important;
-  font-size: 0;
-}
-
-/* Summer - Sunshine Bar */
-body[data-theme="summer"] .theme-top-decoration {
-  display: block !important;
-  background: linear-gradient(90deg, #431407, #C2410C, #F59E0B, #C2410C, #431407) !important;
-  padding: 4px 0 2px;
-  font-size: 1rem;
-  letter-spacing: 4px;
-  animation: sunBar 3s ease-in-out infinite;
-}
-
-@keyframes sunBar {
-  0% { background-position: 0% center; }
-  100% { background-position: 200% center; }
-}
-
-/* ==========================================================================
-   THEME CORNER FESTIVE FLOATING BADGE
-   ========================================================================== */
-.theme-corner-festive-badge {
-  position: fixed;
-  bottom: 22px;
-  right: 22px;
-  background: rgba(15, 23, 42, 0.9);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1.5px solid rgba(255, 255, 255, 0.2);
-  border-radius: 9999px;
-  padding: 0.5rem 1.1rem;
-  color: #FFFFFF;
-  font-size: 0.76rem;
-  font-weight: 900;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  z-index: 9998;
-  letter-spacing: 0.5px;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  user-select: none;
-  animation: badgeEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes badgeEntrance {
-  from { opacity: 0; transform: translateY(20px) scale(0.8); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.theme-corner-festive-badge:hover {
-  transform: translateY(-4px) scale(1.06);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
-}
-
-/* Theme-specific badge accent colors */
-body[data-theme="durga_puja"] .theme-corner-festive-badge {
-  background: rgba(127, 29, 29, 0.92) !important;
-  border-color: rgba(217, 119, 6, 0.6) !important;
-  box-shadow: 0 10px 30px rgba(220, 38, 38, 0.3) !important;
-}
-
-body[data-theme="diwali"] .theme-corner-festive-badge {
-  background: rgba(46, 16, 101, 0.92) !important;
-  border-color: rgba(245, 158, 11, 0.6) !important;
-  box-shadow: 0 10px 30px rgba(109, 40, 217, 0.4) !important;
-}
-
-body[data-theme="winter"] .theme-corner-festive-badge {
-  background: rgba(8, 47, 73, 0.92) !important;
-  border-color: rgba(56, 189, 248, 0.6) !important;
-  box-shadow: 0 10px 30px rgba(2, 132, 199, 0.3) !important;
-}
-
-body[data-theme="christmas"] .theme-corner-festive-badge {
-  background: rgba(20, 83, 45, 0.92) !important;
-  border-color: rgba(234, 179, 8, 0.6) !important;
-  box-shadow: 0 10px 30px rgba(21, 128, 61, 0.3) !important;
-}
-
-body[data-theme="freedom"] .theme-corner-festive-badge {
-  background: rgba(30, 58, 138, 0.92) !important;
-  border-color: rgba(234, 88, 12, 0.6) !important;
-  box-shadow: 0 10px 30px rgba(30, 58, 138, 0.3) !important;
-}
-
-body[data-theme="summer"] .theme-corner-festive-badge {
-  background: rgba(67, 20, 7, 0.92) !important;
-  border-color: rgba(245, 158, 11, 0.6) !important;
-  box-shadow: 0 10px 30px rgba(234, 88, 12, 0.3) !important;
-}
-
-/* ==========================================================================
-   AUDIO WAVE INDICATOR & SOUND TOGGLE PILL
-   ========================================================================== */
-.theme-sound-audio-wave {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  height: 12px;
-  margin-left: 4px;
-}
-
-.theme-sound-audio-wave span {
-  display: inline-block;
-  width: 2.5px;
-  height: 100%;
-  background: currentColor;
-  border-radius: 2px;
-  animation: audioWavePulse 1.2s infinite ease-in-out alternate;
-}
-
-.theme-sound-audio-wave span:nth-child(1) { animation-delay: 0s; height: 35%; }
-.theme-sound-audio-wave span:nth-child(2) { animation-delay: 0.2s; height: 100%; }
-.theme-sound-audio-wave span:nth-child(3) { animation-delay: 0.4s; height: 60%; }
-
-@keyframes audioWavePulse {
-  0% { transform: scaleY(0.3); opacity: 0.6; }
-  100% { transform: scaleY(1.1); opacity: 1; }
-}
-
-.theme-sound-pill-btn {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 9999px;
-  padding: 0.2rem 0.6rem;
-  font-size: 0.65rem;
-  font-weight: 800;
-  color: #FFFFFF;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-left: 0.4rem;
-  user-select: none;
-}
-
-.theme-sound-pill-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.05);
-}
-
-.theme-sound-pill-btn.sound-muted {
-  opacity: 0.6;
-  background: rgba(0, 0, 0, 0.3);
-}
-
-/* ==========================================================================
-   FAIRY LIGHTS GARLAND (Durga Puja, Diwali & Christmas)
-   ========================================================================== */
-.fairy-lights-garland {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 3px 0;
-  background: rgba(0, 0, 0, 0.3);
-  overflow: hidden;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  line-height: 1;
-}
-
-.fairy-light-bulb {
-  width: 9px;
-  height: 13px;
-  border-radius: 50% 50% 40% 40%;
-  display: inline-block;
-  animation: bulbGlow 1.5s infinite alternate ease-in-out;
-}
-
-.fairy-light-bulb:nth-child(3n+1) {
-  background: #EF4444;
-  box-shadow: 0 0 10px #EF4444, 0 0 20px #DC2626;
-  animation-delay: 0s;
-}
-
-.fairy-light-bulb:nth-child(3n+2) {
-  background: #F59E0B;
-  box-shadow: 0 0 10px #F59E0B, 0 0 20px #D97706;
-  animation-delay: 0.5s;
-}
-
-.fairy-light-bulb:nth-child(3n) {
-  background: #10B981;
-  box-shadow: 0 0 10px #10B981, 0 0 20px #059669;
-  animation-delay: 1s;
-}
-
-@keyframes bulbGlow {
-  0% { opacity: 0.4; transform: scale(0.85); }
-  100% { opacity: 1; transform: scale(1.15); }
-}
-
-/* ==========================================================================
-   AURORA BOREALIS HERO GLOW (Winter Theme)
-   ========================================================================== */
-body[data-theme="winter"] .hero-section::before {
-  content: "";
+.loader-progress-fill {
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(120deg, rgba(56, 189, 248, 0.15) 0%, rgba(168, 85, 247, 0.15) 40%, rgba(34, 197, 94, 0.15) 70%, transparent 100%);
-  background-size: 300% 300%;
-  animation: auroraSweep 10s ease infinite;
-  pointer-events: none;
+  left: -100%;
+  height: 100%;
+  width: 100%;
+  border-radius: 1px;
+  animation: loaderSweep 3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-@keyframes auroraSweep {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+/* Default loader progress color */
+.loader-progress-fill { background: rgba(37, 99, 235, 0.8); }
+body[data-theme="durga_puja"] .loader-progress-fill  { background: rgba(180, 83, 9, 0.9); }
+body[data-theme="diwali"] .loader-progress-fill      { background: rgba(146, 64, 14, 0.9); }
+body[data-theme="winter"] .loader-progress-fill      { background: rgba(59, 130, 246, 0.9); }
+body[data-theme="christmas"] .loader-progress-fill   { background: rgba(20, 83, 45, 0.9); }
+body[data-theme="freedom"] .loader-progress-fill     { background: rgba(30, 58, 138, 0.9); }
+body[data-theme="summer"] .loader-progress-fill      { background: rgba(120, 53, 15, 0.9); }
+
+@keyframes loaderSweep {
+  0%   { left: -100%; }
+  100% { left: 0%; }
 }
 
 /* ==========================================================================
-   MOBILE RESPONSIVE
+   MINIMAL SEASON CORNER TAG (Replaces childish floating badge)
+   Just a clean typographic pill — no emojis, no waves, no sound toggle
    ========================================================================== */
+.theme-season-tag {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+  z-index: 9997;
+  pointer-events: none;
+  animation: tagFadeIn 0.6s ease 0.5s both;
+}
+
+@keyframes tagFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Theme-specific season tag accent */
+body[data-theme="durga_puja"] .theme-season-tag {
+  background: rgba(28, 0, 0, 0.85);
+  border-color: rgba(180, 83, 9, 0.3);
+  color: rgba(245, 215, 138, 0.8);
+}
+
+body[data-theme="diwali"] .theme-season-tag {
+  background: rgba(5, 0, 8, 0.9);
+  border-color: rgba(146, 64, 14, 0.35);
+  color: rgba(245, 215, 138, 0.8);
+}
+
+body[data-theme="winter"] .theme-season-tag {
+  background: rgba(2, 13, 24, 0.88);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: rgba(186, 230, 253, 0.8);
+}
+
+body[data-theme="christmas"] .theme-season-tag {
+  background: rgba(3, 13, 7, 0.88);
+  border-color: rgba(146, 64, 14, 0.3);
+  color: rgba(245, 215, 138, 0.8);
+}
+
+body[data-theme="freedom"] .theme-season-tag {
+  background: rgba(15, 23, 42, 0.88);
+  border-color: rgba(120, 53, 15, 0.3);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+body[data-theme="summer"] .theme-season-tag {
+  background: rgba(13, 4, 0, 0.88);
+  border-color: rgba(180, 83, 9, 0.3);
+  color: rgba(254, 215, 170, 0.8);
+}
+
 @media (max-width: 768px) {
-  .theme-corner-festive-badge {
-    bottom: 75px;
+  .theme-season-tag {
+    bottom: 72px;
     right: 14px;
-    font-size: 0.7rem;
-    padding: 0.38rem 0.8rem;
-  }
-
-  .theme-sound-pill-btn {
-    padding: 0.15rem 0.45rem;
-    font-size: 0.6rem;
-  }
-
-  .loader-festive-motif {
-    gap: 0.45rem;
-    margin-bottom: 0.6rem;
-  }
-
-  .motif-durga-puja .pradip-flame { font-size: 1.25rem; }
-  .motif-durga-puja .pradip-base { font-size: 1.4rem; }
-  .motif-durga-puja .motif-dhak-center { font-size: 1.5rem; }
-  .motif-durga-puja .motif-kash-left,
-  .motif-durga-puja .motif-kash-right { font-size: 1.25rem; }
-  .motif-diwali .motif-pradip-glow { font-size: 1.5rem; }
-  .motif-diwali .diwali-sparkle { font-size: 1.2rem; }
-  .motif-diwali .diwali-firework { font-size: 1.5rem; }
-  .motif-winter .winter-flake { font-size: 1.5rem; }
-  .motif-christmas .noel-bell { font-size: 1.5rem; }
-  .motif-christmas .noel-santa { font-size: 1.6rem; }
-  .motif-freedom .tiranga-flag { font-size: 1.6rem; }
-  .motif-freedom .tiranga-chakra { font-size: 1.5rem; }
-  .motif-summer .summer-sun { font-size: 1.6rem; }
-
-  .loader-theme-subtitle {
-    font-size: clamp(0.62rem, 2.8vw, 0.75rem) !important;
-    letter-spacing: 0.3px !important;
+    font-size: 0.58rem;
+    padding: 0.3rem 0.65rem;
   }
 }
 
+/* ==========================================================================
+   THEME-AWARE ANNOUNCEMENT BAR (clean, no glow, no text-shadow)
+   ========================================================================== */
+body[data-theme="durga_puja"] .top-announcement,
+body[data-theme="diwali"] .top-announcement,
+body[data-theme="winter"] .top-announcement,
+body[data-theme="christmas"] .top-announcement,
+body[data-theme="freedom"] .top-announcement,
+body[data-theme="summer"] .top-announcement {
+  text-shadow: none !important;
+}

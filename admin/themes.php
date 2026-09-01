@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Admin Theme Management Studio
  * 1-Click Storewide Theme Customizer & Festive Engine
@@ -17,7 +17,7 @@ $themes = [
     'default' => [
         'name' => 'Obsidian Liquid Glass',
         'tag' => 'DEFAULT / ALL-SEASON',
-        'icon' => '🖤',
+        'icon' => 'ðŸ–¤',
         'desc' => 'Signature modern aesthetic with high-definition frosted liquid glass, deep charcoal tones, and cobalt blue accents.',
         'colors' => ['#0F172A', '#1E3A8A', '#2563EB', '#F4F6FB'],
         'particles' => 'Subtle ambient light refraction',
@@ -26,7 +26,7 @@ $themes = [
     'durga_puja' => [
         'name' => 'Durga Puja (Pujor Mahotsav)',
         'tag' => 'FESTIVE MAHALAYA / AGOMONI',
-        'icon' => '🪔',
+        'icon' => 'ðŸª”',
         'desc' => 'Traditional vermillion crimson, celebratory gold accents, festive announcement bar, and floating Kash Phool & Marigold flower petals.',
         'colors' => ['#991B1B', '#DC2626', '#D97706', '#FEF08A'],
         'particles' => 'Floating Kash Phool reeds & Marigold petals',
@@ -35,7 +35,7 @@ $themes = [
     'diwali' => [
         'name' => 'Diwali (Festival of Lights)',
         'tag' => 'DEEPAVALI CELEBRATION',
-        'icon' => '✨',
+        'icon' => 'âœ¨',
         'desc' => 'Royal deep midnight purple, glowing golden diya sparks, festive discounts, and ascending firework particle embers.',
         'colors' => ['#4C1D95', '#6D28D9', '#F59E0B', '#FAF5FF'],
         'particles' => 'Ascending golden diya sparks & starbursts',
@@ -44,7 +44,7 @@ $themes = [
     'winter' => [
         'name' => 'Winter (Frost & Blizzard)',
         'tag' => 'COLD WEATHER & HOODIES',
-        'icon' => '❄️',
+        'icon' => 'â„ï¸',
         'desc' => 'Arctic Cyan and icy frost blue palette, crystalline borders, and a smooth multi-layered snowfall particle engine.',
         'colors' => ['#0369A1', '#0284C7', '#38BDF8', '#F0F9FF'],
         'particles' => 'Realistic falling snowflakes with wind drift',
@@ -53,7 +53,7 @@ $themes = [
     'christmas' => [
         'name' => 'Christmas (Yuletide Noel)',
         'tag' => 'HOLIDAY SALE & NEW YEAR',
-        'icon' => '🎄',
+        'icon' => 'ðŸŽ„',
         'desc' => 'Rich pine emerald green, ruby velvet crimson, holiday gold, festive greeting banners, and gentle holiday snowfall.',
         'colors' => ['#15803D', '#DC2626', '#EAB308', '#F0FDF4'],
         'particles' => 'Gentle holiday snowfall & starbursts',
@@ -62,7 +62,7 @@ $themes = [
     'freedom' => [
         'name' => 'Freedom (Tiranga Spirit)',
         'tag' => 'INDEPENDENCE & REPUBLIC DAY',
-        'icon' => '🇮🇳',
+        'icon' => 'ðŸ‡®ðŸ‡³',
         'desc' => 'Proud Indian Tiranga tricolor theme with saffron, pure white, and emerald green ribbons with Ashoka navy blue accents.',
         'colors' => ['#EA580C', '#FFFFFF', '#15803D', '#1E3A8A'],
         'particles' => 'Floating saffron, white & green confetti ribbons',
@@ -71,7 +71,7 @@ $themes = [
     'summer' => [
         'name' => 'Summer (Solar Wave & Sunset)',
         'tag' => 'HOT WEATHER & ACID WASH',
-        'icon' => '☀️',
+        'icon' => 'â˜€ï¸',
         'desc' => 'Warm coral and sun-kissed golden amber gradients with energetic solar embers and breathable summer streetwear vibes.',
         'colors' => ['#C2410C', '#EA580C', '#F59E0B', '#FFFBEB'],
         'particles' => 'Floating solar embers & heatwave glow',
@@ -85,7 +85,7 @@ $themes = [
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
         <div>
             <h2 style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 900; color: #0F172A; margin: 0; text-transform: uppercase;">
-                🎨 Themes & Festive Studio
+                ðŸŽ¨ Themes & Festive Studio
             </h2>
             <p style="font-size: 0.86rem; color: #64748B; margin-top: 0.2rem;">
                 Transform your storefront in 1-click with custom festive color palettes, seasonal banners, and 60fps particle physics.
@@ -93,7 +93,7 @@ $themes = [
         </div>
         <div style="display: flex; align-items: center; gap: 1rem;">
             <a href="../index.php" target="_blank" class="btn-fintech-pill" style="text-decoration: none;">
-                <span class="btn-icon-badge badge-blue">👁️</span>
+                <span class="btn-icon-badge badge-blue">ðŸ‘ï¸</span>
                 <span>Open Live Store</span>
             </a>
         </div>
@@ -103,11 +103,11 @@ $themes = [
     <div style="background: rgba(255, 255, 255, 0.9); border: 1.5px solid #E2E8F0; border-radius: 16px; padding: 1.25rem 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.2rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
         <div style="display: flex; align-items: center; gap: 1rem;">
             <div style="width: 50px; height: 50px; border-radius: 14px; background: #0F172A; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.6rem;">
-                <?= $themes[$activeTheme]['icon'] ?? '🎨' ?>
+                <?= $themes[$activeTheme]['icon'] ?? 'ðŸŽ¨' ?>
             </div>
             <div>
                 <div style="font-size: 0.72rem; font-weight: 800; color: #16A34A; text-transform: uppercase; letter-spacing: 1px;">
-                    ● LIVE ON STOREFRONT
+                    â— LIVE ON STOREFRONT
                 </div>
                 <div style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 900; color: #0F172A;">
                     <?= e($themes[$activeTheme]['name'] ?? 'Default') ?>
@@ -115,17 +115,10 @@ $themes = [
             </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-            <!-- Sound FX Master Toggle -->
-            <label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.85rem; font-weight: 700; color: #334155; background: #F8FAFC; padding: 0.45rem 0.9rem; border-radius: 10px; border: 1.5px solid #E2E8F0;">
-                <input type="checkbox" id="sound-toggle" <?= $soundEnabled ? 'checked' : '' ?> onchange="toggleSound(this.checked)" style="width: 18px; height: 18px; cursor: pointer;">
-                <span>🔊 Festive Sound FX</span>
-            </label>
-
-            <!-- Particles Toggle -->
+        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">            <!-- Particles Toggle -->
             <label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.85rem; font-weight: 700; color: #334155; background: #F8FAFC; padding: 0.45rem 0.9rem; border-radius: 10px; border: 1.5px solid #E2E8F0;">
                 <input type="checkbox" id="particles-toggle" <?= $particlesEnabled ? 'checked' : '' ?> onchange="toggleParticles(this.checked)" style="width: 18px; height: 18px; cursor: pointer;">
-                <span>✨ Particle Physics (60fps)</span>
+                <span>âœ¨ Particle Physics (60fps)</span>
             </label>
         </div>
     </div>
@@ -139,7 +132,7 @@ $themes = [
                 
                 <?php if ($isActive): ?>
                     <span style="position: absolute; top: 12px; right: 12px; background: #2563EB; color: #FFFFFF; font-size: 0.68rem; font-weight: 900; padding: 0.25rem 0.75rem; border-radius: 20px; letter-spacing: 0.5px;">
-                        ✓ ACTIVE NOW
+                        âœ“ ACTIVE NOW
                     </span>
                 <?php endif; ?>
 
@@ -174,13 +167,13 @@ $themes = [
 
                     <!-- Special Effects & Sound Motif -->
                     <div style="font-size: 0.75rem; color: #334155; margin-bottom: 0.8rem; background: #F8FAFC; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid #E2E8F0;">
-                        ✨ <strong>Particles:</strong> <?= $thm['particles'] ?>
+                        âœ¨ <strong>Particles:</strong> <?= $thm['particles'] ?>
                     </div>
 
                     <!-- Test Sound FX Button -->
                     <div style="margin-bottom: 1.2rem;">
                         <button type="button" onclick="window.playThemeSound('<?= $key ?>')" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.4rem; background: #F1F5F9; border: 1.5px solid #CBD5E1; color: #0F172A; padding: 0.45rem; border-radius: 10px; font-size: 0.76rem; font-weight: 800; cursor: pointer; transition: all 0.2s ease;">
-                            <span>🎵</span>
+                            <span>ðŸŽµ</span>
                             <span>Test <?= explode(' ', $thm['name'])[0] ?> Audio Motif</span>
                         </button>
                     </div>
@@ -190,12 +183,12 @@ $themes = [
                 <div>
                     <?php if ($isActive): ?>
                         <button disabled class="btn-fintech-pill" style="width: 100%; justify-content: center; background: #10B981 !important; border-color: #10B981 !important; cursor: default;">
-                            <span class="btn-icon-badge badge-green">✓</span>
+                            <span class="btn-icon-badge badge-green">âœ“</span>
                             <span>CURRENTLY ACTIVE</span>
                         </button>
                     <?php else: ?>
                         <button type="button" onclick="activateTheme('<?= $key ?>')" class="btn-fintech-pill" style="width: 100%; justify-content: center;">
-                            <span class="btn-icon-badge badge-blue">⚡</span>
+                            <span class="btn-icon-badge badge-blue">âš¡</span>
                             <span>ACTIVATE THIS THEME</span>
                         </button>
                     <?php endif; ?>
@@ -270,3 +263,4 @@ function toggleSound(enabled) {
 </script>
 
 <?php require_once __DIR__ . '/footer.php'; ?>
+

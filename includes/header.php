@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Header & Responsive Navbar Component
  * The Stitch Co.
@@ -20,8 +20,6 @@ $pageTitle = $pageTitle ?? STORE_NAME . ' | ' . STORE_TAGLINE;
 $isMaintenanceActive = (int)get_setting('maintenance_mode', '0') === 1;
 $activeTheme = get_setting('active_theme', 'default');
 $themeParticlesEnabled = (int)get_setting('theme_particles_enabled', '1');
-$themeSoundEnabled = (int)get_setting('theme_sound_enabled', '1');
-
 $userOrderCount = 0;
 $userAddressCount = 0;
 if ($currentUser) {
@@ -42,9 +40,7 @@ if ($currentUser) {
     <link rel="stylesheet" href="assets/css/style.css?v=<?= time() ?>">
     <link rel="stylesheet" href="assets/css/festive-themes.css?v=<?= time() ?>">
     <link rel="icon" href="assets/images/logo.jpg" type="image/jpeg">
-    <script>
-        window.themeSoundMasterEnabled = <?= $themeSoundEnabled ? 'true' : 'false' ?>;
-        window.activeTheme = '<?= e($activeTheme) ?>';
+    <script>        window.activeTheme = '<?= e($activeTheme) ?>';
     </script>
 </head>
 <body data-theme="<?= e($activeTheme) ?>">
@@ -53,120 +49,55 @@ if ($currentUser) {
     <!-- Persistent Admin Maintenance Mode Warning Banner -->
     <div style="background: linear-gradient(90deg, #B91C1C 0%, #7F1D1D 100%); color: #FFFFFF; padding: 0.65rem 1rem; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; z-index: 999999; position: relative; border-bottom: 2px solid #EF4444; box-shadow: 0 4px 15px rgba(185, 28, 28, 0.4);">
         <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <span style="font-size: 1.1rem; animation: blink 1.2s infinite alternate;">⚠️</span>
+            <span style="font-size: 1.1rem; animation: blink 1.2s infinite alternate;">âš ï¸</span>
             <span><strong>STORE IS IN MAINTENANCE MODE:</strong> Public visitors cannot access the site. (Admin Live Preview)</span>
         </div>
         <div style="display: flex; align-items: center; gap: 0.6rem;">
-            <a href="admin/settings.php" style="background: #FFFFFF; color: #B91C1C; padding: 0.3rem 0.8rem; border-radius: 4px; text-decoration: none; font-size: 0.75rem; font-weight: 900; letter-spacing: 0.5px;">⚡ TURN OFF IN ADMIN</a>
+            <a href="admin/settings.php" style="background: #FFFFFF; color: #B91C1C; padding: 0.3rem 0.8rem; border-radius: 4px; text-decoration: none; font-size: 0.75rem; font-weight: 900; letter-spacing: 0.5px;">âš¡ TURN OFF IN ADMIN</a>
         </div>
     </div>
 <?php endif; ?>
 
-<?php
-// Map theme to its decoration content
-$themeTopDecoContent = '';
-if ($activeTheme === 'durga_puja') {
-    $themeTopDecoContent = '🌸 🪔 🌼 🌸 🪔 🌼 🌸 🪔 🌼 🌸 🪔 🌼 🌸 🪔 🌼 🌸 🪔 🌼 🌸 🪔 🌼 🌸 🪔 🌼 🌸';
-} elseif ($activeTheme === 'diwali') {
-    $themeTopDecoContent = '🪔 ✨ 🎇 ✨ 🪔 ✨ 🎇 ✨ 🪔 ✨ 🎇 ✨ 🪔 ✨ 🎇 ✨ 🪔 ✨ 🎇 ✨ 🪔 ✨ 🎇';
-} elseif ($activeTheme === 'winter') {
-    $themeTopDecoContent = '❄️ ❅ ❄️ ❅ ❄️ ❅ ❄️ ❅ ❄️ ❅ ❄️ ❅ ❄️ ❅ ❄️ ❅ ❄️ ❅ ❄️ ❅ ❄️ ❅ ❄️';
-} elseif ($activeTheme === 'christmas') {
-    $themeTopDecoContent = '🎄 🔔 ❄️ ⭐ 🎄 🔔 ❄️ ⭐ 🎄 🔔 ❄️ ⭐ 🎄 🔔 ❄️ ⭐ 🎄 🔔 ❄️ ⭐ 🎄';
-} elseif ($activeTheme === 'summer') {
-    $themeTopDecoContent = '☀️ 🌊 🌴 ☀️ 🌊 🌴 ☀️ 🌊 🌴 ☀️ 🌊 🌴 ☀️ 🌊 🌴 ☀️ 🌊 🌴 ☀️ 🌊 🌴';
-}
-// Freedom theme uses pure CSS tricolor stripe — no text content needed
-?>
-
-<?php if ($activeTheme !== 'default' && !empty($activeTheme)): ?>
-<div class="theme-top-decoration" role="presentation" aria-hidden="true">
-    <?= $themeTopDecoContent ?>
-</div>
-<?php endif; ?>
 
 
 
-<!-- Stage 1 & 2 Brand Loader with Theme-Specific Festive Animations -->
-<div id="brand-loader" class="loader-theme-<?= e($activeTheme) ?>">
+
+<!-- Premium Typographic Brand Loader -->
+<div id="brand-loader">
     <div class="loader-brand-box">
-        <?php if ($activeTheme === 'durga_puja'): ?>
-            <!-- Durga Puja Festive Ornaments: Kash Phool, Dhak & Animated Pradip Flame -->
-            <div class="loader-festive-motif motif-durga-puja">
-                <span class="motif-kash-left" title="Kash Phool">🌾</span>
-                <div class="motif-pradip-wrap">
-                    <span class="pradip-flame">🔥</span>
-                    <span class="pradip-base">🪔</span>
-                </div>
-                <span class="motif-dhak-center" title="Dhak Rhythm">🥁</span>
-                <span class="motif-kash-right" title="Kash Phool">🌾</span>
-            </div>
-        <?php elseif ($activeTheme === 'diwali'): ?>
-            <!-- Diwali Sparkling Pradips & Starbursts -->
-            <div class="loader-festive-motif motif-diwali">
-                <span class="diwali-sparkle">✨</span>
-                <span class="motif-pradip-glow">🪔</span>
-                <span class="diwali-firework">🎆</span>
-                <span class="motif-pradip-glow">🪔</span>
-                <span class="diwali-sparkle">✨</span>
-            </div>
-        <?php elseif ($activeTheme === 'winter'): ?>
-            <!-- Winter Blizzard & Icicles -->
-            <div class="loader-festive-motif motif-winter">
-                <span class="winter-flake">❄️</span>
-                <span class="winter-frost">🧊</span>
-                <span class="winter-flake">❄️</span>
-            </div>
-        <?php elseif ($activeTheme === 'christmas'): ?>
-            <!-- Christmas Santa Hat & Noel Bell -->
-            <div class="loader-festive-motif motif-christmas">
-                <span class="noel-bell">🔔</span>
-                <span class="noel-santa">🎅</span>
-                <span class="noel-tree">🎄</span>
-            </div>
-        <?php elseif ($activeTheme === 'freedom'): ?>
-            <!-- Tiranga Ribbon -->
-            <div class="loader-festive-motif motif-freedom">
-                <span class="tiranga-flag">🇮🇳</span>
-                <span class="tiranga-chakra">☸️</span>
-                <span class="tiranga-flag">🇮🇳</span>
-            </div>
-        <?php elseif ($activeTheme === 'summer'): ?>
-            <!-- Solar Flare -->
-            <div class="loader-festive-motif motif-summer">
-                <span class="summer-sun">☀️</span>
-                <span class="summer-wave">🌊</span>
-                <span class="summer-sun">☀️</span>
-            </div>
-        <?php endif; ?>
+        <!-- Theme-aware SVG ring around logo -->
+        <div class="loader-logo-ring">
+            <svg class="loader-ring-svg" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="55" cy="55" r="50" stroke-width="1" stroke="currentColor" stroke-dasharray="6 4" opacity="0.3"/>
+                <circle cx="55" cy="55" r="44" stroke-width="0.5" stroke="currentColor" opacity="0.15"/>
+            </svg>
+            <img src="assets/images/logo.jpg" alt="The Stitch Co." class="loader-logo-img">
+        </div>
 
-        <img src="assets/images/logo.jpg" alt="The Stitch Co." style="width: 72px; height: 72px; border-radius: 50%; object-fit: cover; margin: 0 auto 0.8rem; box-shadow: 0 6px 20px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.8);">
-
-        <h1>THE <span>STITCH</span> CO.</h1>
-
-        <?php if ($activeTheme === 'durga_puja'): ?>
-            <p class="loader-theme-subtitle durga-gold-glow">🌸 SHUBHO SARODIYA • শারদোৎসব 🌸</p>
-        <?php elseif ($activeTheme === 'diwali'): ?>
-            <p class="loader-theme-subtitle diwali-gold-glow">✨ SHUBH DEEPAVALI • FESTIVAL OF LIGHTS ✨</p>
-        <?php elseif ($activeTheme === 'winter'): ?>
-            <p class="loader-theme-subtitle winter-cyan-glow">❄️ WINTER STREETWEAR DROPS • FROST EDITION ❄️</p>
-        <?php elseif ($activeTheme === 'christmas'): ?>
-            <p class="loader-theme-subtitle christmas-red-glow">🎄 MERRY CHRISTMAS & HAPPY NEW YEAR 🎄</p>
-        <?php elseif ($activeTheme === 'freedom'): ?>
-            <p class="loader-theme-subtitle freedom-tricolor-glow">🇮🇳 CELEBRATE FREEDOM • PROUDLY INDIAN 🇮🇳</p>
-        <?php elseif ($activeTheme === 'summer'): ?>
-            <p class="loader-theme-subtitle summer-amber-glow">☀️ SUMMER STREET DROPS • BREATHABLE COTTON ☀️</p>
-        <?php else: ?>
-            <p style="color: #94A3B8; font-size: 0.82rem; font-weight: 700; letter-spacing: 2px; margin-top: 0.3rem;">WEAR YOUR VIBE</p>
-        <?php endif; ?>
-
-        <div class="loader-spinner"></div>
+        <div class="loader-brand-wordmark">THE STITCH CO.</div>
+        <div class="loader-brand-sub">
+            <?php
+            $loaderSubs = [
+                'durga_puja'  => 'SHUBHO SARODIYA Â· PUJOR MAHOTSAV',
+                'diwali'      => 'SHUBH DEEPAVALI Â· FESTIVAL OF LIGHTS',
+                'winter'      => 'WINTER COLLECTION Â· FROST EDITION',
+                'christmas'   => 'HOLIDAY SEASON Â· YULETIDE DROPS',
+                'freedom'     => 'CELEBRATING FREEDOM Â· JAI HIND',
+                'summer'      => 'SUMMER COLLECTION Â· SOLAR DROPS',
+                'default'     => 'WEAR YOUR VIBE',
+            ];
+            echo e($loaderSubs[$activeTheme] ?? 'WEAR YOUR VIBE');
+            ?>
+        </div>
+        <div class="loader-progress-line">
+            <div class="loader-progress-fill"></div>
+        </div>
     </div>
 </div>
 
 <?php
 $showAnnouncement = (int)get_setting('announcement_bar_enabled', 1);
-$defaultAnnouncement = 'FREE SHIPPING ON ALL PREPAID ORDERS ABOVE ₹999 🚚 &nbsp;|&nbsp; USE CODE <strong>WELCOME10</strong> FOR 10% OFF';
+$defaultAnnouncement = 'FREE SHIPPING ON ALL PREPAID ORDERS ABOVE â‚¹999 ðŸšš &nbsp;|&nbsp; USE CODE <strong>WELCOME10</strong> FOR 10% OFF';
 $announcementText = trim(get_setting('announcement_bar_text', $defaultAnnouncement));
 
 // If text is gibberish or empty, fallback to default
@@ -176,17 +107,17 @@ if (empty($announcementText) || strlen($announcementText) < 8 || strpos($announc
 
 // Theme specific default greetings if not customized
 if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !== false || $announcementText === $defaultAnnouncement)) {
-    $announcementText = 'SHUBHO SARODIYA! 🌸 PUJOR EXCLUSIVE STREETWEAR DROPS &nbsp;|&nbsp; USE CODE <strong>PUJO10</strong> FOR 10% OFF';
+    $announcementText = 'SHUBHO SARODIYA! ðŸŒ¸ PUJOR EXCLUSIVE STREETWEAR DROPS &nbsp;|&nbsp; USE CODE <strong>PUJO10</strong> FOR 10% OFF';
 } elseif ($activeTheme === 'diwali' && (strpos($announcementText, 'WELCOME10') !== false || $announcementText === $defaultAnnouncement)) {
-    $announcementText = 'HAPPY DIWALI 🪔 ILLUMINATE YOUR STREETWEAR STYLE &nbsp;|&nbsp; USE CODE <strong>DIWALI200</strong> FOR ₹200 OFF';
+    $announcementText = 'HAPPY DIWALI ðŸª” ILLUMINATE YOUR STREETWEAR STYLE &nbsp;|&nbsp; USE CODE <strong>DIWALI200</strong> FOR â‚¹200 OFF';
 } elseif ($activeTheme === 'freedom' && (strpos($announcementText, 'WELCOME10') !== false || $announcementText === $defaultAnnouncement)) {
-    $announcementText = 'CELEBRATE FREEDOM 🇮🇳 PROUDLY CRAFTED IN INDIA &nbsp;|&nbsp; USE CODE <strong>INDIA78</strong>';
+    $announcementText = 'CELEBRATE FREEDOM ðŸ‡®ðŸ‡³ PROUDLY CRAFTED IN INDIA &nbsp;|&nbsp; USE CODE <strong>INDIA78</strong>';
 } elseif ($activeTheme === 'winter' && (strpos($announcementText, 'WELCOME10') !== false || $announcementText === $defaultAnnouncement)) {
-    $announcementText = 'WINTER STREETWEAR DROPS ❄️ STAY WARM & STYLISH &nbsp;|&nbsp; USE CODE <strong>WINTER10</strong> FOR 10% OFF';
+    $announcementText = 'WINTER STREETWEAR DROPS â„ï¸ STAY WARM & STYLISH &nbsp;|&nbsp; USE CODE <strong>WINTER10</strong> FOR 10% OFF';
 } elseif ($activeTheme === 'christmas' && (strpos($announcementText, 'WELCOME10') !== false || $announcementText === $defaultAnnouncement)) {
-    $announcementText = 'MERRY CHRISTMAS & HAPPY NEW YEAR 🎄 HOLIDAY SALE &nbsp;|&nbsp; USE CODE <strong>NOEL15</strong> FOR 15% OFF';
+    $announcementText = 'MERRY CHRISTMAS & HAPPY NEW YEAR ðŸŽ„ HOLIDAY SALE &nbsp;|&nbsp; USE CODE <strong>NOEL15</strong> FOR 15% OFF';
 } elseif ($activeTheme === 'summer' && (strpos($announcementText, 'WELCOME10') !== false || $announcementText === $defaultAnnouncement)) {
-    $announcementText = 'SUMMER STREET DROPS ☀️ 100% BREATHABLE COTTON &nbsp;|&nbsp; USE CODE <strong>SUMMER10</strong>';
+    $announcementText = 'SUMMER STREET DROPS â˜€ï¸ 100% BREATHABLE COTTON &nbsp;|&nbsp; USE CODE <strong>SUMMER10</strong>';
 }
 ?>
 <?php if (in_array($activeTheme, ['durga_puja', 'diwali', 'christmas'])): ?>
@@ -257,19 +188,54 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
 
             <!-- Profile / Account Liquid Glass Dropdown -->
             <div class="profile-dropdown-wrapper" id="profile-dropdown-wrapper">
-                <button type="button" class="nav-icon-btn profile-trigger-btn" id="profile-dropdown-btn" onclick="toggleProfileDropdown(event)" aria-label="Account Menu" aria-expanded="false" style="width: 38px; height: 38px; border-radius: 50%; padding: 0; overflow: hidden; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                    <?php if ($currentUser): ?>
-                        <?php if (!empty($currentUser['avatar'])): ?>
-                            <img src="<?= e($currentUser['avatar']) ?>" alt="<?= e($currentUser['fullname']) ?>" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                <!-- Theme-specific orbiting ring around avatar -->
+                <div class="profile-orbit-ring-wrap">
+                    <!-- Rotating SVG orbit ring -->
+                    <svg class="profile-orbit-svg" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <?php if ($activeTheme === 'durga_puja'): ?>
+                            <!-- Durga Puja: Rotating diya ring with flame dots -->
+                            <circle cx="26" cy="26" r="23" stroke-dasharray="3 5.8" stroke-linecap="round"/>
+                            <circle cx="26" cy="26" r="18" stroke-dasharray="1 4" opacity="0.4"/>
+                        <?php elseif ($activeTheme === 'diwali'): ?>
+                            <!-- Diwali: Jewel faceted orbit -->
+                            <polygon points="26,3 49,26 26,49 3,26" stroke-dasharray="4 4"/>
+                            <circle cx="26" cy="26" r="20" stroke-dasharray="2 6" opacity="0.5"/>
+                        <?php elseif ($activeTheme === 'winter'): ?>
+                            <!-- Winter: Hexagonal snowflake ring -->
+                            <polygon points="26,3 46.8,14.5 46.8,37.5 26,49 5.2,37.5 5.2,14.5" stroke-dasharray="3 3"/>
+                            <circle cx="26" cy="26" r="19" stroke-dasharray="1 5" opacity="0.4"/>
+                        <?php elseif ($activeTheme === 'christmas'): ?>
+                            <!-- Christmas: Star-octagon ring -->
+                            <circle cx="26" cy="26" r="23" stroke-dasharray="5 3.5" stroke-linecap="round"/>
+                            <circle cx="26" cy="26" r="17" stroke-dasharray="2 5" opacity="0.45"/>
+                        <?php elseif ($activeTheme === 'freedom'): ?>
+                            <!-- Freedom: Precise double circle (Ashoka) -->
+                            <circle cx="26" cy="26" r="23" stroke-dasharray="24 2"/>
+                            <circle cx="26" cy="26" r="18" stroke-dasharray="1 3" opacity="0.35"/>
+                        <?php elseif ($activeTheme === 'summer'): ?>
+                            <!-- Summer: Radiating starburst -->
+                            <circle cx="26" cy="26" r="23" stroke-dasharray="2 4" stroke-linecap="round"/>
+                            <circle cx="26" cy="26" r="17" stroke-dasharray="4 3" opacity="0.4"/>
                         <?php else: ?>
-                            <span style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: #111827; color: #FFFFFF; font-size: 0.85rem; font-weight: 800; border-radius: 50%;"><?= strtoupper(substr($currentUser['fullname'], 0, 1)) ?></span>
+                            <!-- Default: Elegant thin dashed circle -->
+                            <circle cx="26" cy="26" r="23" stroke-dasharray="4 3" opacity="0.5"/>
                         <?php endif; ?>
-                    <?php else: ?>
-                        <span style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; border-radius: 50%; background: rgba(0,0,0,0.05);">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                        </span>
-                    <?php endif; ?>
-                </button>
+                    </svg>
+
+                    <button type="button" class="nav-icon-btn profile-trigger-btn" id="profile-dropdown-btn" onclick="toggleProfileDropdown(event)" aria-label="Account Menu" aria-expanded="false">
+                        <?php if ($currentUser): ?>
+                            <?php if (!empty($currentUser['avatar'])): ?>
+                                <img src="<?= e($currentUser['avatar']) ?>" alt="<?= e($currentUser['fullname']) ?>" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                            <?php else: ?>
+                                <span class="profile-initials-avatar"><?= strtoupper(substr($currentUser['fullname'], 0, 1)) ?></span>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <span class="profile-guest-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            </span>
+                        <?php endif; ?>
+                    </button>
+                </div>
 
                 <!-- iOS Liquid Glass Dropdown Panel -->
                 <div class="ios-liquid-glass-dropdown" id="profile-glass-menu">
@@ -286,7 +252,7 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
                             <div class="glass-user-info">
                                 <div class="glass-user-name"><?= e($currentUser['fullname']) ?></div>
                                 <div class="glass-user-email"><?= e($currentUser['email']) ?></div>
-                                <div style="font-size: 0.65rem; font-weight: 800; color: #16A34A; margin-top: 2px;">⚡ Verified Customer Account &rarr;</div>
+                                <div style="font-size: 0.65rem; font-weight: 800; color: #16A34A; margin-top: 2px;">âš¡ Verified Customer Account &rarr;</div>
                             </div>
                         </a>
 
@@ -297,7 +263,7 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
                         <ul class="glass-dropdown-nav">
                             <li>
                                 <a href="dashboard.php" class="glass-nav-item">
-                                    <span class="glass-nav-icon">📊</span>
+                                    <span class="glass-nav-icon">ðŸ“Š</span>
                                     <div class="glass-nav-text">
                                         <span class="glass-nav-title">Profile Dashboard</span>
                                         <span class="glass-nav-sub">Overview, stats & recent activity</span>
@@ -307,7 +273,7 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
                             </li>
                             <li>
                                 <a href="orders.php" class="glass-nav-item">
-                                    <span class="glass-nav-icon">📦</span>
+                                    <span class="glass-nav-icon">ðŸ“¦</span>
                                     <div class="glass-nav-text">
                                         <span class="glass-nav-title">My Orders</span>
                                         <span class="glass-nav-sub">Order history & status</span>
@@ -317,7 +283,7 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
                             </li>
                             <li>
                                 <a href="wishlist.php" class="glass-nav-item">
-                                    <span class="glass-nav-icon">❤️</span>
+                                    <span class="glass-nav-icon">â¤ï¸</span>
                                     <div class="glass-nav-text">
                                         <span class="glass-nav-title">My Wishlist</span>
                                         <span class="glass-nav-sub">Saved street drops</span>
@@ -334,7 +300,7 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
                         <ul class="glass-dropdown-nav">
                             <li>
                                 <a href="addresses.php" class="glass-nav-item">
-                                    <span class="glass-nav-icon">📍</span>
+                                    <span class="glass-nav-icon">ðŸ“</span>
                                     <div class="glass-nav-text">
                                         <span class="glass-nav-title">Saved Addresses</span>
                                         <span class="glass-nav-sub">Doorstep delivery locations</span>
@@ -344,7 +310,7 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
                             </li>
                             <li>
                                 <a href="profile.php" class="glass-nav-item">
-                                    <span class="glass-nav-icon">⚙️</span>
+                                    <span class="glass-nav-icon">âš™ï¸</span>
                                     <div class="glass-nav-text">
                                         <span class="glass-nav-title">Profile Settings</span>
                                         <span class="glass-nav-sub">Avatar, phone & security</span>
@@ -354,7 +320,7 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
                             </li>
                             <li>
                                 <a href="contact.php" class="glass-nav-item">
-                                    <span class="glass-nav-icon">💬</span>
+                                    <span class="glass-nav-icon">ðŸ’¬</span>
                                     <div class="glass-nav-text">
                                         <span class="glass-nav-title">Help & Support</span>
                                         <span class="glass-nav-sub">WhatsApp & customer care</span>
@@ -366,7 +332,7 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
                             <?php if (in_array($currentUser['role'] ?? '', ['admin', 'super_admin'])): ?>
                                 <li>
                                     <a href="admin/index.php" class="glass-nav-item glass-admin-link">
-                                        <span class="glass-nav-icon">⚡</span>
+                                        <span class="glass-nav-icon">âš¡</span>
                                         <div class="glass-nav-text">
                                             <span class="glass-nav-title" style="color: #2563EB;">Admin Control Panel</span>
                                             <span class="glass-nav-sub">Manage catalog, orders & site</span>
@@ -381,7 +347,7 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
 
                         <div class="glass-logout-wrap">
                             <a href="logout.php" class="glass-logout-btn">
-                                <span>🚪</span>
+                                <span>ðŸšª</span>
                                 <span>Log Out (<?= e($currentUser['fullname']) ?>)</span>
                             </a>
                         </div>
@@ -389,14 +355,14 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
                         <!-- Guest Mode -->
                         <div class="glass-guest-box">
                             <div class="glass-guest-title">
-                                Welcome to The Stitch Co. 👋
+                                Welcome to The Stitch Co. ðŸ‘‹
                             </div>
                             <p class="glass-guest-desc">
                                 Sign in to access your orders, track shipments & get exclusive drop perks.
                             </p>
                             <div class="glass-guest-actions">
-                                <a href="login.php" class="glass-btn-primary">🔑 Sign In</a>
-                                <a href="login.php#register" class="glass-btn-secondary">✨ Create Account</a>
+                                <a href="login.php" class="glass-btn-primary">ðŸ”‘ Sign In</a>
+                                <a href="login.php#register" class="glass-btn-secondary">âœ¨ Create Account</a>
                             </div>
                         </div>
 
@@ -406,7 +372,7 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
                         <ul class="glass-dropdown-nav">
                             <li>
                                 <a href="shop.php" class="glass-nav-item">
-                                    <span class="glass-nav-icon">🛍️</span>
+                                    <span class="glass-nav-icon">ðŸ›ï¸</span>
                                     <div class="glass-nav-text">
                                         <span class="glass-nav-title">Shop All Drops</span>
                                         <span class="glass-nav-sub">Explore streetwear catalog</span>
@@ -416,7 +382,7 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
                             </li>
                             <li>
                                 <a href="categories.php" class="glass-nav-item">
-                                    <span class="glass-nav-icon">✨</span>
+                                    <span class="glass-nav-icon">âœ¨</span>
                                     <div class="glass-nav-text">
                                         <span class="glass-nav-title">Browse Categories</span>
                                         <span class="glass-nav-sub">Oversized tees, hoodies & more</span>
@@ -426,7 +392,7 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
                             </li>
                             <li>
                                 <a href="contact.php" class="glass-nav-item">
-                                    <span class="glass-nav-icon">💬</span>
+                                    <span class="glass-nav-icon">ðŸ’¬</span>
                                     <div class="glass-nav-text">
                                         <span class="glass-nav-title">Customer Support</span>
                                         <span class="glass-nav-sub">Get help on WhatsApp</span>
@@ -478,22 +444,22 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
     ?>
 
     <ul class="drawer-menu">
-        <li><a href="index.php">🏠 Home</a></li>
-        <li><a href="shop.php">🛍️ Shop All Catalog</a></li>
-        <li><a href="categories.php">✨ Browse Categories</a></li>
+        <li><a href="index.php">ðŸ  Home</a></li>
+        <li><a href="shop.php">ðŸ›ï¸ Shop All Catalog</a></li>
+        <li><a href="categories.php">âœ¨ Browse Categories</a></li>
 
         <li style="padding: 0.8rem 1rem 0.3rem; font-size: 0.68rem; font-weight: 900; color: #64748B; text-transform: uppercase; letter-spacing: 1.5px; border-top: 1px solid rgba(255,255,255,0.08); margin-top: 0.5rem;">COLLECTIONS</li>
         
         <?php foreach ($drawerCategories as $dCat): 
-            $dIcon = '👕';
+            $dIcon = 'ðŸ‘•';
             $k = $dCat['cat_key'];
-            if ($k === 'oversized') $dIcon = '🔥';
-            elseif ($k === 'polo') $dIcon = '👔';
-            elseif ($k === 'hoodies') $dIcon = '🧥';
-            elseif ($k === 'acid_wash') $dIcon = '⚡';
-            elseif ($k === 'bottoms') $dIcon = '👖';
-            elseif ($k === 'new_arrivals') $dIcon = '✨';
-            elseif ($k === 'tshirts') $dIcon = '✨';
+            if ($k === 'oversized') $dIcon = 'ðŸ”¥';
+            elseif ($k === 'polo') $dIcon = 'ðŸ‘”';
+            elseif ($k === 'hoodies') $dIcon = 'ðŸ§¥';
+            elseif ($k === 'acid_wash') $dIcon = 'âš¡';
+            elseif ($k === 'bottoms') $dIcon = 'ðŸ‘–';
+            elseif ($k === 'new_arrivals') $dIcon = 'âœ¨';
+            elseif ($k === 'tshirts') $dIcon = 'âœ¨';
         ?>
             <li>
                 <a href="shop.php?cat=<?= e($dCat['cat_key']) ?>">
@@ -505,17 +471,18 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
 
         <li style="padding: 0.8rem 1rem 0.3rem; font-size: 0.68rem; font-weight: 900; color: #94A3B8; text-transform: uppercase; letter-spacing: 1.5px; border-top: 1px solid rgba(255,255,255,0.12); margin-top: 0.5rem;">ACCOUNT & SERVICES</li>
         <?php if ($currentUser): ?>
-            <li><a href="dashboard.php">📊 Account Dashboard</a></li>
-            <li><a href="orders.php">📦 My Orders (<?= $userOrderCount ?>)</a></li>
-            <li><a href="wishlist.php">❤️ Saved Wishlist</a></li>
-            <li><a href="addresses.php">📍 Saved Addresses (<?= $userAddressCount ?>)</a></li>
-            <li><a href="profile.php">⚙️ Profile Settings</a></li>
+            <li><a href="dashboard.php">ðŸ“Š Account Dashboard</a></li>
+            <li><a href="orders.php">ðŸ“¦ My Orders (<?= $userOrderCount ?>)</a></li>
+            <li><a href="wishlist.php">â¤ï¸ Saved Wishlist</a></li>
+            <li><a href="addresses.php">ðŸ“ Saved Addresses (<?= $userAddressCount ?>)</a></li>
+            <li><a href="profile.php">âš™ï¸ Profile Settings</a></li>
             <?php if (in_array($currentUser['role'], ['admin', 'super_admin'])): ?>
-                <li><a href="admin/index.php" style="color: #60A5FA !important; font-weight: 900;">⚡ Admin Panel</a></li>
+                <li><a href="admin/index.php" style="color: #60A5FA !important; font-weight: 900;">âš¡ Admin Panel</a></li>
             <?php endif; ?>
-            <li><a href="logout.php" style="color: #F87171 !important;">🚪 Sign Out (<?= e($currentUser['fullname']) ?>)</a></li>
+            <li><a href="logout.php" style="color: #F87171 !important;">ðŸšª Sign Out (<?= e($currentUser['fullname']) ?>)</a></li>
         <?php else: ?>
-            <li><a href="login.php">🔑 Login / Register</a></li>
+            <li><a href="login.php">ðŸ”‘ Login / Register</a></li>
         <?php endif; ?>
     </ul>
 </div>
+
