@@ -3347,12 +3347,88 @@ button, input, select, textarea {
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Mobile Side Drawer */
+/* Mobile Side Drawer - Obsidian Liquid Glass (High Contrast) */
 .mobile-drawer {
-  background: rgba(255, 255, 255, 0.9) !important;
-  backdrop-filter: blur(30px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(30px) saturate(200%) !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.6) !important;
+  background: #0B0F19 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #FFFFFF !important;
+  box-shadow: 10px 0 40px rgba(0, 0, 0, 0.6) !important;
+}
+
+.mobile-drawer .drawer-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.mobile-drawer .drawer-header span {
+  color: #FFFFFF !important;
+  font-weight: 900 !important;
+}
+
+.mobile-drawer .drawer-close-btn {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+}
+
+.mobile-drawer .drawer-search-form input {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  color: #FFFFFF !important;
+}
+
+.mobile-drawer .drawer-search-form input::placeholder {
+  color: #94A3B8 !important;
+}
+
+.mobile-drawer .drawer-menu a {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  font-size: 0.95rem !important;
+}
+
+.mobile-drawer .drawer-menu a:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #60A5FA !important;
+}
+
+/* Profile Dropdown Crisp Text Visibility */
+.ios-liquid-glass-dropdown .glass-user-name {
+  color: #0F172A !important;
+  font-weight: 900 !important;
+}
+
+.ios-liquid-glass-dropdown .glass-user-email {
+  color: #475569 !important;
+  font-weight: 600 !important;
+}
+
+.ios-liquid-glass-dropdown .glass-section-heading {
+  color: #64748B !important;
+  font-weight: 900 !important;
+}
+
+.ios-liquid-glass-dropdown .glass-nav-title {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+.ios-liquid-glass-dropdown .glass-nav-sub {
+  color: #64748B !important;
+  font-weight: 600 !important;
+}
+
+.ios-liquid-glass-dropdown .glass-nav-arrow {
+  color: #94A3B8 !important;
+}
+
+.ios-liquid-glass-dropdown .glass-guest-title {
+  color: #0F172A !important;
+  font-weight: 900 !important;
+}
+
+.ios-liquid-glass-dropdown .glass-guest-desc {
+  color: #475569 !important;
+  font-weight: 600 !important;
 }
 
 /* Toast Notifications */
