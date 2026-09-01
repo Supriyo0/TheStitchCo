@@ -198,7 +198,7 @@ function activateTheme(themeKey) {
     formData.append('action', 'set_active_theme');
     formData.append('theme', themeKey);
 
-    fetch('api/admin_actions.php', {
+    fetch('../api/admin_actions.php', {
         method: 'POST',
         body: formData
     })
@@ -211,7 +211,10 @@ function activateTheme(themeKey) {
             alert(data.message || 'Failed to update theme.');
         }
     })
-    .catch(() => alert('Network error while updating theme.'));
+    .catch((err) => {
+        console.error(err);
+        alert('Network error while updating theme.');
+    });
 }
 
 function toggleParticles(enabled) {
@@ -219,14 +222,14 @@ function toggleParticles(enabled) {
     formData.append('action', 'toggle_theme_particles');
     formData.append('enabled', enabled ? '1' : '0');
 
-    fetch('api/admin_actions.php', {
+    fetch('../api/admin_actions.php', {
         method: 'POST',
         body: formData
     })
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            showToast('Particle animations ' + (enabled ? 'enabled' : 'disabled'));
+            alert('Particle animations ' + (enabled ? 'enabled' : 'disabled'));
         }
     });
 }

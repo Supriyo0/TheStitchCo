@@ -123,6 +123,25 @@
     <script src="assets/js/theme-effects.js?v=<?= time() ?>"></script>
 <?php endif; ?>
 
+<?php if (($activeTheme ?? 'default') !== 'default'): ?>
+    <!-- Floating Festive Theme Corner Badge -->
+    <div class="theme-corner-festive-badge" title="Active Season Theme: <?= e(ucfirst($activeTheme)) ?>">
+        <?php if ($activeTheme === 'durga_puja'): ?>
+            <span>🌸</span> <span>Pujor Mahotsav 🪔</span>
+        <?php elseif ($activeTheme === 'diwali'): ?>
+            <span>✨</span> <span>Diwali Lights 🪔</span>
+        <?php elseif ($activeTheme === 'winter'): ?>
+            <span>❄️</span> <span>Winter Drops 🧊</span>
+        <?php elseif ($activeTheme === 'christmas'): ?>
+            <span>🎄</span> <span>Merry Noel 🎅</span>
+        <?php elseif ($activeTheme === 'freedom'): ?>
+            <span>🇮🇳</span> <span>Proudly Indian ☸️</span>
+        <?php elseif ($activeTheme === 'summer'): ?>
+            <span>☀️</span> <span>Summer Vibes 🌊</span>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>
+
 <?php
 $showWelcome = false;
 $welcomeName = '';

@@ -57,12 +57,79 @@ if ($currentUser) {
     </div>
 <?php endif; ?>
 
-<!-- Stage 1 & 2 Brand Loader -->
-<div id="brand-loader">
+<!-- Stage 1 & 2 Brand Loader with Theme-Specific Festive Animations -->
+<div id="brand-loader" class="loader-theme-<?= e($activeTheme) ?>">
     <div class="loader-brand-box">
-        <img src="assets/images/logo.jpg" alt="The Stitch Co." style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; margin: 0 auto 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+        <?php if ($activeTheme === 'durga_puja'): ?>
+            <!-- Durga Puja Festive Ornaments: Kash Phool, Dhak & Animated Pradip Flame -->
+            <div class="loader-festive-motif motif-durga-puja">
+                <span class="motif-kash-left" title="Kash Phool">🌾</span>
+                <div class="motif-pradip-wrap">
+                    <span class="pradip-flame">🔥</span>
+                    <span class="pradip-base">🪔</span>
+                </div>
+                <span class="motif-dhak-center" title="Dhak Rhythm">🥁</span>
+                <span class="motif-kash-right" title="Kash Phool">🌾</span>
+            </div>
+        <?php elseif ($activeTheme === 'diwali'): ?>
+            <!-- Diwali Sparkling Pradips & Starbursts -->
+            <div class="loader-festive-motif motif-diwali">
+                <span class="diwali-sparkle">✨</span>
+                <span class="motif-pradip-glow">🪔</span>
+                <span class="diwali-firework">🎆</span>
+                <span class="motif-pradip-glow">🪔</span>
+                <span class="diwali-sparkle">✨</span>
+            </div>
+        <?php elseif ($activeTheme === 'winter'): ?>
+            <!-- Winter Blizzard & Icicles -->
+            <div class="loader-festive-motif motif-winter">
+                <span class="winter-flake">❄️</span>
+                <span class="winter-frost">🧊</span>
+                <span class="winter-flake">❄️</span>
+            </div>
+        <?php elseif ($activeTheme === 'christmas'): ?>
+            <!-- Christmas Santa Hat & Noel Bell -->
+            <div class="loader-festive-motif motif-christmas">
+                <span class="noel-bell">🔔</span>
+                <span class="noel-santa">🎅</span>
+                <span class="noel-tree">🎄</span>
+            </div>
+        <?php elseif ($activeTheme === 'freedom'): ?>
+            <!-- Tiranga Ribbon -->
+            <div class="loader-festive-motif motif-freedom">
+                <span class="tiranga-flag">🇮🇳</span>
+                <span class="tiranga-chakra">☸️</span>
+                <span class="tiranga-flag">🇮🇳</span>
+            </div>
+        <?php elseif ($activeTheme === 'summer'): ?>
+            <!-- Solar Flare -->
+            <div class="loader-festive-motif motif-summer">
+                <span class="summer-sun">☀️</span>
+                <span class="summer-wave">🌊</span>
+                <span class="summer-sun">☀️</span>
+            </div>
+        <?php endif; ?>
+
+        <img src="assets/images/logo.jpg" alt="The Stitch Co." style="width: 72px; height: 72px; border-radius: 50%; object-fit: cover; margin: 0 auto 0.8rem; box-shadow: 0 6px 20px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.8);">
+
         <h1>THE <span>STITCH</span> CO.</h1>
-        <p style="color: #94A3B8; font-size: 0.82rem; font-weight: 700; letter-spacing: 2px; margin-top: 0.3rem;">WEAR YOUR VIBE</p>
+
+        <?php if ($activeTheme === 'durga_puja'): ?>
+            <p class="loader-theme-subtitle durga-gold-glow">🌸 SHUBHO SARODIYA • শারদোৎসব 🌸</p>
+        <?php elseif ($activeTheme === 'diwali'): ?>
+            <p class="loader-theme-subtitle diwali-gold-glow">✨ SHUBH DEEPAVALI • FESTIVAL OF LIGHTS ✨</p>
+        <?php elseif ($activeTheme === 'winter'): ?>
+            <p class="loader-theme-subtitle winter-cyan-glow">❄️ WINTER STREETWEAR DROPS • FROST EDITION ❄️</p>
+        <?php elseif ($activeTheme === 'christmas'): ?>
+            <p class="loader-theme-subtitle christmas-red-glow">🎄 MERRY CHRISTMAS & HAPPY NEW YEAR 🎄</p>
+        <?php elseif ($activeTheme === 'freedom'): ?>
+            <p class="loader-theme-subtitle freedom-tricolor-glow">🇮🇳 CELEBRATE FREEDOM • PROUDLY INDIAN 🇮🇳</p>
+        <?php elseif ($activeTheme === 'summer'): ?>
+            <p class="loader-theme-subtitle summer-amber-glow">☀️ SUMMER STREET DROPS • BREATHABLE COTTON ☀️</p>
+        <?php else: ?>
+            <p style="color: #94A3B8; font-size: 0.82rem; font-weight: 700; letter-spacing: 2px; margin-top: 0.3rem;">WEAR YOUR VIBE</p>
+        <?php endif; ?>
+
         <div class="loader-spinner"></div>
     </div>
 </div>
