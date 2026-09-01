@@ -300,11 +300,18 @@
         noise.stop(time + duration + 0.02);
     }
 
+    function isSoundActive() {
+        if (typeof window.themeSoundMasterEnabled !== 'undefined' && !window.themeSoundMasterEnabled) {
+            return false;
+        }
+        return soundEnabled;
+    }
+
     // =========================================================================
     // PUBLIC THEME SOUND DISPATCHER
     // =========================================================================
     window.playThemeSound = function (themeKey) {
-        if (!soundEnabled) return;
+        if (!isSoundActive()) return;
         const theme = themeKey || document.body.getAttribute('data-theme') || 'default';
 
         try {
@@ -337,7 +344,7 @@
     };
 
     window.playCartSound = function () {
-        if (!soundEnabled) return;
+        if (!isSoundActive()) return;
         try {
             playCartSuccessSound();
         } catch (e) {}
@@ -347,14 +354,14 @@
         soundEnabled = !soundEnabled;
         localStorage.setItem('stitch_theme_sound_enabled', soundEnabled ? '1' : '0');
         updateSoundPillUI();
-        if (soundEnabled) {
+        if (isSoundActive()) {
             window.playThemeSound();
         }
         return soundEnabled;
     };
 
     window.isThemeSoundEnabled = function () {
-        return soundEnabled;
+        return isSoundActive();
     };
 
     function updateSoundPillUI() {

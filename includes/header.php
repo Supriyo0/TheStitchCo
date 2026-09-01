@@ -20,6 +20,7 @@ $pageTitle = $pageTitle ?? STORE_NAME . ' | ' . STORE_TAGLINE;
 $isMaintenanceActive = (int)get_setting('maintenance_mode', '0') === 1;
 $activeTheme = get_setting('active_theme', 'default');
 $themeParticlesEnabled = (int)get_setting('theme_particles_enabled', '1');
+$themeSoundEnabled = (int)get_setting('theme_sound_enabled', '1');
 
 $userOrderCount = 0;
 $userAddressCount = 0;
@@ -41,6 +42,10 @@ if ($currentUser) {
     <link rel="stylesheet" href="assets/css/style.css?v=<?= time() ?>">
     <link rel="stylesheet" href="assets/css/festive-themes.css?v=<?= time() ?>">
     <link rel="icon" href="assets/images/logo.jpg" type="image/jpeg">
+    <script>
+        window.themeSoundMasterEnabled = <?= $themeSoundEnabled ? 'true' : 'false' ?>;
+        window.activeTheme = '<?= e($activeTheme) ?>';
+    </script>
 </head>
 <body data-theme="<?= e($activeTheme) ?>">
 

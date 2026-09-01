@@ -537,4 +537,19 @@ if ($action === 'toggle_theme_particles') {
     exit;
 }
 
+// 12. Toggle Theme Audio / Sound Effects Master Switch
+if ($action === 'toggle_theme_sound') {
+    $enabled = ($_POST['enabled'] ?? '1') === '1' ? '1' : '0';
+    update_setting('theme_sound_enabled', $enabled);
+
+    log_admin_activity($admin['id'], $admin['fullname'], 'toggle_theme_sound', ($enabled === '1' ? 'Enabled' : 'Disabled') . ' Storewide Theme Sound FX');
+
+    echo json_encode([
+        'success' => true,
+        'sound_enabled' => $enabled === '1',
+        'message' => 'Festive sound effects ' . ($enabled === '1' ? 'ENABLED' : 'DISABLED') . ' storewide.'
+    ]);
+    exit;
+}
+
 echo json_encode(['success' => false, 'message' => 'Unknown admin action.']);

@@ -11,6 +11,7 @@ require_once __DIR__ . '/header.php';
 $db = get_db();
 $activeTheme = get_setting('active_theme', 'default');
 $particlesEnabled = (int)get_setting('theme_particles_enabled', '1');
+$soundEnabled = (int)get_setting('theme_sound_enabled', '1');
 
 $themes = [
     'default' => [
@@ -114,11 +115,17 @@ $themes = [
             </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+            <!-- Sound FX Master Toggle -->
+            <label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.85rem; font-weight: 700; color: #334155; background: #F8FAFC; padding: 0.45rem 0.9rem; border-radius: 10px; border: 1.5px solid #E2E8F0;">
+                <input type="checkbox" id="sound-toggle" <?= $soundEnabled ? 'checked' : '' ?> onchange="toggleSound(this.checked)" style="width: 18px; height: 18px; cursor: pointer;">
+                <span>🔊 Festive Sound FX</span>
+            </label>
+
             <!-- Particles Toggle -->
-            <label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.85rem; font-weight: 700; color: #334155;">
+            <label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.85rem; font-weight: 700; color: #334155; background: #F8FAFC; padding: 0.45rem 0.9rem; border-radius: 10px; border: 1.5px solid #E2E8F0;">
                 <input type="checkbox" id="particles-toggle" <?= $particlesEnabled ? 'checked' : '' ?> onchange="toggleParticles(this.checked)" style="width: 18px; height: 18px; cursor: pointer;">
-                <span>✨ Animated Particle Physics (60fps)</span>
+                <span>✨ Particle Physics (60fps)</span>
             </label>
         </div>
     </div>
@@ -240,6 +247,23 @@ function toggleParticles(enabled) {
     .then(data => {
         if (data.success) {
             alert('Particle animations ' + (enabled ? 'enabled' : 'disabled'));
+        }
+    });
+}
+
+function toggleSound(enabled) {
+    const formData = new FormData();
+    formData.append('action', 'toggle_theme_sound');
+    formData.append('enabled', enabled ? '1' : '0');
+
+    fetch('../api/admin_actions.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('Festive sound effects ' + (enabled ? 'ENABLED' : 'DISABLED') + ' storewide!');
         }
     });
 }
