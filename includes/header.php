@@ -69,20 +69,26 @@ if ($currentUser) {
 
 <?php
 $showAnnouncement = (int)get_setting('announcement_bar_enabled', 1);
-$announcementText = get_setting('announcement_bar_text', 'FREE SHIPPING ON PREPAID ORDERS ABOVE ₹999 🚚 &nbsp;|&nbsp; USE CODE <strong>WELCOME10</strong> FOR 10% OFF');
+$defaultAnnouncement = 'FREE SHIPPING ON ALL PREPAID ORDERS ABOVE ₹999 🚚 &nbsp;|&nbsp; USE CODE <strong>WELCOME10</strong> FOR 10% OFF';
+$announcementText = trim(get_setting('announcement_bar_text', $defaultAnnouncement));
+
+// If text is gibberish or empty, fallback to default
+if (empty($announcementText) || strlen($announcementText) < 8 || strpos($announcementText, ' ') === false || strpos($announcementText, 'vgykh') !== false) {
+    $announcementText = $defaultAnnouncement;
+}
 
 // Theme specific default greetings if not customized
-if ($activeTheme === 'durga_puja' && strpos($announcementText, 'WELCOME10') !== false) {
+if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !== false || $announcementText === $defaultAnnouncement)) {
     $announcementText = 'SHUBHO SARODIYA! 🌸 PUJOR EXCLUSIVE STREETWEAR DROPS &nbsp;|&nbsp; USE CODE <strong>PUJO10</strong> FOR 10% OFF';
-} elseif ($activeTheme === 'diwali' && strpos($announcementText, 'WELCOME10') !== false) {
+} elseif ($activeTheme === 'diwali' && (strpos($announcementText, 'WELCOME10') !== false || $announcementText === $defaultAnnouncement)) {
     $announcementText = 'HAPPY DIWALI 🪔 ILLUMINATE YOUR STREETWEAR STYLE &nbsp;|&nbsp; USE CODE <strong>DIWALI200</strong> FOR ₹200 OFF';
-} elseif ($activeTheme === 'freedom' && strpos($announcementText, 'WELCOME10') !== false) {
+} elseif ($activeTheme === 'freedom' && (strpos($announcementText, 'WELCOME10') !== false || $announcementText === $defaultAnnouncement)) {
     $announcementText = 'CELEBRATE FREEDOM 🇮🇳 PROUDLY CRAFTED IN INDIA &nbsp;|&nbsp; USE CODE <strong>INDIA78</strong>';
-} elseif ($activeTheme === 'winter' && strpos($announcementText, 'WELCOME10') !== false) {
+} elseif ($activeTheme === 'winter' && (strpos($announcementText, 'WELCOME10') !== false || $announcementText === $defaultAnnouncement)) {
     $announcementText = 'WINTER STREETWEAR DROPS ❄️ STAY WARM & STYLISH &nbsp;|&nbsp; USE CODE <strong>WINTER10</strong> FOR 10% OFF';
-} elseif ($activeTheme === 'christmas' && strpos($announcementText, 'WELCOME10') !== false) {
+} elseif ($activeTheme === 'christmas' && (strpos($announcementText, 'WELCOME10') !== false || $announcementText === $defaultAnnouncement)) {
     $announcementText = 'MERRY CHRISTMAS & HAPPY NEW YEAR 🎄 HOLIDAY SALE &nbsp;|&nbsp; USE CODE <strong>NOEL15</strong> FOR 15% OFF';
-} elseif ($activeTheme === 'summer' && strpos($announcementText, 'WELCOME10') !== false) {
+} elseif ($activeTheme === 'summer' && (strpos($announcementText, 'WELCOME10') !== false || $announcementText === $defaultAnnouncement)) {
     $announcementText = 'SUMMER STREET DROPS ☀️ 100% BREATHABLE COTTON &nbsp;|&nbsp; USE CODE <strong>SUMMER10</strong>';
 }
 ?>
@@ -391,14 +397,17 @@ if ($activeTheme === 'durga_puja' && strpos($announcementText, 'WELCOME10') !== 
             </li>
         <?php endforeach; ?>
 
-        <li style="padding: 0.8rem 1rem 0.3rem; font-size: 0.68rem; font-weight: 900; color: #64748B; text-transform: uppercase; letter-spacing: 1.5px; border-top: 1px solid rgba(255,255,255,0.08); margin-top: 0.5rem;">ACCOUNT & HELP</li>
-        <li><a href="track-order.php">📦 Track My Order</a></li>
+        <li style="padding: 0.8rem 1rem 0.3rem; font-size: 0.68rem; font-weight: 900; color: #94A3B8; text-transform: uppercase; letter-spacing: 1.5px; border-top: 1px solid rgba(255,255,255,0.12); margin-top: 0.5rem;">ACCOUNT & SERVICES</li>
         <?php if ($currentUser): ?>
-            <li><a href="account.php">👤 My Account (<?= e($currentUser['fullname']) ?>)</a></li>
+            <li><a href="dashboard.php">📊 Account Dashboard</a></li>
+            <li><a href="orders.php">📦 My Orders (<?= $userOrderCount ?>)</a></li>
+            <li><a href="wishlist.php">❤️ Saved Wishlist</a></li>
+            <li><a href="addresses.php">📍 Saved Addresses (<?= $userAddressCount ?>)</a></li>
+            <li><a href="profile.php">⚙️ Profile Settings</a></li>
             <?php if (in_array($currentUser['role'], ['admin', 'super_admin'])): ?>
-                <li><a href="admin/index.php" style="color: #60A5FA;">⚡ Admin Dashboard</a></li>
+                <li><a href="admin/index.php" style="color: #60A5FA !important; font-weight: 900;">⚡ Admin Panel</a></li>
             <?php endif; ?>
-            <li><a href="logout.php" style="color: #EF4444;">🚪 Logout</a></li>
+            <li><a href="logout.php" style="color: #F87171 !important;">🚪 Sign Out (<?= e($currentUser['fullname']) ?>)</a></li>
         <?php else: ?>
             <li><a href="login.php">🔑 Login / Register</a></li>
         <?php endif; ?>

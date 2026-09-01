@@ -133,11 +133,11 @@ require_once __DIR__ . '/includes/header.php';
 
             <!-- Action Buttons matching Image 3 -->
             <div class="pdp-actions" style="display: flex; flex-direction: column; gap: 0.75rem; margin: 1.5rem 0 1.2rem;">
-                <button class="add-to-cart-btn" style="background: #000000; color: #FFFFFF; padding: 0.95rem; font-size: 0.92rem; font-weight: 900; letter-spacing: 0.8px; border-radius: 4px; border: none; cursor: pointer; text-transform: uppercase;" onclick="handlePdpAddToCart(<?= $product['id'] ?>)">
-                    ADD TO CART
+                <button class="add-to-cart-btn" style="background: #0F172A; color: #FFFFFF; padding: 0.95rem; font-size: 0.92rem; font-weight: 900; letter-spacing: 0.8px; border-radius: 9999px; border: none; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 0.6rem; box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: all 0.2s ease;" onclick="handlePdpAddToCart(<?= $product['id'] ?>)">
+                    <span>🛒</span> <span>ADD TO CART</span>
                 </button>
-                <button class="btn-buy-now" style="background: #FFFFFF; color: #000000; border: 1.5px solid #000000; padding: 0.9rem; font-size: 0.92rem; font-weight: 900; letter-spacing: 0.8px; border-radius: 4px; cursor: pointer; text-transform: uppercase;" onclick="handlePdpBuyNow(<?= $product['id'] ?>)">
-                    BUY NOW
+                <button class="btn-buy-now" style="background: #FFFFFF; color: #0F172A; border: 2px solid #0F172A; padding: 0.9rem; font-size: 0.92rem; font-weight: 900; letter-spacing: 0.8px; border-radius: 9999px; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 0.6rem; transition: all 0.2s ease;" onclick="handlePdpBuyNow(<?= $product['id'] ?>)">
+                    <span>⚡</span> <span>BUY NOW</span>
                 </button>
             </div>
 
