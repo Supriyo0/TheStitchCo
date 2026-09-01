@@ -149,13 +149,22 @@ $orders = $stmt->fetchAll();
                                 <span style="font-size: 0.75rem; color: var(--admin-text-muted);"><?= e($ord['customer_phone']) ?></span>
                             </td>
                             <td>
-                                <div style="font-size: 0.82rem; font-weight: 700; color: #2563EB;">
-                                    💳 <?= e($ord['payment_method']) ?>
-                                </div>
-                                <?php if (!empty($ord['utr_number'])): ?>
-                                    <div style="font-size: 0.75rem; font-family: monospace; color: var(--admin-text-main); font-weight: 800;">
-                                        UTR: <?= e($ord['utr_number']) ?>
+                                <?php if (strpos($ord['payment_method'], 'Cash on Delivery') !== false): ?>
+                                    <div style="font-size: 0.82rem; font-weight: 800; color: #059669;">
+                                        💵 Cash on Delivery (COD)
                                     </div>
+                                    <span style="font-size: 0.7rem; color: #16A34A; font-weight: 700; background: #ECFDF5; padding: 0.15rem 0.4rem; border-radius: 4px; border: 1px solid #A7F3D0; display: inline-block; margin-top: 2px;">
+                                        Collect on Delivery
+                                    </span>
+                                <?php else: ?>
+                                    <div style="font-size: 0.82rem; font-weight: 700; color: #2563EB;">
+                                        💳 <?= e($ord['payment_method']) ?>
+                                    </div>
+                                    <?php if (!empty($ord['utr_number']) && strpos($ord['utr_number'], 'COD') === false): ?>
+                                        <div style="font-size: 0.75rem; font-family: monospace; color: var(--admin-text-main); font-weight: 800;">
+                                            UTR: <?= e($ord['utr_number']) ?>
+                                        </div>
+                                    <?php endif; ?>
                                 <?php endif; ?>
                                 <?php if (!empty($ord['proof_screenshot'])): ?>
                                     <button onclick="viewProofModal('<?= e($ord['proof_screenshot']) ?>')" style="background: none; border: none; color: #2563EB; font-size: 0.72rem; font-weight: 700; cursor: pointer; padding: 0; text-decoration: underline; margin-top: 0.2rem;">

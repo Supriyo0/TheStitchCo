@@ -54,7 +54,7 @@ $waLines[] = "💰 *Total Amount:* ₹" . number_format((float)$order['total_pri
 $waLines[] = "💳 *Payment Method:* " . $order['payment_method'];
 
 $utr = $paymentRecord['utr_number'] ?? '';
-if (!empty($utr)) {
+if (!empty($utr) && strpos($utr, 'COD') === false) {
     $waLines[] = "🏷️ *UPI UTR / Ref:* " . $utr;
 }
 

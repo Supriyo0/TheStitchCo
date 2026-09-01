@@ -61,24 +61,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
     $utrNumber = trim($_POST['utr_number'] ?? '');
     $customerNote = trim($_POST['customer_note'] ?? '');
 
+    if ($paymentMethod === 'Cash on Delivery (COD)') {
+        $utrNumber = 'COD (Pay on Delivery)';
+    }
+
     $orderNumber = 'TSC-' . date('ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
 
-        // Handle Payment Screenshot Upload via ImgBB / Local Storage
-        $proofPath = '';
-        if (!empty($_FILES['payment_proof']['name'])) {
-            $proofUp = upload_to_imgbb($_FILES['payment_proof']);
-            if ($proofUp['success']) {
-                $proofPath = $proofUp['url'] ?? $proofUp['relative_url'];
-            }
+    // Handle Payment Screenshot Upload via ImgBB / Local Storage (Only if UPI)
+    $proofPath = '';
+    if ($paymentMethod !== 'Cash on Delivery (COD)' && !empty($_FILES['payment_proof']['name'])) {
+        $proofUp = upload_to_imgbb($_FILES['payment_proof']);
+        if ($proofUp['success']) {
+            $proofPath = $proofUp['url'] ?? $proofUp['relative_url'];
         }
+    }
 
-        $fullName = $shipping['fullname'];
-        $email = $shipping['email'];
-        $phone = $shipping['phone'];
-        $fullShippingText = "{$fullName}\nPhone: {$phone}\n{$shipping['address_line1']}" . 
-                            (!empty($shipping['address_line2']) ? "\n{$shipping['address_line2']}" : '') . 
-                            (!empty($shipping['landmark']) ? "\nLandmark: {$shipping['landmark']}" : '') . 
-                            "\n{$shipping['city']}, {$shipping['state']} - {$shipping['pincode']}\nIndia";
+    $fullName = $shipping['fullname'];
+    $email = $shipping['email'];
+    $phone = $shipping['phone'];
+    $fullShippingText = "{$fullName}\nPhone: {$phone}\n{$shipping['address_line1']}" . 
+                        (!empty($shipping['address_line2']) ? "\n{$shipping['address_line2']}" : '') . 
+                        (!empty($shipping['landmark']) ? "\nLandmark: {$shipping['landmark']}" : '') . 
+                        "\n{$shipping['city']}, {$shipping['state']} - {$shipping['pincode']}\nIndia";
 
         try {
             $db->beginTransaction();
@@ -245,85 +249,162 @@ require_once __DIR__ . '/includes/header.php';
                     </a>
                 </div>
 
-                <!-- Payment Method Card (UPI Scan & Pay) -->
+                <!-- Payment Method Selection Card (UPI + Cash on Delivery) -->
                 <div style="background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-sm); margin-bottom: 2rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
-                        <h2 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; text-transform: uppercase;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.5rem;">
+                        <h2 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 900; text-transform: uppercase; margin: 0;">
                             Select Payment Method
                         </h2>
-                        <span style="background: #ECFDF5; border: 1px solid #10B981; color: #059669; font-size: 0.72rem; font-weight: 800; padding: 0.2rem 0.6rem; border-radius: 4px;">
-                            🔒 ZERO EXTRA CHARGES
+                        <span style="background: #ECFDF5; border: 1px solid #10B981; color: #059669; font-size: 0.72rem; font-weight: 800; padding: 0.25rem 0.65rem; border-radius: 20px;">
+                            🔒 100% SECURE CHECKOUT
                         </span>
                     </div>
 
-                    <!-- UPI Scan & Pay Box -->
-                    <div style="border: 2px solid var(--primary); background: #FAF5FF; border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 1.5rem;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem;">
-                            <div style="display: flex; align-items: center; gap: 0.6rem;">
-                                <input type="radio" name="payment_method" value="UPI (Scan & Pay)" checked style="accent-color: var(--primary); transform: scale(1.15);">
-                                <strong style="font-size: 1rem; color: #1E1B4B;">UPI (Scan QR / GPay / PhonePe / Paytm)</strong>
-                            </div>
-                            <span style="background: #2563EB; color: #fff; font-size: 0.72rem; font-weight: 800; padding: 0.2rem 0.6rem; border-radius: 4px;">INSTANT</span>
-                        </div>
+                    <!-- Payment Options Radio Stack -->
+                    <div style="display: flex; flex-direction: column; gap: 1.2rem; margin-bottom: 1.5rem;">
+                        
+                        <!-- Option 1: UPI Scan & Pay -->
+                        <div id="payment-card-upi" style="border: 2px solid #2563EB; background: #F8FAFC; border-radius: 12px; padding: 1.2rem; transition: all 0.25s ease;">
+                            <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <input type="radio" name="payment_method" value="UPI (Scan & Pay)" checked onchange="togglePaymentMethod('upi')" style="accent-color: #2563EB; transform: scale(1.2);">
+                                    <div>
+                                        <strong style="font-size: 1rem; color: #0F172A; display: block;">📱 UPI (Scan QR / GPay / PhonePe / Paytm)</strong>
+                                        <span style="font-size: 0.76rem; color: #64748B;">Instant online payment with zero processing fee</span>
+                                    </div>
+                                </div>
+                                <span style="background: #2563EB; color: #fff; font-size: 0.72rem; font-weight: 900; padding: 0.25rem 0.6rem; border-radius: 6px; letter-spacing: 0.4px;">FAST DISPATCH ⚡</span>
+                            </label>
 
-                        <!-- QR Code Box -->
-                        <div class="qr-box-container" style="text-align: center; background: #FFFFFF; border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 1.5rem;">
-                            <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.8rem;">
-                                Scan QR & Pay Exact Amount: <strong style="color: #000; font-size: 1.05rem;"><?= format_price($totalPrice) ?></strong>
-                            </div>
-                            
-                            <div class="qr-image-frame" style="width: 200px; height: 200px; margin: 0 auto 1rem; border-radius: 12px; overflow: hidden; border: 2px solid #E2E8F0; padding: 0.5rem; background: #fff;">
-                                <img src="<?= e($upiQrImageUrl) ?>" alt="UPI QR Code" style="width: 100%; height: 100%; object-fit: contain;">
-                            </div>
+                            <!-- QR Code & UPI Deep Links Box (Shown when UPI is active) -->
+                            <div id="upi-details-container" style="margin-top: 1.2rem; padding-top: 1.2rem; border-top: 1px dashed #CBD5E1;">
+                                <div class="qr-box-container" style="text-align: center; background: #FFFFFF; border: 1.5px solid #E2E8F0; border-radius: 12px; padding: 1.4rem;">
+                                    <div style="font-size: 0.8rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.8rem;">
+                                        Scan QR & Pay Exact Amount: <strong style="color: #0F172A; font-size: 1.1rem;"><?= format_price($totalPrice) ?></strong>
+                                    </div>
+                                    
+                                    <div class="qr-image-frame" style="width: 190px; height: 190px; margin: 0 auto 1rem; border-radius: 12px; overflow: hidden; border: 2px solid #E2E8F0; padding: 0.5rem; background: #fff;">
+                                        <img src="<?= e($upiQrImageUrl) ?>" alt="UPI QR Code" style="width: 100%; height: 100%; object-fit: contain;">
+                                    </div>
 
-                            <div style="font-weight: 800; font-size: 0.95rem; color: var(--primary);">
-                                UPI ID: <span style="color: #2563EB; user-select: all; font-family: monospace; background: #EFF6FF; padding: 0.2rem 0.6rem; border-radius: 4px;"><?= e($upiMerchantId) ?></span>
-                            </div>
-                            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem;">
-                                Verified Merchant: <strong><?= e($upiMerchantName) ?></strong>
-                            </div>
+                                    <div style="font-weight: 800; font-size: 0.95rem; color: #0F172A;">
+                                        UPI ID: <span style="color: #2563EB; user-select: all; font-family: monospace; background: #EFF6FF; padding: 0.25rem 0.6rem; border-radius: 4px; border: 1px solid #BFDBFE;"><?= e($upiMerchantId) ?></span>
+                                    </div>
+                                    <div style="font-size: 0.78rem; color: #64748B; margin-top: 0.4rem;">
+                                        Verified Merchant: <strong><?= e($upiMerchantName) ?></strong>
+                                    </div>
 
-                            <!-- Mobile UPI Deep Link Apps -->
-                            <div style="margin-top: 1.2rem; border-top: 1px dashed var(--border); padding-top: 1rem;">
-                                <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.6rem;">OR CLICK TO PAY DIRECTLY VIA UPI APPS:</div>
-                                <div class="upi-intent-buttons" style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
-                                    <a href="<?= $upiIntentUrl ?>" class="upi-app-btn" target="_blank" style="padding: 0.5rem 0.9rem; background: #F8FAFC; border: 1.5px solid var(--border); border-radius: 6px; font-weight: 700; font-size: 0.8rem; text-decoration: none; color: #1E293B;">🟢 Google Pay</a>
-                                    <a href="<?= $upiIntentUrl ?>" class="upi-app-btn" target="_blank" style="padding: 0.5rem 0.9rem; background: #F8FAFC; border: 1.5px solid var(--border); border-radius: 6px; font-weight: 700; font-size: 0.8rem; text-decoration: none; color: #1E293B;">🟣 PhonePe</a>
-                                    <a href="<?= $upiIntentUrl ?>" class="upi-app-btn" target="_blank" style="padding: 0.5rem 0.9rem; background: #F8FAFC; border: 1.5px solid var(--border); border-radius: 6px; font-weight: 700; font-size: 0.8rem; text-decoration: none; color: #1E293B;">🔵 Paytm</a>
-                                    <a href="<?= $upiIntentUrl ?>" class="upi-app-btn" target="_blank" style="padding: 0.5rem 0.9rem; background: #F8FAFC; border: 1.5px solid var(--border); border-radius: 6px; font-weight: 700; font-size: 0.8rem; text-decoration: none; color: #1E293B;">🟠 Any UPI App</a>
+                                    <!-- Mobile UPI Deep Link Apps -->
+                                    <div style="margin-top: 1.2rem; border-top: 1px dashed #E2E8F0; padding-top: 1rem;">
+                                        <div style="font-size: 0.75rem; font-weight: 800; color: #64748B; margin-bottom: 0.6rem; text-transform: uppercase;">OR CLICK TO PAY VIA UPI APPS:</div>
+                                        <div class="upi-intent-buttons" style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                                            <a href="<?= $upiIntentUrl ?>" class="upi-app-btn" target="_blank" style="padding: 0.45rem 0.85rem; background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 6px; font-weight: 800; font-size: 0.78rem; text-decoration: none; color: #1E293B;">🟢 Google Pay</a>
+                                            <a href="<?= $upiIntentUrl ?>" class="upi-app-btn" target="_blank" style="padding: 0.45rem 0.85rem; background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 6px; font-weight: 800; font-size: 0.78rem; text-decoration: none; color: #1E293B;">🟣 PhonePe</a>
+                                            <a href="<?= $upiIntentUrl ?>" class="upi-app-btn" target="_blank" style="padding: 0.45rem 0.85rem; background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 6px; font-weight: 800; font-size: 0.78rem; text-decoration: none; color: #1E293B;">🔵 Paytm</a>
+                                            <a href="<?= $upiIntentUrl ?>" class="upi-app-btn" target="_blank" style="padding: 0.45rem 0.85rem; background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 6px; font-weight: 800; font-size: 0.78rem; text-decoration: none; color: #1E293B;">🟠 Any UPI App</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Optional UTR and Proof Attachment -->
+                                <div style="margin-top: 1.2rem; background: #FFFFFF; border: 1.5px solid #E2E8F0; border-radius: 12px; padding: 1.2rem;">
+                                    <h4 style="font-size: 0.88rem; font-weight: 800; margin-bottom: 0.8rem; color: #0F172A;">
+                                        📝 Enter Payment Reference (Optional)
+                                    </h4>
+                                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                        <div>
+                                            <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.3rem;">UPI Reference / UTR Number</label>
+                                            <input type="text" name="utr_number" placeholder="e.g. 324156789012 (Optional)" style="width: 100%; padding: 0.7rem 0.9rem; border: 1.5px solid #CBD5E1; border-radius: 6px; font-size: 0.9rem; font-weight: 700; letter-spacing: 0.5px;">
+                                            <span style="font-size: 0.72rem; color: #64748B; margin-top: 0.2rem; display: block;">You can also share your payment receipt via WhatsApp after placing the order.</span>
+                                        </div>
+                                        <div>
+                                            <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.3rem;">Upload Payment Screenshot (Optional)</label>
+                                            <input type="file" name="payment_proof" accept="image/*" style="width: 100%; font-size: 0.82rem;">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- UTR Reference & Proof Screenshot Form -->
-                        <div style="margin-top: 1.5rem; background: #FFFFFF; border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 1.2rem;">
-                            <h4 style="font-size: 0.9rem; font-weight: 800; margin-bottom: 0.8rem; color: var(--primary);">
-                                📝 Enter Payment Confirmation Details
-                            </h4>
-                            <div style="display: flex; flex-direction: column; gap: 1rem;">
-                                <div>
-                                    <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem;">UPI Reference / UTR Number (Optional)</label>
-                                    <input type="text" name="utr_number" placeholder="e.g. 324156789012 (Optional)" style="width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 0.95rem; font-weight: 700; letter-spacing: 0.5px;">
-                                    <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem; display: block;">You can find the 12-digit UTR/Ref number in your GPay / PhonePe / Paytm transaction receipt, or send proof via WhatsApp.</span>
+                        <!-- Option 2: Cash on Delivery (COD) -->
+                        <div id="payment-card-cod" style="border: 1.5px solid #CBD5E1; background: #FFFFFF; border-radius: 12px; padding: 1.2rem; transition: all 0.25s ease;">
+                            <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <input type="radio" name="payment_method" value="Cash on Delivery (COD)" onchange="togglePaymentMethod('cod')" style="accent-color: #16A34A; transform: scale(1.2);">
+                                    <div>
+                                        <strong style="font-size: 1rem; color: #0F172A; display: block;">💵 Cash on Delivery (COD)</strong>
+                                        <span style="font-size: 0.76rem; color: #64748B;">Pay via Cash or UPI at your doorstep upon parcel arrival</span>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem;">Upload Payment Screenshot (Optional for Instant Verification)</label>
-                                    <input type="file" name="payment_proof" accept="image/*" style="width: 100%; font-size: 0.82rem;">
-                                </div>
-                                <div>
-                                    <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem;">Order / Delivery Note (Optional)</label>
-                                    <input type="text" name="customer_note" placeholder="e.g. Please deliver after 5 PM / Leave with security" style="width: 100%; padding: 0.65rem 1rem; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 0.85rem;">
+                                <span style="background: #ECFDF5; border: 1px solid #10B981; color: #059669; font-size: 0.72rem; font-weight: 900; padding: 0.25rem 0.6rem; border-radius: 6px;">PAY AT DOORSTEP 🚚</span>
+                            </label>
+
+                            <!-- COD Instructions Box (Shown when COD is active) -->
+                            <div id="cod-details-container" style="display: none; margin-top: 1.2rem; padding-top: 1.2rem; border-top: 1px dashed #CBD5E1;">
+                                <div style="background: #F0FDF4; border: 1.5px solid #86EFAC; border-radius: 10px; padding: 1rem 1.2rem;">
+                                    <div style="font-size: 0.85rem; font-weight: 800; color: #166534; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.4rem;">
+                                        <span>✓</span>
+                                        <span>Cash on Delivery is Available for Your Pincode!</span>
+                                    </div>
+                                    <ul style="font-size: 0.78rem; color: #15803D; line-height: 1.5; margin-left: 1.2rem;">
+                                        <li>Please keep exact cash amount <strong>(<?= format_price($totalPrice) ?>)</strong> or UPI app ready during delivery.</li>
+                                        <li>Our courier delivery partner (Delhivery / Blue Dart) will hand over the sealed parcel upon payment receipt.</li>
+                                        <li>All standard 7-day return and exchange policies apply fully.</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Shared Delivery / Order Note Field -->
+                    <div style="margin-top: 1rem;">
+                        <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem; color: #334155;">Special Delivery Instructions / Note (Optional)</label>
+                        <input type="text" name="customer_note" placeholder="e.g. Please deliver after 4 PM / Call before delivery" style="width: 100%; padding: 0.75rem 1rem; border: 1.5px solid #CBD5E1; border-radius: 8px; font-size: 0.88rem;">
                     </div>
                 </div>
 
                 <!-- Confirm & Place Order CTA Button -->
-                <button type="submit" name="place_order" style="width: 100%; padding: 1.2rem; background: #16A34A; color: #FFFFFF; font-family: var(--font-heading); font-size: 1.05rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; border: none; border-radius: var(--radius-md); cursor: pointer; box-shadow: 0 4px 20px rgba(22, 163, 74, 0.35); transition: var(--transition);">
-                    CONFIRM & PLACE ORDER (<?= format_price($totalPrice) ?>) 🔒
+                <button type="submit" name="place_order" id="btn-submit-order" style="width: 100%; padding: 1.2rem; background: #16A34A; color: #FFFFFF; font-family: var(--font-heading); font-size: 1.05rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; border: none; border-radius: var(--radius-md); cursor: pointer; box-shadow: 0 4px 20px rgba(22, 163, 74, 0.35); transition: var(--transition);">
+                    CONFIRM & PAY VIA UPI (<?= format_price($totalPrice) ?>) 🔒
                 </button>
             </div>
+
+            <script>
+            function togglePaymentMethod(method) {
+                const cardUpi = document.getElementById('payment-card-upi');
+                const cardCod = document.getElementById('payment-card-cod');
+                const upiContainer = document.getElementById('upi-details-container');
+                const codContainer = document.getElementById('cod-details-container');
+                const submitBtn = document.getElementById('btn-submit-order');
+                const formattedTotal = '<?= format_price($totalPrice) ?>';
+
+                if (method === 'cod') {
+                    cardCod.style.borderColor = '#16A34A';
+                    cardCod.style.backgroundColor = '#F0FDF4';
+                    cardUpi.style.borderColor = '#CBD5E1';
+                    cardUpi.style.backgroundColor = '#FFFFFF';
+                    
+                    upiContainer.style.display = 'none';
+                    codContainer.style.display = 'block';
+
+                    submitBtn.textContent = 'PLACE CASH ON DELIVERY ORDER (' + formattedTotal + ') 🚚';
+                    submitBtn.style.backgroundColor = '#0F172A';
+                    submitBtn.style.boxShadow = '0 4px 20px rgba(15, 23, 42, 0.35)';
+                } else {
+                    cardUpi.style.borderColor = '#2563EB';
+                    cardUpi.style.backgroundColor = '#F8FAFC';
+                    cardCod.style.borderColor = '#CBD5E1';
+                    cardCod.style.backgroundColor = '#FFFFFF';
+                    
+                    upiContainer.style.display = 'block';
+                    codContainer.style.display = 'none';
+
+                    submitBtn.textContent = 'CONFIRM & PAY VIA UPI (' + formattedTotal + ') 🔒';
+                    submitBtn.style.backgroundColor = '#16A34A';
+                    submitBtn.style.boxShadow = '0 4px 20px rgba(22, 163, 74, 0.35)';
+                }
+            }
+            </script>
 
             <!-- Right: Order Summary Sidebar -->
             <div>
