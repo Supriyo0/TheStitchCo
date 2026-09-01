@@ -18,6 +18,8 @@ $wishlistCount = get_wishlist_count($_SESSION['user_id'] ?? null);
 $currentUser = current_user();
 $pageTitle = $pageTitle ?? STORE_NAME . ' | ' . STORE_TAGLINE;
 $isMaintenanceActive = (int)get_setting('maintenance_mode', '0') === 1;
+$activeTheme = get_setting('active_theme', 'default');
+$themeParticlesEnabled = (int)get_setting('theme_particles_enabled', '1');
 
 $userOrderCount = 0;
 $userAddressCount = 0;
@@ -37,9 +39,10 @@ if ($currentUser) {
     <title><?= e($pageTitle) ?></title>
     <meta name="description" content="Premium heavyweight oversized graphic streetwear designed to elevate your style. 240 GSM Bio-Wash Combed Cotton.">
     <link rel="stylesheet" href="assets/css/style.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="assets/css/festive-themes.css?v=<?= time() ?>">
     <link rel="icon" href="assets/images/logo.jpg" type="image/jpeg">
 </head>
-<body>
+<body data-theme="<?= e($activeTheme) ?>">
 
 <?php if ($isMaintenanceActive && is_admin()): ?>
     <!-- Persistent Admin Maintenance Mode Warning Banner -->
@@ -67,6 +70,21 @@ if ($currentUser) {
 <?php
 $showAnnouncement = (int)get_setting('announcement_bar_enabled', 1);
 $announcementText = get_setting('announcement_bar_text', 'FREE SHIPPING ON PREPAID ORDERS ABOVE ₹999 🚚 &nbsp;|&nbsp; USE CODE <strong>WELCOME10</strong> FOR 10% OFF');
+
+// Theme specific default greetings if not customized
+if ($activeTheme === 'durga_puja' && strpos($announcementText, 'WELCOME10') !== false) {
+    $announcementText = 'SHUBHO SARODIYA! 🌸 PUJOR EXCLUSIVE STREETWEAR DROPS &nbsp;|&nbsp; USE CODE <strong>PUJO10</strong> FOR 10% OFF';
+} elseif ($activeTheme === 'diwali' && strpos($announcementText, 'WELCOME10') !== false) {
+    $announcementText = 'HAPPY DIWALI 🪔 ILLUMINATE YOUR STREETWEAR STYLE &nbsp;|&nbsp; USE CODE <strong>DIWALI200</strong> FOR ₹200 OFF';
+} elseif ($activeTheme === 'freedom' && strpos($announcementText, 'WELCOME10') !== false) {
+    $announcementText = 'CELEBRATE FREEDOM 🇮🇳 PROUDLY CRAFTED IN INDIA &nbsp;|&nbsp; USE CODE <strong>INDIA78</strong>';
+} elseif ($activeTheme === 'winter' && strpos($announcementText, 'WELCOME10') !== false) {
+    $announcementText = 'WINTER STREETWEAR DROPS ❄️ STAY WARM & STYLISH &nbsp;|&nbsp; USE CODE <strong>WINTER10</strong> FOR 10% OFF';
+} elseif ($activeTheme === 'christmas' && strpos($announcementText, 'WELCOME10') !== false) {
+    $announcementText = 'MERRY CHRISTMAS & HAPPY NEW YEAR 🎄 HOLIDAY SALE &nbsp;|&nbsp; USE CODE <strong>NOEL15</strong> FOR 15% OFF';
+} elseif ($activeTheme === 'summer' && strpos($announcementText, 'WELCOME10') !== false) {
+    $announcementText = 'SUMMER STREET DROPS ☀️ 100% BREATHABLE COTTON &nbsp;|&nbsp; USE CODE <strong>SUMMER10</strong>';
+}
 ?>
 <?php if ($showAnnouncement && !empty($announcementText)): ?>
     <!-- Top Announcement Banner -->

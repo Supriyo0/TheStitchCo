@@ -117,6 +117,11 @@
 
 <!-- Scripts -->
 <script src="assets/js/main.js?v=<?= time() ?>"></script>
+<?php if (!empty($themeParticlesEnabled) && ($activeTheme ?? 'default') !== 'default'): ?>
+    <!-- Active Theme Particle Physics Engine -->
+    <canvas id="theme-particles-canvas"></canvas>
+    <script src="assets/js/theme-effects.js?v=<?= time() ?>"></script>
+<?php endif; ?>
 
 <?php
 $showWelcome = false;

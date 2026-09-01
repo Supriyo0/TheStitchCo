@@ -503,4 +503,38 @@ if ($action === 'toggle_maintenance') {
     exit;
 }
 
+// 10. Set Active Festive & Seasonal Theme
+if ($action === 'set_active_theme') {
+    $theme = trim($_POST['theme'] ?? 'default');
+    $validThemes = ['default', 'winter', 'summer', 'durga_puja', 'freedom', 'diwali', 'christmas'];
+
+    if (!in_array($theme, $validThemes)) {
+        echo json_encode(['success' => false, 'message' => 'Invalid theme selected.']);
+        exit;
+    }
+
+    update_setting('active_theme', $theme);
+    log_admin_activity($admin['id'], $admin['fullname'], 'set_active_theme', 'Switched storefront theme to ' . strtoupper($theme));
+
+    echo json_encode([
+        'success' => true,
+        'active_theme' => $theme,
+        'message' => 'Theme updated to ' . ucfirst($theme) . ' successfully!'
+    ]);
+    exit;
+}
+
+// 11. Toggle Theme Particle Animations
+if ($action === 'toggle_theme_particles') {
+    $enabled = ($_POST['enabled'] ?? '1') === '1' ? '1' : '0';
+    update_setting('theme_particles_enabled', $enabled);
+
+    echo json_encode([
+        'success' => true,
+        'particles_enabled' => $enabled === '1',
+        'message' => 'Particle effects updated.'
+    ]);
+    exit;
+}
+
 echo json_encode(['success' => false, 'message' => 'Unknown admin action.']);

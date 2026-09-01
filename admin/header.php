@@ -174,6 +174,15 @@ try {
             </a>
         </li>
         <li>
+            <a href="themes.php" class="sidebar-link <?= $currentFile === 'themes.php' ? 'active' : '' ?>">
+                <div class="sidebar-link-content">
+                    <span class="sidebar-icon">🎨</span>
+                    <span>Themes & Festive Studio</span>
+                </div>
+                <span class="nav-badge-pill" style="background: #2563EB;">New</span>
+            </a>
+        </li>
+        <li>
             <a href="settings.php" class="sidebar-link <?= $currentFile === 'settings.php' ? 'active' : '' ?>">
                 <div class="sidebar-link-content">
                     <span class="sidebar-icon">

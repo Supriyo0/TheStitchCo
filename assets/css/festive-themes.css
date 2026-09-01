@@ -1,0 +1,252 @@
+/* ==========================================================================
+   THE STITCH CO. - FESTIVE & SEASONAL THEME ENGINE
+   Dynamic Storewide Themes: Default, Winter, Summer, Durga Puja, Freedom, Diwali, Christmas
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. DEFAULT THEME: Obsidian Liquid Glass (Modern Streetwear)
+   -------------------------------------------------------------------------- */
+body[data-theme="default"],
+body:not([data-theme]) {
+  --theme-primary: #0F172A;
+  --theme-secondary: #1E3A8A;
+  --theme-accent: #2563EB;
+  --theme-bg: #F4F6FB;
+  --theme-surface: rgba(255, 255, 255, 0.82);
+  --theme-glass-border: rgba(255, 255, 255, 0.85);
+  --theme-glass-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.07), 0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+  --theme-badge-bg: #0F172A;
+  --theme-badge-text: #FFFFFF;
+  --theme-hero-glow: rgba(37, 99, 235, 0.15);
+}
+
+/* --------------------------------------------------------------------------
+   2. WINTER THEME: Frost & Blizzard (Icy Cyan & Arctic Blue)
+   -------------------------------------------------------------------------- */
+body[data-theme="winter"] {
+  --theme-primary: #0369A1;
+  --theme-secondary: #0284C7;
+  --theme-accent: #38BDF8;
+  --theme-bg: #F0F9FF;
+  --theme-surface: rgba(240, 249, 255, 0.85);
+  --theme-glass-border: rgba(186, 230, 253, 0.8);
+  --theme-glass-shadow: 0 16px 36px -10px rgba(2, 132, 199, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.95) inset;
+  --theme-badge-bg: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
+  --theme-badge-text: #FFFFFF;
+  --theme-hero-glow: rgba(56, 189, 248, 0.25);
+  --brand-blue: #0284C7;
+  --brand-blue-hover: #0369A1;
+}
+
+body[data-theme="winter"] .main-header {
+  border-bottom: 2px solid rgba(56, 189, 248, 0.4) !important;
+  box-shadow: 0 4px 20px rgba(2, 132, 199, 0.08) !important;
+}
+
+body[data-theme="winter"] .top-announcement {
+  background: linear-gradient(90deg, #082F49 0%, #0C4A6E 50%, #0369A1 100%) !important;
+  color: #E0F2FE !important;
+  border-bottom: 1px solid #38BDF8 !important;
+}
+
+body[data-theme="winter"] .product-card:hover {
+  border-color: #38BDF8 !important;
+  box-shadow: 0 20px 45px -10px rgba(2, 132, 199, 0.2), 0 0 0 1px #BAE6FD inset !important;
+}
+
+body[data-theme="winter"] .btn-icon-badge.badge-blue {
+  background: #0284C7 !important;
+}
+
+/* --------------------------------------------------------------------------
+   3. SUMMER THEME: Solar Wave & Sunset Glow (Sun-Kissed Amber & Coral)
+   -------------------------------------------------------------------------- */
+body[data-theme="summer"] {
+  --theme-primary: #C2410C;
+  --theme-secondary: #EA580C;
+  --theme-accent: #F59E0B;
+  --theme-bg: #FFFBEB;
+  --theme-surface: rgba(255, 251, 235, 0.88);
+  --theme-glass-border: rgba(254, 215, 170, 0.85);
+  --theme-glass-shadow: 0 16px 36px -10px rgba(234, 88, 12, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.95) inset;
+  --theme-badge-bg: linear-gradient(135deg, #EA580C 0%, #D97706 100%);
+  --theme-badge-text: #FFFFFF;
+  --theme-hero-glow: rgba(245, 158, 11, 0.25);
+  --brand-blue: #EA580C;
+  --brand-blue-hover: #C2410C;
+}
+
+body[data-theme="summer"] .main-header {
+  border-bottom: 2px solid rgba(245, 158, 11, 0.4) !important;
+  box-shadow: 0 4px 20px rgba(234, 88, 12, 0.08) !important;
+}
+
+body[data-theme="summer"] .top-announcement {
+  background: linear-gradient(90deg, #431407 0%, #7C2D12 50%, #C2410C 100%) !important;
+  color: #FEF3C7 !important;
+  border-bottom: 1px solid #F59E0B !important;
+}
+
+body[data-theme="summer"] .product-card:hover {
+  border-color: #F59E0B !important;
+  box-shadow: 0 20px 45px -10px rgba(234, 88, 12, 0.18), 0 0 0 1px #FED7AA inset !important;
+}
+
+/* --------------------------------------------------------------------------
+   4. DURGA PUJA THEME: Pujor Mahotsav & Agomoni (Vermillion Red & Festive Gold)
+   -------------------------------------------------------------------------- */
+body[data-theme="durga_puja"] {
+  --theme-primary: #991B1B;
+  --theme-secondary: #DC2626;
+  --theme-accent: #D97706;
+  --theme-bg: #FFF7ED;
+  --theme-surface: rgba(255, 247, 237, 0.88);
+  --theme-glass-border: rgba(254, 202, 202, 0.85);
+  --theme-glass-shadow: 0 16px 36px -10px rgba(220, 38, 38, 0.14), 0 0 0 1px rgba(255, 255, 255, 0.95) inset;
+  --theme-badge-bg: linear-gradient(135deg, #DC2626 0%, #D97706 100%);
+  --theme-badge-text: #FFFFFF;
+  --theme-hero-glow: rgba(220, 38, 38, 0.22);
+  --brand-blue: #DC2626;
+  --brand-blue-hover: #991B1B;
+}
+
+body[data-theme="durga_puja"] .main-header {
+  border-bottom: 2px solid #D97706 !important;
+  box-shadow: 0 4px 25px rgba(220, 38, 38, 0.1) !important;
+}
+
+body[data-theme="durga_puja"] .top-announcement {
+  background: linear-gradient(90deg, #7F1D1D 0%, #991B1B 45%, #D97706 100%) !important;
+  color: #FEF08A !important;
+  font-weight: 800 !important;
+  border-bottom: 1.5px solid #FDE047 !important;
+  letter-spacing: 0.5px !important;
+}
+
+body[data-theme="durga_puja"] .product-card:hover {
+  border-color: #DC2626 !important;
+  box-shadow: 0 20px 45px -10px rgba(220, 38, 38, 0.22), 0 0 0 1px #FCA5A5 inset !important;
+}
+
+body[data-theme="durga_puja"] .nav-brand-title {
+  color: #991B1B !important;
+}
+
+/* --------------------------------------------------------------------------
+   5. FREEDOM THEME: Tiranga Spirit (Saffron, White, Emerald Green & Ashoka Navy)
+   -------------------------------------------------------------------------- */
+body[data-theme="freedom"] {
+  --theme-primary: #1E3A8A;
+  --theme-secondary: #EA580C;
+  --theme-accent: #15803D;
+  --theme-bg: #F8FAFC;
+  --theme-surface: rgba(255, 255, 255, 0.88);
+  --theme-glass-border: rgba(254, 215, 170, 0.8);
+  --theme-glass-shadow: 0 16px 36px -10px rgba(30, 58, 138, 0.10), 0 0 0 1px rgba(255, 255, 255, 0.95) inset;
+  --theme-badge-bg: linear-gradient(135deg, #EA580C 0%, #FFFFFF 50%, #15803D 100%);
+  --theme-badge-text: #0F172A;
+  --theme-hero-glow: rgba(30, 58, 138, 0.2);
+  --brand-blue: #1E3A8A;
+  --brand-blue-hover: #15803D;
+}
+
+body[data-theme="freedom"] .main-header {
+  border-bottom: 3px solid;
+  border-image: linear-gradient(90deg, #EA580C 0%, #FFFFFF 50%, #15803D 100%) 1 !important;
+  box-shadow: 0 4px 20px rgba(30, 58, 138, 0.08) !important;
+}
+
+body[data-theme="freedom"] .top-announcement {
+  background: linear-gradient(90deg, #EA580C 0%, #1E3A8A 50%, #15803D 100%) !important;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  border-bottom: 2px solid #FFFFFF !important;
+}
+
+body[data-theme="freedom"] .product-card:hover {
+  border-color: #1E3A8A !important;
+  box-shadow: 0 20px 45px -10px rgba(30, 58, 138, 0.16), 0 0 0 1px #BFDBFE inset !important;
+}
+
+/* --------------------------------------------------------------------------
+   6. DIWALI THEME: Festival of Lights & Diyas (Midnight Purple & Golden Sparks)
+   -------------------------------------------------------------------------- */
+body[data-theme="diwali"] {
+  --theme-primary: #4C1D95;
+  --theme-secondary: #6D28D9;
+  --theme-accent: #F59E0B;
+  --theme-bg: #FAF5FF;
+  --theme-surface: rgba(250, 245, 255, 0.88);
+  --theme-glass-border: rgba(233, 213, 255, 0.85);
+  --theme-glass-shadow: 0 16px 36px -10px rgba(109, 40, 217, 0.14), 0 0 0 1px rgba(255, 255, 255, 0.95) inset;
+  --theme-badge-bg: linear-gradient(135deg, #7C3AED 0%, #F59E0B 100%);
+  --theme-badge-text: #FFFFFF;
+  --theme-hero-glow: rgba(245, 158, 11, 0.28);
+  --brand-blue: #7C3AED;
+  --brand-blue-hover: #4C1D95;
+}
+
+body[data-theme="diwali"] .main-header {
+  border-bottom: 2px solid #F59E0B !important;
+  box-shadow: 0 4px 25px rgba(109, 40, 217, 0.1) !important;
+}
+
+body[data-theme="diwali"] .top-announcement {
+  background: linear-gradient(90deg, #2E1065 0%, #4C1D95 50%, #78350F 100%) !important;
+  color: #FDE68A !important;
+  font-weight: 800 !important;
+  border-bottom: 1.5px solid #FBBF24 !important;
+}
+
+body[data-theme="diwali"] .product-card:hover {
+  border-color: #F59E0B !important;
+  box-shadow: 0 20px 45px -10px rgba(109, 40, 217, 0.2), 0 0 0 1px #FDE68A inset !important;
+}
+
+/* --------------------------------------------------------------------------
+   7. CHRISTMAS THEME: Yuletide Noel & Holiday Cheer (Pine Green & Velvet Crimson)
+   -------------------------------------------------------------------------- */
+body[data-theme="christmas"] {
+  --theme-primary: #15803D;
+  --theme-secondary: #DC2626;
+  --theme-accent: #EAB308;
+  --theme-bg: #F0FDF4;
+  --theme-surface: rgba(240, 253, 244, 0.88);
+  --theme-glass-border: rgba(187, 247, 208, 0.85);
+  --theme-glass-shadow: 0 16px 36px -10px rgba(21, 128, 61, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.95) inset;
+  --theme-badge-bg: linear-gradient(135deg, #15803D 0%, #DC2626 100%);
+  --theme-badge-text: #FFFFFF;
+  --theme-hero-glow: rgba(21, 128, 61, 0.25);
+  --brand-blue: #15803D;
+  --brand-blue-hover: #DC2626;
+}
+
+body[data-theme="christmas"] .main-header {
+  border-bottom: 2px solid #DC2626 !important;
+  box-shadow: 0 4px 20px rgba(21, 128, 61, 0.1) !important;
+}
+
+body[data-theme="christmas"] .top-announcement {
+  background: linear-gradient(90deg, #14532D 0%, #15803D 50%, #991B1B 100%) !important;
+  color: #FEF08A !important;
+  font-weight: 800 !important;
+  border-bottom: 1.5px solid #EAB308 !important;
+}
+
+body[data-theme="christmas"] .product-card:hover {
+  border-color: #DC2626 !important;
+  box-shadow: 0 20px 45px -10px rgba(21, 128, 61, 0.2), 0 0 0 1px #BBF7D0 inset !important;
+}
+
+/* --------------------------------------------------------------------------
+   THEME PARTICLES CANVAS (Full-screen Non-Intrusive Layer)
+   -------------------------------------------------------------------------- */
+#theme-particles-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+}
