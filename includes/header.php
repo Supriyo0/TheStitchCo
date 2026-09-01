@@ -114,20 +114,157 @@ $announcementText = get_setting('announcement_bar_text', 'FREE SHIPPING ON PREPA
                 <span class="badge-count cart-badge-count" style="display: <?= $cartData['count'] > 0 ? 'flex' : 'none' ?>;"><?= $cartData['count'] ?></span>
             </a>
 
-            <!-- User / Account -->
-            <?php if ($currentUser): ?>
-                <a href="account.php" class="nav-icon-btn" title="My Account" style="width: 36px; height: 36px; border-radius: 50%; padding: 0; overflow: hidden; border: none; background: transparent; display: flex; align-items: center; justify-content: center;">
-                    <?php if (!empty($currentUser['avatar'])): ?>
-                        <img src="<?= e($currentUser['avatar']) ?>" alt="<?= e($currentUser['fullname']) ?>" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+            <!-- Profile / Account Liquid Glass Dropdown -->
+            <div class="profile-dropdown-wrapper" id="profile-dropdown-wrapper">
+                <button type="button" class="nav-icon-btn profile-trigger-btn" id="profile-dropdown-btn" onclick="toggleProfileDropdown(event)" aria-label="Account Menu" aria-expanded="false" style="width: 38px; height: 38px; border-radius: 50%; padding: 0; overflow: hidden; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                    <?php if ($currentUser): ?>
+                        <?php if (!empty($currentUser['avatar'])): ?>
+                            <img src="<?= e($currentUser['avatar']) ?>" alt="<?= e($currentUser['fullname']) ?>" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        <?php else: ?>
+                            <span style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: #111827; color: #FFFFFF; font-size: 0.85rem; font-weight: 800; border-radius: 50%;"><?= strtoupper(substr($currentUser['fullname'], 0, 1)) ?></span>
+                        <?php endif; ?>
                     <?php else: ?>
-                        <span style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: #111827; color: #FFFFFF; font-size: 0.85rem; font-weight: 800; border-radius: 50%;"><?= strtoupper(substr($currentUser['fullname'], 0, 1)) ?></span>
+                        <span style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; border-radius: 50%; background: rgba(0,0,0,0.05);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        </span>
                     <?php endif; ?>
-                </a>
-            <?php else: ?>
-                <a href="login.php" class="nav-icon-btn" title="Login / Register">
-                    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                </a>
-            <?php endif; ?>
+                </button>
+
+                <!-- iOS Liquid Glass Dropdown Panel -->
+                <div class="ios-liquid-glass-dropdown" id="profile-glass-menu">
+                    <?php if ($currentUser): ?>
+                        <div class="glass-dropdown-user-box">
+                            <div class="glass-user-avatar">
+                                <?php if (!empty($currentUser['avatar'])): ?>
+                                    <img src="<?= e($currentUser['avatar']) ?>" alt="<?= e($currentUser['fullname']) ?>">
+                                <?php else: ?>
+                                    <span><?= strtoupper(substr($currentUser['fullname'], 0, 1)) ?></span>
+                                <?php endif; ?>
+                            </div>
+                            <div class="glass-user-info">
+                                <div class="glass-user-name"><?= e($currentUser['fullname']) ?></div>
+                                <div class="glass-user-email"><?= e($currentUser['email']) ?></div>
+                            </div>
+                        </div>
+
+                        <div class="glass-menu-divider"></div>
+
+                        <ul class="glass-dropdown-nav">
+                            <li>
+                                <a href="account.php?tab=orders" class="glass-nav-item">
+                                    <span class="glass-nav-icon">📦</span>
+                                    <div class="glass-nav-text">
+                                        <span class="glass-nav-title">My Orders</span>
+                                        <span class="glass-nav-sub">Track delivery & status</span>
+                                    </div>
+                                    <span class="glass-nav-arrow">&rarr;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="account.php?tab=wishlist" class="glass-nav-item">
+                                    <span class="glass-nav-icon">❤️</span>
+                                    <div class="glass-nav-text">
+                                        <span class="glass-nav-title">My Wishlist</span>
+                                        <span class="glass-nav-sub">Saved street drops (<?= $wishlistCount ?>)</span>
+                                    </div>
+                                    <span class="glass-nav-arrow">&rarr;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="account.php?tab=addresses" class="glass-nav-item">
+                                    <span class="glass-nav-icon">📍</span>
+                                    <div class="glass-nav-text">
+                                        <span class="glass-nav-title">Saved Addresses</span>
+                                        <span class="glass-nav-sub">Manage delivery locations</span>
+                                    </div>
+                                    <span class="glass-nav-arrow">&rarr;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="account.php?tab=profile" class="glass-nav-item">
+                                    <span class="glass-nav-icon">👤</span>
+                                    <div class="glass-nav-text">
+                                        <span class="glass-nav-title">Account Settings</span>
+                                        <span class="glass-nav-sub">Edit profile & security</span>
+                                    </div>
+                                    <span class="glass-nav-arrow">&rarr;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="track-order.php" class="glass-nav-item">
+                                    <span class="glass-nav-icon">🚚</span>
+                                    <div class="glass-nav-text">
+                                        <span class="glass-nav-title">Track Any Order</span>
+                                        <span class="glass-nav-sub">Live courier tracking</span>
+                                    </div>
+                                    <span class="glass-nav-arrow">&rarr;</span>
+                                </a>
+                            </li>
+
+                            <?php if (in_array($currentUser['role'] ?? '', ['admin', 'super_admin'])): ?>
+                                <li>
+                                    <a href="admin/index.php" class="glass-nav-item glass-admin-link">
+                                        <span class="glass-nav-icon">⚡</span>
+                                        <div class="glass-nav-text">
+                                            <span class="glass-nav-title" style="color: #2563EB;">Admin Dashboard</span>
+                                            <span class="glass-nav-sub">Manage store & orders</span>
+                                        </div>
+                                        <span class="glass-nav-arrow" style="color: #2563EB;">&rarr;</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+
+                        <div class="glass-menu-divider"></div>
+
+                        <div class="glass-logout-wrap">
+                            <a href="logout.php" class="glass-logout-btn">
+                                <span>🚪</span>
+                                <span>Log Out</span>
+                            </a>
+                        </div>
+                    <?php else: ?>
+                        <!-- Guest Mode -->
+                        <div class="glass-guest-box">
+                            <div class="glass-guest-title">
+                                Welcome to The Stitch Co. 👋
+                            </div>
+                            <p class="glass-guest-desc">
+                                Sign in to access your orders, track shipments & get exclusive drop perks.
+                            </p>
+                            <div class="glass-guest-actions">
+                                <a href="login.php" class="glass-btn-primary">🔑 Sign In</a>
+                                <a href="login.php#register" class="glass-btn-secondary">✨ Create Account</a>
+                            </div>
+                        </div>
+
+                        <div class="glass-menu-divider"></div>
+
+                        <ul class="glass-dropdown-nav">
+                            <li>
+                                <a href="track-order.php" class="glass-nav-item">
+                                    <span class="glass-nav-icon">📦</span>
+                                    <div class="glass-nav-text">
+                                        <span class="glass-nav-title">Track My Order</span>
+                                        <span class="glass-nav-sub">Search with Order ID</span>
+                                    </div>
+                                    <span class="glass-nav-arrow">&rarr;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="categories.php" class="glass-nav-item">
+                                    <span class="glass-nav-icon">✨</span>
+                                    <div class="glass-nav-text">
+                                        <span class="glass-nav-title">Browse Collections</span>
+                                        <span class="glass-nav-sub">All streetwear categories</span>
+                                    </div>
+                                    <span class="glass-nav-arrow">&rarr;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
     </div>
 

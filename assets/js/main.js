@@ -320,3 +320,48 @@ document.addEventListener('DOMContentLoaded', () => {
     initLiveSearch('.mobile-search-form');
     initLiveSearch('.drawer-search-form');
 });
+
+// ==========================================
+// iOS Liquid Glass Profile Dropdown Controller
+// ==========================================
+function toggleProfileDropdown(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    const menu = document.getElementById('profile-glass-menu');
+    const btn = document.getElementById('profile-dropdown-btn');
+    if (!menu) return;
+
+    const isActive = menu.classList.contains('active');
+    if (isActive) {
+        menu.classList.remove('active');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+    } else {
+        menu.classList.add('active');
+        if (btn) btn.setAttribute('aria-expanded', 'true');
+    }
+}
+
+// Global click outside and escape key listeners for profile dropdown
+document.addEventListener('click', function(e) {
+    const wrapper = document.getElementById('profile-dropdown-wrapper');
+    const menu = document.getElementById('profile-glass-menu');
+    const btn = document.getElementById('profile-dropdown-btn');
+    if (wrapper && !wrapper.contains(e.target) && menu && menu.classList.contains('active')) {
+        menu.classList.remove('active');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const menu = document.getElementById('profile-glass-menu');
+        const btn = document.getElementById('profile-dropdown-btn');
+        if (menu && menu.classList.contains('active')) {
+            menu.classList.remove('active');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+        }
+    }
+});
+
