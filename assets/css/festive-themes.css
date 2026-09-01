@@ -548,5 +548,36 @@ body[data-theme="christmas"] .product-card:hover {
     font-size: 0.7rem;
     padding: 0.35rem 0.75rem;
   }
+
+  .loader-festive-motif {
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .motif-durga-puja .pradip-flame {
+    font-size: 1.3rem;
+  }
+
+  .motif-durga-puja .pradip-base {
+    font-size: 1.4rem;
+  }
+
+  .motif-durga-puja .motif-dhak-center {
+    font-size: 1.5rem;
+  }
+
+  .motif-durga-puja .motif-kash-left,
+  .motif-durga-puja .motif-kash-right {
+    font-size: 1.3rem;
+  }
+
+  .motif-diwali .motif-pradip-glow {
+    font-size: 1.5rem;
+  }
+
+  .loader-theme-subtitle {
+    font-size: clamp(0.7rem, 3.2vw, 0.8rem) !important;
+    letter-spacing: 0.5px !important;
+  }
 }
 
