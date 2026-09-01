@@ -4,6 +4,13 @@
  * The Stitch Co.
  */
 
+// Enable Gzip output compression if supported
+if (!ob_get_level() && !headers_sent()) {
+    if (extension_loaded('zlib') && !ini_get('zlib.output_compression')) {
+        ob_start('ob_gzhandler');
+    }
+}
+
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/functions.php';
@@ -37,10 +44,17 @@ if ($currentUser) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle) ?></title>
     <meta name="description" content="Premium heavyweight oversized graphic streetwear designed to elevate your style. 240 GSM Bio-Wash Combed Cotton.">
+    
+    <!-- High-Performance Preconnects & Font Loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=Cinzel:wght@600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="assets/css/style.css?v=<?= time() ?>">
     <link rel="stylesheet" href="assets/css/festive-themes.css?v=<?= time() ?>">
     <link rel="icon" href="assets/images/logo.jpg" type="image/jpeg">
-    <script>        window.activeTheme = '<?= e($activeTheme) ?>';
+    <script>
+        window.activeTheme = '<?= e($activeTheme) ?>';
     </script>
 </head>
 <body data-theme="<?= e($activeTheme) ?>">

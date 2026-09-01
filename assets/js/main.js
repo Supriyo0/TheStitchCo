@@ -21,14 +21,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 1b. Navigation Page Spinner
-    //     On page load: hide/remove it (we arrived). On link click: show it.
     const navSpinner = document.getElementById('nav-page-spinner');
     if (navSpinner) {
         navSpinner.style.opacity = '0';
-        setTimeout(() => navSpinner.remove(), 200);
+        setTimeout(() => navSpinner.remove(), 180);
     }
 
-    // Show nav spinner on every internal navigation click
+    // High-Speed Link Prefetching Cache
+    const prefetchedUrls = new Set();
+    function prefetchPage(url) {
+        if (!url || prefetchedUrls.has(url)) return;
+        prefetchedUrls.add(url);
+        const link = document.createElement('link');
+        link.rel = 'prefetch';
+        link.href = url;
+        document.head.appendChild(link);
+    }
+
+    // Instant prefetch on mouseover/touchstart (65ms intent threshold)
+    document.addEventListener('mouseover', (e) => {
+        const link = e.target.closest('a[href]');
+        if (!link) return;
+        const href = link.getAttribute('href');
+        if (!href || href.startsWith('#') || href.startsWith('mailto:') ||
+            href.startsWith('tel:') || href.startsWith('javascript:') ||
+            link.target === '_blank' || href.startsWith('http')) return;
+        prefetchPage(href);
+    }, { passive: true });
+
+    document.addEventListener('touchstart', (e) => {
+        const link = e.target.closest('a[href]');
+        if (!link) return;
+        const href = link.getAttribute('href');
+        if (href && !href.startsWith('#') && !href.startsWith('http')) prefetchPage(href);
+    }, { passive: true });
+
+    // Show lightweight nav spinner on click
     document.addEventListener('click', (e) => {
         const link = e.target.closest('a[href]');
         if (!link) return;

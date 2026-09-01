@@ -3,7 +3,39 @@
    Streetwear Aesthetic • Indian E-Commerce Experience
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+/* Performance & Rendering Optimizations */
+*, *::before, *::after {
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* GPU Acceleration for UI layers & smooth 60fps interaction */
+.product-card,
+.btn-fintech-pill,
+.nav-icon-btn,
+.ios-liquid-glass-dropdown,
+.mobile-drawer,
+.profile-orbit-ring-wrap,
+.hero-slider-slide {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Content visibility to defer offscreen layout computations */
+.product-grid,
+.features-grid,
+.category-scroll-container,
+footer {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 500px;
+}
 
 :root {
   --primary: #0F172A;
