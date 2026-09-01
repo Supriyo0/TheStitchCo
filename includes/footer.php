@@ -141,6 +141,8 @@ $footerTheme = $activeTheme ?? 'default';
 
 <!-- Scripts -->
 <script src="assets/js/main.js?v=<?= time() ?>"></script>
+<script src="assets/js/theme-sound-engine.js?v=<?= time() ?>"></script>
+
 <?php if (!empty($themeParticlesEnabled) && ($activeTheme ?? 'default') !== 'default'): ?>
     <!-- Active Theme Particle Physics Engine -->
     <canvas id="theme-particles-canvas"></canvas>
@@ -148,8 +150,8 @@ $footerTheme = $activeTheme ?? 'default';
 <?php endif; ?>
 
 <?php if (($activeTheme ?? 'default') !== 'default'): ?>
-    <!-- Floating Festive Theme Corner Badge -->
-    <div class="theme-corner-festive-badge" title="Active Season Theme: <?= e(ucfirst($activeTheme)) ?>">
+    <!-- Floating Festive Theme Corner Badge with Sound Chime Trigger & Mute Control -->
+    <div class="theme-corner-festive-badge" title="Click to play seasonal chime! Active: <?= e(ucfirst($activeTheme)) ?>" onclick="window.playThemeSound('<?= e($activeTheme) ?>')">
         <?php if ($activeTheme === 'durga_puja'): ?>
             <span>🌸</span> <span>Pujor Mahotsav 🪔</span>
         <?php elseif ($activeTheme === 'diwali'): ?>
@@ -163,6 +165,16 @@ $footerTheme = $activeTheme ?? 'default';
         <?php elseif ($activeTheme === 'summer'): ?>
             <span>☀️</span> <span>Summer Vibes 🌊</span>
         <?php endif; ?>
+
+        <!-- Mini Audio Wave Animation -->
+        <span class="theme-sound-audio-wave" aria-hidden="true">
+            <span></span><span></span><span></span>
+        </span>
+
+        <!-- Sound Mute/Unmute Quick Pill -->
+        <button type="button" id="theme-sound-toggle-btn" class="theme-sound-pill-btn" onclick="event.stopPropagation(); window.toggleThemeSound();" title="Toggle theme sounds">
+            🔊 <span>Sound</span>
+        </button>
     </div>
 <?php endif; ?>
 

@@ -184,6 +184,15 @@ if ($activeTheme === 'durga_puja' && (strpos($announcementText, 'WELCOME10') !==
     $announcementText = 'SUMMER STREET DROPS ☀️ 100% BREATHABLE COTTON &nbsp;|&nbsp; USE CODE <strong>SUMMER10</strong>';
 }
 ?>
+<?php if (in_array($activeTheme, ['durga_puja', 'diwali', 'christmas'])): ?>
+    <!-- Sparkling Festive Fairy Lights Garland -->
+    <div class="fairy-lights-garland" aria-hidden="true">
+        <?php for ($i = 0; $i < 18; $i++): ?>
+            <span class="fairy-light-bulb"></span>
+        <?php endfor; ?>
+    </div>
+<?php endif; ?>
+
 <?php if ($showAnnouncement && !empty($announcementText)): ?>
     <!-- Top Announcement Banner -->
     <div class="top-announcement">

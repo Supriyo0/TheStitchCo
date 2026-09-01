@@ -1179,6 +1179,129 @@ body[data-theme="summer"] .theme-corner-festive-badge {
 }
 
 /* ==========================================================================
+   AUDIO WAVE INDICATOR & SOUND TOGGLE PILL
+   ========================================================================== */
+.theme-sound-audio-wave {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 12px;
+  margin-left: 4px;
+}
+
+.theme-sound-audio-wave span {
+  display: inline-block;
+  width: 2.5px;
+  height: 100%;
+  background: currentColor;
+  border-radius: 2px;
+  animation: audioWavePulse 1.2s infinite ease-in-out alternate;
+}
+
+.theme-sound-audio-wave span:nth-child(1) { animation-delay: 0s; height: 35%; }
+.theme-sound-audio-wave span:nth-child(2) { animation-delay: 0.2s; height: 100%; }
+.theme-sound-audio-wave span:nth-child(3) { animation-delay: 0.4s; height: 60%; }
+
+@keyframes audioWavePulse {
+  0% { transform: scaleY(0.3); opacity: 0.6; }
+  100% { transform: scaleY(1.1); opacity: 1; }
+}
+
+.theme-sound-pill-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 9999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 0.4rem;
+  user-select: none;
+}
+
+.theme-sound-pill-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.theme-sound-pill-btn.sound-muted {
+  opacity: 0.6;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================================================
+   FAIRY LIGHTS GARLAND (Durga Puja, Diwali & Christmas)
+   ========================================================================== */
+.fairy-lights-garland {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 3px 0;
+  background: rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  line-height: 1;
+}
+
+.fairy-light-bulb {
+  width: 9px;
+  height: 13px;
+  border-radius: 50% 50% 40% 40%;
+  display: inline-block;
+  animation: bulbGlow 1.5s infinite alternate ease-in-out;
+}
+
+.fairy-light-bulb:nth-child(3n+1) {
+  background: #EF4444;
+  box-shadow: 0 0 10px #EF4444, 0 0 20px #DC2626;
+  animation-delay: 0s;
+}
+
+.fairy-light-bulb:nth-child(3n+2) {
+  background: #F59E0B;
+  box-shadow: 0 0 10px #F59E0B, 0 0 20px #D97706;
+  animation-delay: 0.5s;
+}
+
+.fairy-light-bulb:nth-child(3n) {
+  background: #10B981;
+  box-shadow: 0 0 10px #10B981, 0 0 20px #059669;
+  animation-delay: 1s;
+}
+
+@keyframes bulbGlow {
+  0% { opacity: 0.4; transform: scale(0.85); }
+  100% { opacity: 1; transform: scale(1.15); }
+}
+
+/* ==========================================================================
+   AURORA BOREALIS HERO GLOW (Winter Theme)
+   ========================================================================== */
+body[data-theme="winter"] .hero-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(120deg, rgba(56, 189, 248, 0.15) 0%, rgba(168, 85, 247, 0.15) 40%, rgba(34, 197, 94, 0.15) 70%, transparent 100%);
+  background-size: 300% 300%;
+  animation: auroraSweep 10s ease infinite;
+  pointer-events: none;
+}
+
+@keyframes auroraSweep {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ==========================================================================
    MOBILE RESPONSIVE
    ========================================================================== */
 @media (max-width: 768px) {
@@ -1187,6 +1310,11 @@ body[data-theme="summer"] .theme-corner-festive-badge {
     right: 14px;
     font-size: 0.7rem;
     padding: 0.38rem 0.8rem;
+  }
+
+  .theme-sound-pill-btn {
+    padding: 0.15rem 0.45rem;
+    font-size: 0.6rem;
   }
 
   .loader-festive-motif {
@@ -1214,3 +1342,4 @@ body[data-theme="summer"] .theme-corner-festive-badge {
     letter-spacing: 0.3px !important;
   }
 }
+

@@ -165,9 +165,17 @@ $themes = [
                         </div>
                     </div>
 
-                    <!-- Special Effects -->
-                    <div style="font-size: 0.75rem; color: #334155; margin-bottom: 1.4rem; background: #F8FAFC; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid #E2E8F0;">
+                    <!-- Special Effects & Sound Motif -->
+                    <div style="font-size: 0.75rem; color: #334155; margin-bottom: 0.8rem; background: #F8FAFC; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid #E2E8F0;">
                         ✨ <strong>Particles:</strong> <?= $thm['particles'] ?>
+                    </div>
+
+                    <!-- Test Sound FX Button -->
+                    <div style="margin-bottom: 1.2rem;">
+                        <button type="button" onclick="window.playThemeSound('<?= $key ?>')" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.4rem; background: #F1F5F9; border: 1.5px solid #CBD5E1; color: #0F172A; padding: 0.45rem; border-radius: 10px; font-size: 0.76rem; font-weight: 800; cursor: pointer; transition: all 0.2s ease;">
+                            <span>🎵</span>
+                            <span>Test <?= explode(' ', $thm['name'])[0] ?> Audio Motif</span>
+                        </button>
                     </div>
                 </div>
 
@@ -189,6 +197,8 @@ $themes = [
         <?php endforeach; ?>
     </div>
 </div>
+
+<script src="../assets/js/theme-sound-engine.js?v=<?= time() ?>"></script>
 
 <script>
 function activateTheme(themeKey) {
