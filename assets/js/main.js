@@ -2,18 +2,52 @@
  * The Stitch Co. - Main Client-Side JavaScript
  * Dynamic interactions, AJAX Cart, Wishlist, Loaders, Toasts
  */
-
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Brand Loader dismiss (3 second display)
+    // 1. Brand Loader — First visit only (sessionStorage flag)
     const loader = document.getElementById('brand-loader');
     if (loader) {
-        setTimeout(() => {
-            loader.classList.add('fade-out');
-            setTimeout(() => loader.remove(), 500);
-        }, 3000);
+        const hasSeenLoader = sessionStorage.getItem('stitch_loader_shown');
+        if (!hasSeenLoader) {
+            // First visit in this session — show full 3s brand loader
+            sessionStorage.setItem('stitch_loader_shown', '1');
+            setTimeout(() => {
+                loader.classList.add('fade-out');
+                setTimeout(() => loader.remove(), 500);
+            }, 3000);
+        } else {
+            // Returning within same session — skip instantly
+            loader.remove();
+        }
     }
 
-    // 2. Mobile Slide Drawer Toggle (Bulletproof global functions)
+    // 1b. Navigation Page Spinner
+    //     On page load: hide/remove it (we arrived). On link click: show it.
+    const navSpinner = document.getElementById('nav-page-spinner');
+    if (navSpinner) {
+        navSpinner.style.opacity = '0';
+        setTimeout(() => navSpinner.remove(), 200);
+    }
+
+    // Show nav spinner on every internal navigation click
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('a[href]');
+        if (!link) return;
+        const href = link.getAttribute('href');
+        if (!href || href.startsWith('#') || href.startsWith('mailto:') ||
+            href.startsWith('tel:') || href.startsWith('javascript:') ||
+            link.target === '_blank' || href.startsWith('http')) return;
+        if (link.hasAttribute('download') || link.getAttribute('onclick')) return;
+
+        let sp = document.getElementById('nav-page-spinner');
+        if (!sp) {
+            sp = document.createElement('div');
+            sp.id = 'nav-page-spinner';
+            document.body.appendChild(sp);
+        }
+        sp.style.opacity = '1';
+    });
+
+    // 2. Mobile Slide Drawer Toggle
     window.openMobileDrawer = function() {
         const mobileDrawer = document.getElementById('mobile-drawer');
         const drawerOverlay = document.getElementById('mobile-drawer-overlay');

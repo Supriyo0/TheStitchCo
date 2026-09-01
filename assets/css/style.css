@@ -262,6 +262,55 @@ body[data-theme="summer"] .theme-footer-top-deco {
 }
 
 /* ==========================================================================
+   NAV PAGE SPINNER — lightweight circle shown on internal link clicks
+   Hidden (opacity 0) as soon as the next page's DOMContentLoaded fires
+   ========================================================================== */
+#nav-page-spinner {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999998;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+/* The spinning ring inside */
+#nav-page-spinner::after {
+  content: "";
+  width: 36px;
+  height: 36px;
+  border: 2.5px solid rgba(0, 0, 0, 0.08);
+  border-top-color: #1D4ED8;
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+}
+
+/* Theme-specific spinner accent colors */
+body[data-theme="durga_puja"] #nav-page-spinner::after { border-top-color: #B45309; }
+body[data-theme="durga_puja"] #nav-page-spinner        { background: rgba(253, 246, 236, 0.7); }
+
+body[data-theme="diwali"] #nav-page-spinner::after     { border-top-color: #92400E; }
+body[data-theme="diwali"] #nav-page-spinner            { background: rgba(13, 1, 22, 0.75); }
+
+body[data-theme="winter"] #nav-page-spinner::after     { border-top-color: #3B82F6; }
+body[data-theme="winter"] #nav-page-spinner            { background: rgba(235, 243, 250, 0.7); }
+
+body[data-theme="christmas"] #nav-page-spinner::after  { border-top-color: #14532D; }
+body[data-theme="christmas"] #nav-page-spinner         { background: rgba(240, 247, 242, 0.7); }
+
+body[data-theme="freedom"] #nav-page-spinner::after    { border-top-color: #1E3A8A; }
+body[data-theme="summer"] #nav-page-spinner::after     { border-top-color: #B45309; }
+body[data-theme="summer"] #nav-page-spinner            { background: rgba(255, 248, 240, 0.7); }
+
+
+
+/* ==========================================================================
    TOP BAR & HEADER NAVBAR
    ========================================================================== */
 .top-announcement {
