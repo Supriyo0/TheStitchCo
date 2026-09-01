@@ -137,16 +137,19 @@ require_once __DIR__ . '/includes/header.php';
                     </div>
                 </div>
 
-                <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.9rem; font-weight: 700;">
-                    <li><a href="account.php?tab=dashboard" style="display: block; padding: 0.6rem 0.8rem; border-radius: var(--radius-sm); <?= $tab === 'dashboard' ? 'background: var(--primary); color: #fff;' : '' ?>">📊 Dashboard</a></li>
-                    <li><a href="account.php?tab=orders" style="display: block; padding: 0.6rem 0.8rem; border-radius: var(--radius-sm); <?= $tab === 'orders' ? 'background: var(--primary); color: #fff;' : '' ?>">📦 My Orders (<?= $orderCount ?>)</a></li>
-                    <li><a href="account.php?tab=wishlist" style="display: block; padding: 0.6rem 0.8rem; border-radius: var(--radius-sm); <?= $tab === 'wishlist' ? 'background: var(--primary); color: #fff;' : '' ?>">♡ Wishlist (<?= $wishlistCount ?>)</a></li>
-                    <li><a href="account.php?tab=addresses" style="display: block; padding: 0.6rem 0.8rem; border-radius: var(--radius-sm); <?= $tab === 'addresses' ? 'background: var(--primary); color: #fff;' : '' ?>">📍 Saved Addresses (<?= $addressCount ?>)</a></li>
-                    <li><a href="account.php?tab=profile" style="display: block; padding: 0.6rem 0.8rem; border-radius: var(--radius-sm); <?= $tab === 'profile' ? 'background: var(--primary); color: #fff;' : '' ?>">⚙️ Profile & Photo</a></li>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.88rem; font-weight: 700;">
+                    <li><a href="dashboard.php" style="display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 0.85rem; border-radius: var(--radius-sm); text-decoration: none; <?= $tab === 'dashboard' ? 'background: #0F172A; color: #fff;' : 'color: #334155;' ?>"><span>📊</span><span>Profile Dashboard</span></a></li>
+                    <li><a href="orders.php" style="display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 0.85rem; border-radius: var(--radius-sm); text-decoration: none; <?= $tab === 'orders' ? 'background: #0F172A; color: #fff;' : 'color: #334155;' ?>"><span>📦 My Orders</span><span style="font-size: 0.72rem; background: rgba(0,0,0,0.08); padding: 0.15rem 0.45rem; border-radius: 10px;"><?= $orderCount ?></span></a></li>
+                    <li><a href="track-order.php" style="display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 0.85rem; border-radius: var(--radius-sm); text-decoration: none; color: #334155;"><span>🚚</span><span>Track Live Order</span></a></li>
+                    <li><a href="wishlist.php" style="display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 0.85rem; border-radius: var(--radius-sm); text-decoration: none; <?= $tab === 'wishlist' ? 'background: #0F172A; color: #fff;' : 'color: #334155;' ?>"><span>❤️ My Wishlist</span><span style="font-size: 0.72rem; background: rgba(239,68,68,0.12); color: #EF4444; padding: 0.15rem 0.45rem; border-radius: 10px;"><?= $wishlistCount ?></span></a></li>
+                    <li><a href="addresses.php" style="display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 0.85rem; border-radius: var(--radius-sm); text-decoration: none; <?= $tab === 'addresses' ? 'background: #0F172A; color: #fff;' : 'color: #334155;' ?>"><span>📍 Saved Addresses</span><span style="font-size: 0.72rem; background: rgba(0,0,0,0.08); padding: 0.15rem 0.45rem; border-radius: 10px;"><?= $addressCount ?></span></a></li>
+                    <li><a href="profile.php" style="display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 0.85rem; border-radius: var(--radius-sm); text-decoration: none; <?= $tab === 'profile' ? 'background: #0F172A; color: #fff;' : 'color: #334155;' ?>"><span>⚙️</span><span>Profile Settings</span></a></li>
+                    <li><a href="coupons.php" style="display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 0.85rem; border-radius: var(--radius-sm); text-decoration: none; <?= $tab === 'coupons' ? 'background: #0F172A; color: #fff;' : 'color: #334155;' ?>"><span>🎟️</span><span>Coupons & Offers</span></a></li>
+                    <li><a href="contact.php" style="display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 0.85rem; border-radius: var(--radius-sm); text-decoration: none; color: #334155;"><span>💬</span><span>Help & Support</span></a></li>
                     <?php if (in_array($currentUser['role'], ['admin', 'super_admin'])): ?>
-                        <li><a href="admin/index.php" style="display: block; padding: 0.6rem 0.8rem; border-radius: var(--radius-sm); color: #2563EB;">⚡ Admin Panel</a></li>
+                        <li><a href="admin/index.php" style="display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 0.85rem; border-radius: var(--radius-sm); text-decoration: none; color: #2563EB; background: #EFF6FF;"><span>⚡</span><span>Admin Control Panel</span></a></li>
                     <?php endif; ?>
-                    <li><a href="logout.php" style="display: block; padding: 0.6rem 0.8rem; border-radius: var(--radius-sm); color: #EF4444;">🚪 Logout</a></li>
+                    <li><a href="logout.php" style="display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 0.85rem; border-radius: var(--radius-sm); text-decoration: none; color: #EF4444;"><span>🚪</span><span>Log Out</span></a></li>
                 </ul>
             </div>
         </div>
@@ -540,6 +543,54 @@ require_once __DIR__ . '/includes/header.php';
                             SAVE CHANGES
                         </button>
                     </form>
+                </div>
+
+            <?php elseif ($tab === 'coupons'): ?>
+                <!-- Coupons & Offers Tab -->
+                <?php
+                $couponsList = $db->query("SELECT * FROM coupons WHERE is_active = 1 ORDER BY id DESC")->fetchAll();
+                ?>
+                <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.8rem; box-shadow: var(--shadow-sm);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.5rem;">
+                        <h3 style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 900; text-transform: uppercase; margin: 0;">
+                            🎟️ Available Coupons & Exclusive Drops
+                        </h3>
+                        <span style="font-size: 0.75rem; font-weight: 800; background: #ECFDF5; color: #059669; border: 1px solid #10B981; padding: 0.25rem 0.65rem; border-radius: 20px;">
+                            APPLY AT CHECKOUT
+                        </span>
+                    </div>
+
+                    <?php if (empty($couponsList)): ?>
+                        <div style="text-align: center; padding: 2.5rem 1rem;">
+                            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🎫</div>
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">No active coupons at this moment. Stay tuned for our next streetwear drop!</p>
+                        </div>
+                    <?php else: ?>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem;">
+                            <?php foreach ($couponsList as $cpn): ?>
+                                <div style="border: 2px dashed #CBD5E1; background: #F8FAFC; border-radius: 12px; padding: 1.4rem; position: relative; overflow: hidden;">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem;">
+                                        <span style="font-family: monospace; font-size: 1.15rem; font-weight: 900; color: #2563EB; background: #EFF6FF; border: 1.5px solid #BFDBFE; padding: 0.3rem 0.75rem; border-radius: 6px; user-select: all;">
+                                            <?= e($cpn['code']) ?>
+                                        </span>
+                                        <button onclick="navigator.clipboard.writeText('<?= e($cpn['code']) ?>'); alert('Coupon code <?= e($cpn['code']) ?> copied!');" style="background: #0F172A; color: #fff; border: none; border-radius: 6px; padding: 0.35rem 0.7rem; font-size: 0.72rem; font-weight: 800; cursor: pointer;">
+                                            📋 COPY
+                                        </button>
+                                    </div>
+                                    <div style="font-size: 0.92rem; font-weight: 800; color: #0F172A; margin-bottom: 0.3rem;">
+                                        <?php if ($cpn['discount_type'] === 'percentage'): ?>
+                                            <?= (int)$cpn['discount_value'] ?>% OFF Your Order
+                                        <?php else: ?>
+                                            Flat <?= format_price($cpn['discount_value']) ?> OFF
+                                        <?php endif; ?>
+                                    </div>
+                                    <div style="font-size: 0.78rem; color: #64748B;">
+                                        Min Order: <?= ($cpn['min_order_amount'] > 0) ? format_price($cpn['min_order_amount']) : 'No Minimum' ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
         </div>

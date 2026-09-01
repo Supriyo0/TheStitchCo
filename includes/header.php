@@ -18,6 +18,16 @@ $wishlistCount = get_wishlist_count($_SESSION['user_id'] ?? null);
 $currentUser = current_user();
 $pageTitle = $pageTitle ?? STORE_NAME . ' | ' . STORE_TAGLINE;
 $isMaintenanceActive = (int)get_setting('maintenance_mode', '0') === 1;
+
+$userOrderCount = 0;
+$userAddressCount = 0;
+if ($currentUser) {
+    try {
+        $dbHdr = get_db();
+        $userOrderCount = (int)$dbHdr->query("SELECT COUNT(*) FROM orders WHERE customer_id = " . (int)$currentUser['id'])->fetchColumn();
+        $userAddressCount = (int)$dbHdr->query("SELECT COUNT(*) FROM user_addresses WHERE user_id = " . (int)$currentUser['id'])->fetchColumn();
+    } catch (Exception $e) {}
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -70,27 +80,28 @@ $announcementText = get_setting('announcement_bar_text', 'FREE SHIPPING ON PREPA
     <div class="container navbar">
         <!-- Left: Mobile Toggle & Brand Logo -->
         <div style="display: flex; align-items: center; gap: 0.85rem;">
-            <button class="mobile-toggle" id="mobile-menu-toggle" aria-label="Open menu">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            <button type="button" class="mobile-menu-toggle" id="mobile-menu-btn" aria-label="Open mobile menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
             <a href="index.php" class="nav-brand">
+                <img src="assets/images/logo.jpg" alt="The Stitch Co. Logo" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.15); flex-shrink: 0;">
                 <div class="nav-brand-text-box">
-                    <span class="nav-brand-title">STITCH</span>
+                    <span class="nav-brand-title">THE STITCH CO.</span>
                     <span class="nav-brand-sub">WEAR YOUR VIBE</span>
                 </div>
             </a>
         </div>
 
-        <!-- Center: Nav Links -->
+        <!-- Center: Primary Desktop Links -->
         <ul class="nav-links">
-            <li><a href="index.php" class="<?= basename($_SERVER['PHP_SELF']) === 'index.php' ? 'active' : '' ?>">HOME</a></li>
-            <li><a href="categories.php" class="<?= basename($_SERVER['PHP_SELF']) === 'categories.php' ? 'active' : '' ?>">CATEGORIES</a></li>
-            <li><a href="shop.php?cat=new_arrivals" class="<?= ($_GET['cat'] ?? '') === 'new_arrivals' ? 'active' : '' ?>">NEW ARRIVALS</a></li>
-            <li><a href="shop.php?sort=popular" class="<?= ($_GET['sort'] ?? '') === 'popular' && empty($_GET['cat']) ? 'active' : '' ?>">BEST SELLERS</a></li>
-            <li><a href="shop.php?cat=oversized" class="<?= ($_GET['cat'] ?? '') === 'oversized' ? 'active' : '' ?>">OVERSIZED</a></li>
+            <li><a href="index.php" class="<?= (basename($_SERVER['PHP_SELF']) === 'index.php') ? 'active' : '' ?>">Home</a></li>
+            <li><a href="shop.php" class="<?= (basename($_SERVER['PHP_SELF']) === 'shop.php' && empty($_GET['category'])) ? 'active' : '' ?>">All Drops</a></li>
+            <li><a href="categories.php" class="<?= (basename($_SERVER['PHP_SELF']) === 'categories.php') ? 'active' : '' ?>">Categories</a></li>
+            <li><a href="shop.php?sort=newest">New Arrivals</a></li>
+            <li><a href="track-order.php" class="<?= (basename($_SERVER['PHP_SELF']) === 'track-order.php') ? 'active' : '' ?>">Track Order</a></li>
         </ul>
 
-        <!-- Search Bar (Desktop) -->
+        <!-- Right: Desktop Instant Search Box -->
         <div class="header-search">
             <form action="shop.php" method="GET" class="header-search-form">
                 <input type="text" name="q" placeholder="Search for products..." value="<?= e($_GET['q'] ?? '') ?>" autocomplete="off">
@@ -100,10 +111,10 @@ $announcementText = get_setting('announcement_bar_text', 'FREE SHIPPING ON PREPA
             </form>
         </div>
 
-        <!-- Right: Actions (Wishlist, Cart, User) -->
+        <!-- Right: Actions (Wishlist, Cart, Profile Dropdown) -->
         <div class="nav-actions">
             <!-- Wishlist -->
-            <a href="account.php?tab=wishlist" class="nav-icon-btn" title="Wishlist" aria-label="Wishlist">
+            <a href="wishlist.php" class="nav-icon-btn" title="Wishlist" aria-label="Wishlist">
                 <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                 <span class="badge-count wishlist-badge-count" style="display: <?= $wishlistCount > 0 ? 'flex' : 'none' ?>;"><?= $wishlistCount ?></span>
             </a>
@@ -133,7 +144,8 @@ $announcementText = get_setting('announcement_bar_text', 'FREE SHIPPING ON PREPA
                 <!-- iOS Liquid Glass Dropdown Panel -->
                 <div class="ios-liquid-glass-dropdown" id="profile-glass-menu">
                     <?php if ($currentUser): ?>
-                        <div class="glass-dropdown-user-box">
+                        <!-- User Card Link -->
+                        <a href="dashboard.php" class="glass-dropdown-user-box" style="text-decoration: none; color: inherit; transition: opacity 0.2s;" title="Open Profile Dashboard">
                             <div class="glass-user-avatar">
                                 <?php if (!empty($currentUser['avatar'])): ?>
                                     <img src="<?= e($currentUser['avatar']) ?>" alt="<?= e($currentUser['fullname']) ?>">
@@ -144,58 +156,98 @@ $announcementText = get_setting('announcement_bar_text', 'FREE SHIPPING ON PREPA
                             <div class="glass-user-info">
                                 <div class="glass-user-name"><?= e($currentUser['fullname']) ?></div>
                                 <div class="glass-user-email"><?= e($currentUser['email']) ?></div>
+                                <div style="font-size: 0.65rem; font-weight: 800; color: #16A34A; margin-top: 2px;">⚡ Verified Customer Account &rarr;</div>
                             </div>
-                        </div>
+                        </a>
 
                         <div class="glass-menu-divider"></div>
 
+                        <!-- Section: Orders & Dashboard -->
+                        <div class="glass-section-heading">MY ACCOUNT & ORDERS</div>
                         <ul class="glass-dropdown-nav">
                             <li>
-                                <a href="account.php?tab=orders" class="glass-nav-item">
+                                <a href="dashboard.php" class="glass-nav-item">
+                                    <span class="glass-nav-icon">📊</span>
+                                    <div class="glass-nav-text">
+                                        <span class="glass-nav-title">Profile Dashboard</span>
+                                        <span class="glass-nav-sub">Overview, stats & recent activity</span>
+                                    </div>
+                                    <span class="glass-nav-arrow">&rarr;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="orders.php" class="glass-nav-item">
                                     <span class="glass-nav-icon">📦</span>
                                     <div class="glass-nav-text">
                                         <span class="glass-nav-title">My Orders</span>
-                                        <span class="glass-nav-sub">Track delivery & status</span>
+                                        <span class="glass-nav-sub">Track delivery, invoice & status</span>
                                     </div>
-                                    <span class="glass-nav-arrow">&rarr;</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="account.php?tab=wishlist" class="glass-nav-item">
-                                    <span class="glass-nav-icon">❤️</span>
-                                    <div class="glass-nav-text">
-                                        <span class="glass-nav-title">My Wishlist</span>
-                                        <span class="glass-nav-sub">Saved street drops (<?= $wishlistCount ?>)</span>
-                                    </div>
-                                    <span class="glass-nav-arrow">&rarr;</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="account.php?tab=addresses" class="glass-nav-item">
-                                    <span class="glass-nav-icon">📍</span>
-                                    <div class="glass-nav-text">
-                                        <span class="glass-nav-title">Saved Addresses</span>
-                                        <span class="glass-nav-sub">Manage delivery locations</span>
-                                    </div>
-                                    <span class="glass-nav-arrow">&rarr;</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="account.php?tab=profile" class="glass-nav-item">
-                                    <span class="glass-nav-icon">👤</span>
-                                    <div class="glass-nav-text">
-                                        <span class="glass-nav-title">Account Settings</span>
-                                        <span class="glass-nav-sub">Edit profile & security</span>
-                                    </div>
-                                    <span class="glass-nav-arrow">&rarr;</span>
+                                    <span class="glass-count-tag"><?= $userOrderCount ?></span>
                                 </a>
                             </li>
                             <li>
                                 <a href="track-order.php" class="glass-nav-item">
                                     <span class="glass-nav-icon">🚚</span>
                                     <div class="glass-nav-text">
-                                        <span class="glass-nav-title">Track Any Order</span>
-                                        <span class="glass-nav-sub">Live courier tracking</span>
+                                        <span class="glass-nav-title">Track Live Order</span>
+                                        <span class="glass-nav-sub">Delhivery & courier updates</span>
+                                    </div>
+                                    <span class="glass-nav-arrow">&rarr;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="wishlist.php" class="glass-nav-item">
+                                    <span class="glass-nav-icon">❤️</span>
+                                    <div class="glass-nav-text">
+                                        <span class="glass-nav-title">My Wishlist</span>
+                                        <span class="glass-nav-sub">Saved street drops</span>
+                                    </div>
+                                    <span class="glass-count-tag" style="background: rgba(239, 68, 68, 0.1); color: #EF4444;"><?= $wishlistCount ?></span>
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div class="glass-menu-divider"></div>
+
+                        <!-- Section: Settings & Addresses -->
+                        <div class="glass-section-heading">SETTINGS & PREFERENCES</div>
+                        <ul class="glass-dropdown-nav">
+                            <li>
+                                <a href="addresses.php" class="glass-nav-item">
+                                    <span class="glass-nav-icon">📍</span>
+                                    <div class="glass-nav-text">
+                                        <span class="glass-nav-title">Saved Addresses</span>
+                                        <span class="glass-nav-sub">Doorstep delivery locations</span>
+                                    </div>
+                                    <span class="glass-count-tag"><?= $userAddressCount ?></span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="profile.php" class="glass-nav-item">
+                                    <span class="glass-nav-icon">⚙️</span>
+                                    <div class="glass-nav-text">
+                                        <span class="glass-nav-title">Profile Settings</span>
+                                        <span class="glass-nav-sub">Avatar, phone & security</span>
+                                    </div>
+                                    <span class="glass-nav-arrow">&rarr;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="coupons.php" class="glass-nav-item">
+                                    <span class="glass-nav-icon">🎟️</span>
+                                    <div class="glass-nav-text">
+                                        <span class="glass-nav-title">Coupons & Offers</span>
+                                        <span class="glass-nav-sub">Discount codes & vouchers</span>
+                                    </div>
+                                    <span class="glass-nav-arrow">&rarr;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="contact.php" class="glass-nav-item">
+                                    <span class="glass-nav-icon">💬</span>
+                                    <div class="glass-nav-text">
+                                        <span class="glass-nav-title">Help & Support</span>
+                                        <span class="glass-nav-sub">WhatsApp & customer care</span>
                                     </div>
                                     <span class="glass-nav-arrow">&rarr;</span>
                                 </a>
@@ -206,8 +258,8 @@ $announcementText = get_setting('announcement_bar_text', 'FREE SHIPPING ON PREPA
                                     <a href="admin/index.php" class="glass-nav-item glass-admin-link">
                                         <span class="glass-nav-icon">⚡</span>
                                         <div class="glass-nav-text">
-                                            <span class="glass-nav-title" style="color: #2563EB;">Admin Dashboard</span>
-                                            <span class="glass-nav-sub">Manage store & orders</span>
+                                            <span class="glass-nav-title" style="color: #2563EB;">Admin Control Panel</span>
+                                            <span class="glass-nav-sub">Manage catalog, orders & site</span>
                                         </div>
                                         <span class="glass-nav-arrow" style="color: #2563EB;">&rarr;</span>
                                     </a>
@@ -220,7 +272,7 @@ $announcementText = get_setting('announcement_bar_text', 'FREE SHIPPING ON PREPA
                         <div class="glass-logout-wrap">
                             <a href="logout.php" class="glass-logout-btn">
                                 <span>🚪</span>
-                                <span>Log Out</span>
+                                <span>Log Out (<?= e($currentUser['fullname']) ?>)</span>
                             </a>
                         </div>
                     <?php else: ?>
@@ -240,10 +292,11 @@ $announcementText = get_setting('announcement_bar_text', 'FREE SHIPPING ON PREPA
 
                         <div class="glass-menu-divider"></div>
 
+                        <div class="glass-section-heading">QUICK LINKS</div>
                         <ul class="glass-dropdown-nav">
                             <li>
                                 <a href="track-order.php" class="glass-nav-item">
-                                    <span class="glass-nav-icon">📦</span>
+                                    <span class="glass-nav-icon">🚚</span>
                                     <div class="glass-nav-text">
                                         <span class="glass-nav-title">Track My Order</span>
                                         <span class="glass-nav-sub">Search with Order ID</span>
@@ -261,6 +314,16 @@ $announcementText = get_setting('announcement_bar_text', 'FREE SHIPPING ON PREPA
                                     <span class="glass-nav-arrow">&rarr;</span>
                                 </a>
                             </li>
+                            <li>
+                                <a href="contact.php" class="glass-nav-item">
+                                    <span class="glass-nav-icon">💬</span>
+                                    <div class="glass-nav-text">
+                                        <span class="glass-nav-title">Customer Support</span>
+                                        <span class="glass-nav-sub">Get help on WhatsApp</span>
+                                    </div>
+                                    <span class="glass-nav-arrow">&rarr;</span>
+                                </a>
+                            </li>
                         </ul>
                     <?php endif; ?>
                 </div>
@@ -268,7 +331,7 @@ $announcementText = get_setting('announcement_bar_text', 'FREE SHIPPING ON PREPA
         </div>
     </div>
 
-    <!-- Mobile Search Row (Matching Image 2 Blueprint) -->
+    <!-- Mobile Search Row -->
     <div class="container mobile-search-row">
         <form action="shop.php" method="GET" class="mobile-search-form">
             <input type="text" name="q" placeholder="Search for products..." value="<?= e($_GET['q'] ?? '') ?>" autocomplete="off">

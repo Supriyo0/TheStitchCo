@@ -2874,14 +2874,17 @@ button, input, select, textarea {
   position: absolute;
   top: calc(100% + 14px);
   right: 0;
-  width: 310px;
+  width: 320px;
+  max-height: calc(100vh - 90px);
+  overflow-y: auto;
+  scrollbar-width: thin;
   background: var(--ios-glass-bg);
   backdrop-filter: var(--ios-glass-blur);
   -webkit-backdrop-filter: var(--ios-glass-blur);
   border: 1px solid var(--ios-glass-border);
   border-radius: 22px;
   box-shadow: var(--ios-glass-shadow);
-  padding: 1.1rem;
+  padding: 1rem;
   z-index: 2000;
   opacity: 0;
   visibility: hidden;
@@ -2889,6 +2892,15 @@ button, input, select, textarea {
   transform-origin: top right;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
+}
+
+.ios-liquid-glass-dropdown::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ios-liquid-glass-dropdown::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
 }
 
 .ios-liquid-glass-dropdown.active {
@@ -2903,7 +2915,12 @@ button, input, select, textarea {
   display: flex;
   align-items: center;
   gap: 0.85rem;
-  padding: 0.2rem 0.3rem 0.5rem;
+  padding: 0.4rem 0.5rem 0.6rem;
+  border-radius: 14px;
+}
+
+.glass-dropdown-user-box:hover {
+  background: rgba(255, 255, 255, 0.6);
 }
 
 .glass-user-avatar {
@@ -2958,7 +2975,27 @@ button, input, select, textarea {
 .glass-menu-divider {
   height: 1px;
   background: rgba(0, 0, 0, 0.07);
-  margin: 0.75rem -0.4rem;
+  margin: 0.6rem -0.2rem;
+}
+
+/* Section Headings */
+.glass-section-heading {
+  font-size: 0.64rem;
+  font-weight: 900;
+  color: #94A3B8;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 0.35rem 0.55rem 0.2rem;
+}
+
+/* Count Tag */
+.glass-count-tag {
+  font-size: 0.7rem;
+  font-weight: 800;
+  background: rgba(0, 0, 0, 0.06);
+  color: #0F172A;
+  padding: 0.15rem 0.45rem;
+  border-radius: 20px;
 }
 
 /* Navigation List */
@@ -2968,14 +3005,14 @@ button, input, select, textarea {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.2rem;
 }
 
 .glass-nav-item {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.6rem 0.75rem;
+  padding: 0.55rem 0.7rem;
   border-radius: 12px;
   text-decoration: none;
   color: #0F172A;
@@ -2990,8 +3027,8 @@ button, input, select, textarea {
 }
 
 .glass-nav-icon {
-  font-size: 1.1rem;
-  width: 24px;
+  font-size: 1.05rem;
+  width: 22px;
   text-align: center;
   flex-shrink: 0;
 }
