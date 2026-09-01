@@ -115,6 +115,50 @@ button, input, select, textarea {
 }
 
 /* ==========================================================================
+   THEME FOOTER TOP DECORATION BAR
+   ========================================================================== */
+.theme-footer-top-deco {
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding: 0.55rem 1rem;
+  letter-spacing: 1px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+body[data-theme="durga_puja"] .theme-footer-top-deco {
+  background: linear-gradient(90deg, #7F1D1D, #B45309, #7F1D1D);
+  border-bottom: 2px solid #D97706;
+}
+
+body[data-theme="diwali"] .theme-footer-top-deco {
+  background: linear-gradient(90deg, #2E1065, #4C1D95, #78350F);
+  border-bottom: 2px solid #FBBF24;
+}
+
+body[data-theme="winter"] .theme-footer-top-deco {
+  background: linear-gradient(90deg, #082F49, #0C4A6E, #082F49);
+  border-bottom: 2px solid #38BDF8;
+}
+
+body[data-theme="christmas"] .theme-footer-top-deco {
+  background: linear-gradient(90deg, #14532D, #15803D, #991B1B);
+  border-bottom: 2px solid #EAB308;
+}
+
+body[data-theme="freedom"] .theme-footer-top-deco {
+  background: linear-gradient(90deg, #EA580C 0%, #EA580C 33.3%, #1E3A8A 33.3%, #1E3A8A 66.6%, #15803D 66.6%);
+  border-bottom: 2px solid #FFFFFF;
+}
+
+body[data-theme="summer"] .theme-footer-top-deco {
+  background: linear-gradient(90deg, #431407, #C2410C, #F59E0B, #C2410C, #431407);
+  border-bottom: 2px solid #F59E0B;
+}
+
+/* ==========================================================================
    LOADER & SPINNERS
    ========================================================================== */
 #brand-loader {

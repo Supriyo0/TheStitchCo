@@ -5,8 +5,32 @@
  */
 ?>
 
+<?php
+// Theme-aware footer top decoration
+$footerTheme = $activeTheme ?? 'default';
+?>
+
+<?php if ($footerTheme !== 'default'): ?>
+<div class="theme-footer-top-deco" aria-hidden="true">
+    <?php if ($footerTheme === 'durga_puja'): ?>
+        <span style="color: #D97706; letter-spacing: 3px;">🌸 শুভ শারদোৎসব • SHUBHO PUJO • THE STITCH CO. 🌸</span>
+    <?php elseif ($footerTheme === 'diwali'): ?>
+        <span style="color: #FDE68A; letter-spacing: 3px;">🪔 शुभ दीपावली • HAPPY DIWALI • THE STITCH CO. 🪔</span>
+    <?php elseif ($footerTheme === 'winter'): ?>
+        <span style="color: #BAE6FD; letter-spacing: 3px;">❄️ WINTER COLLECTION • STAY WARM, STAY STREET ❄️</span>
+    <?php elseif ($footerTheme === 'christmas'): ?>
+        <span style="color: #FEF08A; letter-spacing: 3px;">🎄 MERRY CHRISTMAS & HAPPY NEW YEAR • THE STITCH CO. 🎄</span>
+    <?php elseif ($footerTheme === 'freedom'): ?>
+        <span style="color: #FFFFFF; letter-spacing: 3px;">🇮🇳 जय हिन्द • JAI HIND • CELEBRATE FREEDOM WITH STYLE 🇮🇳</span>
+    <?php elseif ($footerTheme === 'summer'): ?>
+        <span style="color: #FEF3C7; letter-spacing: 3px;">☀️ SUMMER DROPS ARE HERE • BREATHABLE COTTON STREETWEAR ☀️</span>
+    <?php endif; ?>
+</div>
+<?php endif; ?>
+
 <!-- Desktop/Tablet Footer -->
 <footer class="site-footer">
+
     <div class="container">
         <div class="footer-grid">
             <!-- Brand Column -->

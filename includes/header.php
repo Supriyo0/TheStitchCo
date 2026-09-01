@@ -57,6 +57,31 @@ if ($currentUser) {
     </div>
 <?php endif; ?>
 
+<?php
+// Map theme to its decoration content
+$themeTopDecoContent = '';
+if ($activeTheme === 'durga_puja') {
+    $themeTopDecoContent = '🌸 🪔 🌼 🌸 🪔 🌼 🌸 🪔 🌼 🌸 🪔 🌼 🌸 🪔 🌼 🌸 🪔 🌼 🌸 🪔 🌼 🌸 🪔 🌼 🌸';
+} elseif ($activeTheme === 'diwali') {
+    $themeTopDecoContent = '🪔 ✨ 🎇 ✨ 🪔 ✨ 🎇 ✨ 🪔 ✨ 🎇 ✨ 🪔 ✨ 🎇 ✨ 🪔 ✨ 🎇 ✨ 🪔 ✨ 🎇';
+} elseif ($activeTheme === 'winter') {
+    $themeTopDecoContent = '❄️ ❅ ❄️ ❅ ❄️ ❅ ❄️ ❅ ❄️ ❅ ❄️ ❅ ❄️ ❅ ❄️ ❅ ❄️ ❅ ❄️ ❅ ❄️ ❅ ❄️';
+} elseif ($activeTheme === 'christmas') {
+    $themeTopDecoContent = '🎄 🔔 ❄️ ⭐ 🎄 🔔 ❄️ ⭐ 🎄 🔔 ❄️ ⭐ 🎄 🔔 ❄️ ⭐ 🎄 🔔 ❄️ ⭐ 🎄';
+} elseif ($activeTheme === 'summer') {
+    $themeTopDecoContent = '☀️ 🌊 🌴 ☀️ 🌊 🌴 ☀️ 🌊 🌴 ☀️ 🌊 🌴 ☀️ 🌊 🌴 ☀️ 🌊 🌴 ☀️ 🌊 🌴';
+}
+// Freedom theme uses pure CSS tricolor stripe — no text content needed
+?>
+
+<?php if ($activeTheme !== 'default' && !empty($activeTheme)): ?>
+<div class="theme-top-decoration" role="presentation" aria-hidden="true">
+    <?= $themeTopDecoContent ?>
+</div>
+<?php endif; ?>
+
+
+
 <!-- Stage 1 & 2 Brand Loader with Theme-Specific Festive Animations -->
 <div id="brand-loader" class="loader-theme-<?= e($activeTheme) ?>">
     <div class="loader-brand-box">
