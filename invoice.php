@@ -94,7 +94,7 @@ $invoiceNumber = 'TSCINV-' . date('Y', strtotime($order['created_at'])) . '-' . 
 <body>
 
 <div class="print-actions">
-    <a href="account.php?tab=orders" style="color: #2563EB; font-weight: 700; text-decoration: none;">&larr; Back to Account Orders</a>
+    <a href="orders.php" style="color: #2563EB; font-weight: 700; text-decoration: none;">&larr; Back to My Orders</a>
     <button class="btn-print" onclick="window.print()">🖨️ Print / Download PDF</button>
 </div>
 

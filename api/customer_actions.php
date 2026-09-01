@@ -54,11 +54,11 @@ try {
 }
 
 // 1. Request Order Cancellation
-if ($action === 'request_cancellation') {
+if ($action === 'request_cancellation' || $action === 'request_cancel') {
     $orderId = (int)($_POST['order_id'] ?? 0);
     $orderNumber = trim($_POST['order_number'] ?? '');
-    $reason = trim($_POST['cancel_reason'] ?? '');
-    $additionalNotes = trim($_POST['additional_notes'] ?? '');
+    $reason = trim($_POST['cancel_reason'] ?? ($_POST['reason'] ?? ''));
+    $additionalNotes = trim($_POST['additional_notes'] ?? ($_POST['notes'] ?? ''));
 
     if ($orderId <= 0 && empty($orderNumber)) {
         echo json_encode(['success' => false, 'message' => 'Invalid order reference.']);
@@ -139,7 +139,7 @@ if ($action === 'request_cancellation') {
 
         echo json_encode([
             'success' => true, 
-            'message' => 'Your cancellation request has been submitted. Our store admin will review and approve it shortly.'
+            'message' => 'Your cancellation request has been submitted. Our store team will review and approve it shortly.'
         ]);
     } catch (Exception $e) {
         echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
@@ -147,11 +147,11 @@ if ($action === 'request_cancellation') {
     exit;
 }
 
-// 2. Request Post-Delivery Return & Refund with 3 Product Photos & UPI ID
+// 2. Request Post-Delivery Return & Refund with optional Product Photos & UPI ID
 if ($action === 'request_return') {
     $orderId = (int)($_POST['order_id'] ?? 0);
-    $reason = trim($_POST['reason'] ?? '');
-    $notes = trim($_POST['notes'] ?? '');
+    $reason = trim($_POST['reason'] ?? ($_POST['return_reason'] ?? ''));
+    $notes = trim($_POST['notes'] ?? ($_POST['additional_notes'] ?? ''));
     $upiId = trim($_POST['upi_id'] ?? '');
     $returnType = trim($_POST['return_type'] ?? 'refund');
 
@@ -166,7 +166,7 @@ if ($action === 'request_return') {
     }
 
     if (empty($upiId)) {
-        echo json_encode(['success' => false, 'message' => 'Please provide your UPI ID for the refund disbursement.']);
+        echo json_encode(['success' => false, 'message' => 'Please provide your UPI ID or Bank Account for refund disbursement.']);
         exit;
     }
 
@@ -196,34 +196,22 @@ if ($action === 'request_return') {
         exit;
     }
 
-    // Check 3 Required Image Uploads
-    if (empty($_FILES['img_front']['name']) || empty($_FILES['img_back']['name']) || empty($_FILES['img_tag']['name'])) {
-        echo json_encode([
-            'success' => false, 
-            'message' => 'Please upload all 3 required photos: Front View, Back View, and Brand/Price Tag.'
-        ]);
-        exit;
-    }
+    // Optional Image Uploads
+    $imgFrontUrl = null;
+    $imgBackUrl = null;
+    $imgTagUrl = null;
 
-    // Upload Front Photo
-    $upFront = handle_image_upload($_FILES['img_front'], 'returns', 'ret_front_' . $orderId);
-    if (!$upFront['success']) {
-        echo json_encode(['success' => false, 'message' => 'Front Photo upload failed: ' . ($upFront['message'] ?? '')]);
-        exit;
+    if (!empty($_FILES['img_front']['name'])) {
+        $upFront = handle_image_upload($_FILES['img_front'], 'returns', 'ret_front_' . $orderId);
+        if ($upFront['success']) $imgFrontUrl = $upFront['url'];
     }
-
-    // Upload Back Photo
-    $upBack = handle_image_upload($_FILES['img_back'], 'returns', 'ret_back_' . $orderId);
-    if (!$upBack['success']) {
-        echo json_encode(['success' => false, 'message' => 'Back Photo upload failed: ' . ($upBack['message'] ?? '')]);
-        exit;
+    if (!empty($_FILES['img_back']['name'])) {
+        $upBack = handle_image_upload($_FILES['img_back'], 'returns', 'ret_back_' . $orderId);
+        if ($upBack['success']) $imgBackUrl = $upBack['url'];
     }
-
-    // Upload Tag Photo
-    $upTag = handle_image_upload($_FILES['img_tag'], 'returns', 'ret_tag_' . $orderId);
-    if (!$upTag['success']) {
-        echo json_encode(['success' => false, 'message' => 'Brand Tag Photo upload failed: ' . ($upTag['message'] ?? '')]);
-        exit;
+    if (!empty($_FILES['img_tag']['name'])) {
+        $upTag = handle_image_upload($_FILES['img_tag'], 'returns', 'ret_tag_' . $orderId);
+        if ($upTag['success']) $imgTagUrl = $upTag['url'];
     }
 
     try {
@@ -258,15 +246,15 @@ if ($action === 'request_return') {
             $order['customer_email'],
             $reason,
             $notes,
-            $upFront['url'],
-            $upBack['url'],
-            $upTag['url'],
+            $imgFrontUrl,
+            $imgBackUrl,
+            $imgTagUrl,
             $upiId,
             $returnType,
             $order['total_price']
         ]);
 
-        log_order_status_transition($order['id'], 'Delivered', 'Delivered', 'Customer submitted 7-Day Return / Refund request with 3 product verification photos and UPI ID (' . $upiId . ')', 'Customer');
+        log_order_status_transition($order['id'], 'Delivered', 'Delivered', 'Customer submitted 7-Day Return / Refund request with UPI ID (' . $upiId . ')', 'Customer');
 
         // Admin Notification
         create_notification(
@@ -279,7 +267,7 @@ if ($action === 'request_return') {
 
         echo json_encode([
             'success' => true,
-            'message' => 'Return request submitted successfully! Our team will inspect your product photos and schedule pickup within 24 hours.'
+            'message' => 'Return & Refund request submitted successfully! Our team will review your request and schedule reverse pickup within 24–48 hours.'
         ]);
     } catch (Exception $e) {
         echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
@@ -288,3 +276,5 @@ if ($action === 'request_return') {
 }
 
 echo json_encode(['success' => false, 'message' => 'Unknown customer action.']);
+
+
