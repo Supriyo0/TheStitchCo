@@ -16,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_settings'])) {
     // Explicitly handle checkboxes
     $settingsData['announcement_bar_enabled'] = isset($settingsData['announcement_bar_enabled']) ? '1' : '0';
     $settingsData['maintenance_mode'] = isset($settingsData['maintenance_mode']) ? '1' : '0';
+    $settingsData['phonepe_enabled'] = isset($settingsData['phonepe_enabled']) ? '1' : '0';
 
     foreach ($settingsData as $key => $val) {
         update_setting($key, trim($val));
@@ -123,25 +124,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_settings'])) {
                     <input type="text" name="settings[imgbb_api_key]" value="<?= e(get_setting('imgbb_api_key', 'e3a1f81d1ef8fca02d1373e34b171bf7')) ?>" placeholder="ImgBB API Key" style="width: 100%; padding: 0.7rem; border: 1.5px solid var(--admin-border); border-radius: 6px; font-family: monospace;">
                 </div>
 
-                <!-- UPI Gateway Configuration -->
+                <!-- PhonePe Payment Gateway Configuration -->
                 <div style="grid-column: span 2; border-top: 1px solid var(--admin-border); padding-top: 1.5rem; margin-top: 0.5rem;">
-                    <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 800; margin-bottom: 1rem; color: #2563EB;">UPI Scan & Pay Gateway Settings</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                        <div>
+                            <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 800; color: #6739B7; margin-bottom: 0.2rem;">
+                                🟣 PhonePe Payment Gateway Configuration
+                            </h3>
+                            <span style="font-size: 0.8rem; color: var(--admin-text-muted);">Configure PhonePe Standard Checkout API (PG V1 / Hermes) for instant UPI & Card payments.</span>
+                        </div>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; background: #FAF5FF; border: 1.5px solid #D8B4FE; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer;">
+                            <input type="checkbox" name="settings[phonepe_enabled]" value="1" <?= (get_setting('phonepe_enabled', '1') == '1') ? 'checked' : '' ?> style="accent-color: #6739B7; transform: scale(1.15);">
+                            <span style="font-size: 0.82rem; font-weight: 800; color: #581C87;">Enable PhonePe Gateway</span>
+                        </label>
+                    </div>
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem;">Merchant UPI VPA / ID *</label>
-                    <input type="text" name="settings[upi_id]" required value="<?= e(get_setting('upi_id', 'thestitchco@upi')) ?>" style="width: 100%; padding: 0.7rem; border: 1.5px solid var(--admin-border); border-radius: 6px; font-weight: 800; color: #1E3A8A;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem;">Environment Mode *</label>
+                    <?php $peMode = get_setting('phonepe_mode', 'production'); ?>
+                    <select name="settings[phonepe_mode]" style="width: 100%; padding: 0.7rem; border: 1.5px solid var(--admin-border); border-radius: 6px; font-weight: 700;">
+                        <option value="production" <?= $peMode === 'production' ? 'selected' : '' ?>>🟢 Production / Live Mode (Real Transactions)</option>
+                        <option value="sandbox" <?= $peMode === 'sandbox' ? 'selected' : '' ?>>🟡 UAT / Sandbox Mode (Testing)</option>
+                    </select>
                 </div>
                 <div>
-                    <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem;">UPI Merchant Display Name *</label>
-                    <input type="text" name="settings[upi_merchant_name]" required value="<?= e(get_setting('upi_merchant_name', 'The Stitch Co.')) ?>" style="width: 100%; padding: 0.7rem; border: 1.5px solid var(--admin-border); border-radius: 6px;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem;">Merchant ID / Client ID *</label>
+                    <input type="text" name="settings[phonepe_merchant_id]" value="<?= e(get_setting('phonepe_merchant_id', 'SU2508281240185820112176')) ?>" placeholder="e.g. SU2508281240185820112176" style="width: 100%; padding: 0.7rem; border: 1.5px solid var(--admin-border); border-radius: 6px; font-family: monospace; font-weight: 700; color: #1E3A8A;">
                 </div>
-                <div style="grid-column: span 2;">
-                    <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem;">Upload Custom UPI QR Code Image (PNG / JPG / SVG)</label>
-                    <input type="file" name="upi_qr_file" accept="image/*" style="width: 100%; font-size: 0.85rem;">
-                    <div style="margin-top: 0.6rem; display: flex; align-items: center; gap: 0.8rem;">
-                        <img src="../<?= e(get_setting('upi_qr_image', 'assets/images/upi_qr.svg')) ?>" alt="QR Preview" style="width: 60px; height: 60px; border: 1px solid var(--admin-border); border-radius: 4px; padding: 2px;">
-                        <span style="font-size: 0.75rem; color: var(--admin-text-muted);">Current Active QR: <?= e(get_setting('upi_qr_image', 'assets/images/upi_qr.svg')) ?></span>
+
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem;">Salt Key / Secret Key *</label>
+                    <input type="text" name="settings[phonepe_salt_key]" value="<?= e(get_setting('phonepe_salt_key', 'a987a9bc-cf7e-417b-a627-21105e2de2d7')) ?>" placeholder="e.g. a987a9bc-cf7e-417b-a627-21105e2de2d7" style="width: 100%; padding: 0.7rem; border: 1.5px solid var(--admin-border); border-radius: 6px; font-family: monospace; font-size: 0.82rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem;">Salt Index *</label>
+                    <input type="text" name="settings[phonepe_salt_index]" value="<?= e(get_setting('phonepe_salt_index', '1')) ?>" placeholder="e.g. 1" style="width: 100%; padding: 0.7rem; border: 1.5px solid var(--admin-border); border-radius: 6px; font-family: monospace; font-weight: 700;">
+                </div>
+
+                <div style="grid-column: span 2; background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 1rem 1.2rem;">
+                    <div style="font-size: 0.82rem; font-weight: 800; color: #334155; margin-bottom: 0.5rem; text-transform: uppercase;">
+                        🔗 PhonePe Webhook & Callback URLs (Copy for PhonePe Merchant Dashboard):
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.78rem;">
+                        <div>
+                            <span style="color: var(--admin-text-muted); font-weight: 600;">Callback / Redirect URL:</span><br>
+                            <code style="background: #FFFFFF; border: 1px solid #CBD5E1; padding: 0.3rem 0.6rem; border-radius: 4px; display: block; margin-top: 0.2rem; user-select: all;"><?= BASE_URL ?>phonepe-response.php</code>
+                        </div>
+                        <div>
+                            <span style="color: var(--admin-text-muted); font-weight: 600;">Server-to-Server Webhook URL:</span><br>
+                            <code style="background: #FFFFFF; border: 1px solid #CBD5E1; padding: 0.3rem 0.6rem; border-radius: 4px; display: block; margin-top: 0.2rem; user-select: all;"><?= BASE_URL ?>api/phonepe-webhook.php</code>
+                        </div>
                     </div>
                 </div>
 

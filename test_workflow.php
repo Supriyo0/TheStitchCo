@@ -6,6 +6,7 @@
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/includes/order_functions.php';
+require_once __DIR__ . '/includes/phonepe.php';
 
 $db = get_db();
 
@@ -22,9 +23,19 @@ foreach ($tables as $t) {
 $couponTest = validate_coupon('WELCOME10', 1398.00);
 echo "✓ Coupon [WELCOME10] Validation: " . ($couponTest['valid'] ? 'PASSED (Saved ' . format_price($couponTest['discount_amount']) . ')' : 'FAILED') . "\n";
 
-// 3. Test UPI Deep Link Generator
-$upiLink = generate_upi_intent_link('thestitchco@upi', 'The Stitch Co.', 1258.20, 'TSC-TEST-001');
-echo "✓ UPI Deep Link Generated: " . substr($upiLink, 0, 45) . "...\n";
+// 3. Test PhonePe Payment Gateway Helper & Checksum Generator
+$phonepeConfig = phonepe_get_config();
+echo "✓ PhonePe Gateway Config: Mode [" . $phonepeConfig['mode'] . "] MID [" . $phonepeConfig['merchant_id'] . "]\n";
+$phonepeInit = phonepe_initiate_payment([
+    'order_id' => 9999,
+    'order_number' => 'TSC-DIAG-001',
+    'amount' => 1258.20,
+    'customer_id' => 1,
+    'customer_name' => 'Diagnostic Tester',
+    'customer_phone' => '9876543210',
+    'customer_email' => 'test@thestitchco.shop'
+], 'http://localhost/phonepe-response.php', 'http://localhost/api/phonepe-webhook.php');
+echo "✓ PhonePe PG Initiation: " . ($phonepeInit['success'] ? 'SUCCESS (Redirect URL Generated)' : 'ERROR: ' . $phonepeInit['message']) . "\n";
 
 // 4. Test Sample Order Placement
 $orderNumber = 'TSC-TEST-' . rand(1000, 9999);

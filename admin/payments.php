@@ -4,12 +4,12 @@
  * The Stitch Co.
  */
 
-$adminTitle = 'UPI Payment Verification';
+$adminTitle = 'Payment Verification & Gateway Logs';
 require_once __DIR__ . '/header.php';
 
-$filter = $_GET['filter'] ?? 'Pending';
+$filter = $_GET['filter'] ?? 'all';
 $sql = "
-    SELECT p.*, o.order_number, o.customer_name, o.customer_email, o.customer_phone
+    SELECT p.*, o.order_number, o.customer_name, o.customer_email, o.customer_phone, o.payment_method AS order_payment_method
     FROM payments p
     JOIN orders o ON p.order_id = o.id
 ";
@@ -25,14 +25,14 @@ $payments = $db->query($sql)->fetchAll();
 <div class="admin-card">
     <div class="admin-card-header">
         <div>
-            <h2 class="admin-card-title">UPI Transactions & Approvals</h2>
-            <span style="font-size: 0.8rem; color: var(--admin-text-muted);">Verify customer-submitted UTR references against bank receipts before approving orders.</span>
+            <h2 class="admin-card-title">Payments & Gateway Transactions</h2>
+            <span style="font-size: 0.8rem; color: var(--admin-text-muted);">View PhonePe automated transactions, COD orders, and payment statuses.</span>
         </div>
         <div class="filter-tabs">
-            <a href="payments.php?filter=Pending" class="filter-tab-btn <?= $filter === 'Pending' ? 'active' : '' ?>">Pending Approval</a>
-            <a href="payments.php?filter=Approved" class="filter-tab-btn <?= $filter === 'Approved' ? 'active' : '' ?>">Approved</a>
-            <a href="payments.php?filter=Rejected" class="filter-tab-btn <?= $filter === 'Rejected' ? 'active' : '' ?>">Rejected</a>
             <a href="payments.php?filter=all" class="filter-tab-btn <?= $filter === 'all' ? 'active' : '' ?>">All Payments</a>
+            <a href="payments.php?filter=Approved" class="filter-tab-btn <?= $filter === 'Approved' ? 'active' : '' ?>">Approved / Paid</a>
+            <a href="payments.php?filter=Pending" class="filter-tab-btn <?= $filter === 'Pending' ? 'active' : '' ?>">Pending</a>
+            <a href="payments.php?filter=Rejected" class="filter-tab-btn <?= $filter === 'Rejected' ? 'active' : '' ?>">Rejected / Failed</a>
         </div>
     </div>
 
@@ -43,9 +43,9 @@ $payments = $db->query($sql)->fetchAll();
                     <th>Payment ID</th>
                     <th>Order Ref</th>
                     <th>Customer</th>
+                    <th>Method</th>
                     <th>Amount</th>
-                    <th>UTR / Ref Number</th>
-                    <th>Screenshot Proof</th>
+                    <th>Transaction Ref / UTR</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
@@ -65,19 +65,28 @@ $payments = $db->query($sql)->fetchAll();
                                 <strong><?= e($p['customer_name']) ?></strong><br>
                                 <span style="font-size: 0.75rem; color: var(--admin-text-muted);"><?= e($p['customer_phone']) ?></span>
                             </td>
+                            <td>
+                                <?php if (stripos($p['payment_method'], 'PhonePe') !== false): ?>
+                                    <span style="background: #FAF5FF; border: 1px solid #D8B4FE; color: #6739B7; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.55rem; border-radius: 4px;">
+                                        🟣 PhonePe PG
+                                    </span>
+                                <?php elseif (stripos($p['payment_method'], 'Cash') !== false || stripos($p['payment_method'], 'COD') !== false): ?>
+                                    <span style="background: #F0FDF4; border: 1px solid #86EFAC; color: #166534; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.55rem; border-radius: 4px;">
+                                        💵 COD
+                                    </span>
+                                <?php else: ?>
+                                    <span style="background: #F8FAFC; border: 1px solid #CBD5E1; color: #334155; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.55rem; border-radius: 4px;">
+                                        <?= e($p['payment_method']) ?>
+                                    </span>
+                                <?php endif; ?>
+                            </td>
                             <td><strong style="font-size: 1rem; font-weight: 800;"><?= format_price($p['amount']) ?></strong></td>
                             <td>
-                                <span style="font-family: monospace; font-weight: 800; background: #EEF2FF; padding: 0.25rem 0.55rem; border-radius: 4px; color: #1E3A8A; user-select: all;">
+                                <span style="font-family: monospace; font-weight: 800; background: #EEF2FF; padding: 0.25rem 0.55rem; border-radius: 4px; color: #1E3A8A; user-select: all; font-size: 0.8rem;">
                                     <?= e($p['utr_number'] ?? 'N/A') ?>
                                 </span>
-                            </td>
-                            <td>
-                                <?php if (!empty($p['proof_screenshot'])): ?>
-                                    <button onclick="viewProofModal('<?= e($p['proof_screenshot']) ?>')" style="background: #111827; color: #fff; border: none; padding: 0.35rem 0.7rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">
-                                        📷 View Proof
-                                    </button>
-                                <?php else: ?>
-                                    <span style="color: var(--admin-text-muted); font-size: 0.75rem;">No File</span>
+                                <?php if (!empty($p['admin_notes'])): ?>
+                                    <div style="font-size: 0.7rem; color: #64748B; margin-top: 0.2rem;"><?= e($p['admin_notes']) ?></div>
                                 <?php endif; ?>
                             </td>
                             <td>

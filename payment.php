@@ -1,6 +1,6 @@
 <?php
 /**
- * Step 2: UPI Payment & Order Final Confirmation
+ * Step 2: Payment & Order Final Confirmation
  * The Stitch Co.
  */
 
@@ -9,6 +9,7 @@ require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/order_functions.php';
+require_once __DIR__ . '/includes/phonepe.php';
 
 $db = get_db();
 
@@ -53,28 +54,18 @@ $baseShippingFee = ($productDeliveryCharge > 0) ? $productDeliveryCharge : 0.00;
 $shippingFee = ($shippingMethod === 'express') ? ($baseShippingFee + 99.00) : $baseShippingFee;
 $totalPrice = max(0, $subtotal - $discountAmount + $shippingFee);
 
-$errorMessage = '';
+$errorMessage = $_SESSION['checkout_error'] ?? '';
+unset($_SESSION['checkout_error']);
+
+// Fetch PhonePe Gateway Config
+$phonePeConfig = phonepe_get_config();
 
 // Handle Final Order Placement
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
-    $paymentMethod = trim($_POST['payment_method'] ?? 'UPI (Scan & Pay)');
-    $utrNumber = trim($_POST['utr_number'] ?? '');
+    $paymentMethod = trim($_POST['payment_method'] ?? 'PhonePe (UPI / Cards / NetBanking)');
     $customerNote = trim($_POST['customer_note'] ?? '');
 
-    if ($paymentMethod === 'Cash on Delivery (COD)') {
-        $utrNumber = 'COD (Pay on Delivery)';
-    }
-
     $orderNumber = 'TSC-' . date('ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
-
-    // Handle Payment Screenshot Upload via ImgBB / Local Storage (Only if UPI)
-    $proofPath = '';
-    if ($paymentMethod !== 'Cash on Delivery (COD)' && !empty($_FILES['payment_proof']['name'])) {
-        $proofUp = upload_to_imgbb($_FILES['payment_proof']);
-        if ($proofUp['success']) {
-            $proofPath = $proofUp['url'] ?? $proofUp['relative_url'];
-        }
-    }
 
     $fullName = $shipping['fullname'];
     $email = $shipping['email'];
@@ -84,12 +75,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
                         (!empty($shipping['landmark']) ? "\nLandmark: {$shipping['landmark']}" : '') . 
                         "\n{$shipping['city']}, {$shipping['state']} - {$shipping['pincode']}\nIndia";
 
+    $customerId = $currentUser['id'] ?? 0;
+    $nowIst = date('Y-m-d H:i:s');
+
+    if ($paymentMethod === 'Cash on Delivery (COD)') {
+        // ============================================
+        // CASH ON DELIVERY (COD) FLOW
+        // ============================================
         try {
             $db->beginTransaction();
-
-            $customerId = $currentUser['id'] ?? 0;
-
-            $nowIst = date('Y-m-d H:i:s');
 
             // 1. Insert Order Record
             $orderStmt = $db->prepare("
@@ -143,10 +137,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
 
             // 3. Record Payment Submission
             $payStmt = $db->prepare("
-                INSERT INTO payments (order_id, customer_id, amount, payment_method, utr_number, proof_screenshot, customer_note, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending')
+                INSERT INTO payments (order_id, customer_id, amount, payment_method, utr_number, customer_note, status)
+                VALUES (?, ?, ?, ?, 'COD (Pay on Delivery)', ?, 'Pending')
             ");
-            $payStmt->execute([$orderId, $customerId, $totalPrice, $paymentMethod, $utrNumber, $proofPath, $customerNote]);
+            $payStmt->execute([$orderId, $customerId, $totalPrice, $paymentMethod, $customerNote]);
 
             // 4. Record Coupon Usage
             if ($appliedCoupon) {
@@ -156,8 +150,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
             }
 
             // 5. Record Status History & Admin Notification
-            log_order_status_transition($orderId, null, 'Order Placed', 'Order placed with ' . $paymentMethod . ' (UTR: ' . $utrNumber . ')', $fullName);
-            create_notification(null, 'New Order Received', 'New order #' . $orderNumber . ' placed by ' . $fullName . ' (' . format_price($totalPrice) . ')', 'order', 'orders.php');
+            log_order_status_transition($orderId, null, 'Order Placed', 'Order placed with Cash on Delivery', $fullName);
+            create_notification(null, 'New COD Order Received', 'New COD order #' . $orderNumber . ' placed by ' . $fullName . ' (' . format_price($totalPrice) . ')', 'order', 'orders.php');
 
             // 6. Clear Cart, Shipping Session & Coupon
             clear_cart();
@@ -170,14 +164,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
             require_once __DIR__ . '/includes/mailer.php';
             try {
                 $orderData = [
-                    'order_number' => $orderNumber,
-                    'customer_name' => $fullName,
-                    'customer_email' => $email,
-                    'total_price' => $totalPrice,
-                    'subtotal' => $subtotal,
-                    'shipping_fee' => $shippingFee,
-                    'discount_amount' => $discountAmount,
-                    'payment_method' => $paymentMethod,
+                    'order_number'     => $orderNumber,
+                    'customer_name'    => $fullName,
+                    'customer_email'   => $email,
+                    'total_price'      => $totalPrice,
+                    'subtotal'         => $subtotal,
+                    'shipping_fee'     => $shippingFee,
+                    'discount_amount'  => $discountAmount,
+                    'payment_method'   => $paymentMethod,
                     'shipping_address' => $fullShippingText
                 ];
                 send_order_confirmation_email($orderData, $cartData['items']);
@@ -187,17 +181,126 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
 
             header("Location: order-success.php?order_number=" . urlencode($orderNumber));
             exit;
+
         } catch (Exception $e) {
             $db->rollBack();
             $errorMessage = 'Order placement failed: ' . $e->getMessage();
         }
-    }
 
-// UPI Dynamic QR & Deep Link
-$upiMerchantId = get_setting('upi_id', 'thestitchco@upi');
-$upiMerchantName = get_setting('upi_merchant_name', 'The Stitch Co.');
-$upiIntentUrl = generate_upi_intent_link($upiMerchantId, $upiMerchantName, $totalPrice, 'TSC-ORDER');
-$upiQrImageUrl = get_setting('upi_qr_image', 'assets/images/upi_qr.svg');
+    } else {
+        // ============================================
+        // PHONEPE PAYMENT GATEWAY ONLINE FLOW
+        // ============================================
+        try {
+            $db->beginTransaction();
+
+            // 1. Insert Order Record
+            $orderStmt = $db->prepare("
+                INSERT INTO orders (
+                    order_number, customer_id, customer_name, customer_email, customer_phone,
+                    shipping_address, shipping_method, payment_method, subtotal,
+                    discount_amount, coupon_code, shipping_fee, total_price,
+                    status, payment_status, notes, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 'PhonePe (UPI / Online)', ?, ?, ?, ?, ?, 'Order Placed', 'Pending', ?, ?)
+            ");
+            $orderStmt->execute([
+                $orderNumber,
+                $customerId,
+                $fullName,
+                $email,
+                $phone,
+                $fullShippingText,
+                $shippingMethod,
+                $subtotal,
+                $discountAmount,
+                $appliedCoupon['code'] ?? null,
+                $shippingFee,
+                $totalPrice,
+                $customerNote,
+                $nowIst
+            ]);
+            $orderId = (int)$db->lastInsertId();
+
+            // 2. Insert Order Items & Decrement Inventory
+            $itemStmt = $db->prepare("
+                INSERT INTO order_items (order_id, product_id, product_name, size, quantity, price, total, image)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ");
+            $stockStmt = $db->prepare("UPDATE products SET stock = GREATEST(0, stock - ?) WHERE id = ?");
+
+            foreach ($cartData['items'] as $item) {
+                $itemTotal = $item['price'] * $item['quantity'];
+                $itemStmt->execute([
+                    $orderId,
+                    $item['product_id'],
+                    $item['name'],
+                    $item['size'],
+                    $item['quantity'],
+                    $item['price'],
+                    $itemTotal,
+                    $item['thumbnail']
+                ]);
+                $stockStmt->execute([$item['quantity'], $item['product_id']]);
+            }
+
+            // 3. Record Initial Payment Entry
+            $tempTxnRef = 'INIT_' . $orderId . '_' . time();
+            $payStmt = $db->prepare("
+                INSERT INTO payments (order_id, customer_id, amount, payment_method, utr_number, customer_note, status)
+                VALUES (?, ?, ?, 'PhonePe (UPI / Online)', ?, ?, 'Pending')
+            ");
+            $payStmt->execute([$orderId, $customerId, $totalPrice, $tempTxnRef, $customerNote]);
+
+            // 4. Record Coupon Usage
+            if ($appliedCoupon) {
+                $db->prepare("INSERT INTO coupon_usage (coupon_id, user_id, order_id, discount_amount) VALUES (?, ?, ?, ?)")
+                   ->execute([$appliedCoupon['id'], $customerId, $orderId, $discountAmount]);
+                $db->prepare("UPDATE coupons SET used_count = used_count + 1 WHERE id = ?")->execute([$appliedCoupon['id']]);
+            }
+
+            $db->commit();
+
+            // Store in Session for fallback verification
+            $_SESSION['phonepe_order_id'] = $orderId;
+
+            // 5. Initiate PhonePe Payment
+            $redirectUrl = BASE_URL . 'phonepe-response.php';
+            $callbackUrl = BASE_URL . 'api/phonepe-webhook.php';
+
+            $orderPayload = [
+                'order_id'       => $orderId,
+                'order_number'   => $orderNumber,
+                'amount'         => $totalPrice,
+                'customer_id'    => $customerId,
+                'customer_name'  => $fullName,
+                'customer_phone' => $phone,
+                'customer_email' => $email
+            ];
+
+            $phonePeRes = phonepe_initiate_payment($orderPayload, $redirectUrl, $callbackUrl);
+
+            if ($phonePeRes['success'] && !empty($phonePeRes['redirect_url'])) {
+                // Update UTR/Ref in DB to the actual Merchant Transaction ID
+                $db->prepare("UPDATE payments SET utr_number = ? WHERE order_id = ?")
+                   ->execute([$phonePeRes['merchant_txn_id'], $orderId]);
+
+                $_SESSION['phonepe_merchant_txn_id'] = $phonePeRes['merchant_txn_id'];
+
+                // Redirect user to PhonePe PG Checkout
+                header("Location: " . $phonePeRes['redirect_url']);
+                exit;
+            } else {
+                // Handle initiation failure
+                $errorMessage = 'PhonePe Gateway Error: ' . ($phonePeRes['message'] ?? 'Could not initialize payment.');
+                error_log("PhonePe initiation failed: " . json_encode($phonePeRes));
+            }
+
+        } catch (Exception $e) {
+            $db->rollBack();
+            $errorMessage = 'Payment initiation failed: ' . $e->getMessage();
+        }
+    }
+}
 
 $pageTitle = 'Step 2: Payment & Final Confirmation | ' . STORE_NAME;
 require_once __DIR__ . '/includes/header.php';
@@ -218,19 +321,20 @@ require_once __DIR__ . '/includes/header.php';
     </div>
 
     <?php if (!empty($errorMessage)): ?>
-        <div style="background: #FEF2F2; border: 1.5px solid #EF4444; color: #DC2626; padding: 1rem 1.5rem; border-radius: var(--radius-md); margin-bottom: 2rem; font-weight: 700;">
-            ⚠️ <?= e($errorMessage) ?>
+        <div style="background: #FEF2F2; border: 1.5px solid #EF4444; color: #DC2626; padding: 1rem 1.5rem; border-radius: var(--radius-md); margin-bottom: 2rem; font-weight: 700; display: flex; align-items: center; gap: 0.8rem;">
+            <span style="font-size: 1.4rem;">⚠️</span>
+            <div><?= e($errorMessage) ?></div>
         </div>
     <?php endif; ?>
 
-    <form action="payment.php" method="POST" enctype="multipart/form-data" id="payment-step-form">
+    <form action="payment.php" method="POST" id="payment-step-form">
         <div style="display: grid; grid-template-columns: 1fr; gap: 2.5rem;" class="checkout-grid">
             <!-- Left: Deliver-To Summary + Payment Submission -->
             <div>
                 <!-- Deliver-To Summary Banner -->
                 <div style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
                     <div>
-                        <div style="font-size: 0.75rem; font-weight: 800; color: #2563EB; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.3rem;">
+                        <div style="font-size: 0.75rem; font-weight: 800; color: #6739B7; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.3rem;">
                             📦 Delivering To:
                         </div>
                         <div style="font-size: 1rem; font-weight: 800; color: var(--text-main);">
@@ -249,94 +353,83 @@ require_once __DIR__ . '/includes/header.php';
                     </a>
                 </div>
 
-                <!-- Payment Method Selection Card (UPI + Cash on Delivery) -->
+                <!-- Payment Method Selection Card (PhonePe + Cash on Delivery) -->
                 <div style="background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-sm); margin-bottom: 2rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.5rem;">
                         <h2 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 900; text-transform: uppercase; margin: 0;">
                             Select Payment Method
                         </h2>
-                        <span style="background: #ECFDF5; border: 1px solid #10B981; color: #059669; font-size: 0.72rem; font-weight: 800; padding: 0.25rem 0.65rem; border-radius: 20px;">
-                            🔒 100% SECURE CHECKOUT
+                        <span style="background: #EDE9FE; border: 1px solid #C4B5FD; color: #5B21B6; font-size: 0.72rem; font-weight: 800; padding: 0.25rem 0.65rem; border-radius: 20px;">
+                            🔒 100% SECURE GATEWAY
                         </span>
                     </div>
 
                     <!-- Payment Options Radio Stack -->
                     <div style="display: flex; flex-direction: column; gap: 1.2rem; margin-bottom: 1.5rem;">
                         
-                        <!-- Option 1: UPI Scan & Pay -->
-                        <div id="payment-card-upi" style="border: 2px solid #2563EB; background: #F8FAFC; border-radius: 12px; padding: 1.2rem; transition: all 0.25s ease;">
-                            <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
-                                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                    <input type="radio" name="payment_method" value="UPI (Scan & Pay)" checked onchange="togglePaymentMethod('upi')" style="accent-color: #2563EB; transform: scale(1.2);">
+                        <!-- Option 1: PhonePe Payment Gateway (UPI / Cards / NetBanking) -->
+                        <div id="payment-card-phonepe" style="border: 2px solid #6739B7; background: #FAF5FF; border-radius: 12px; padding: 1.4rem; transition: all 0.25s ease;">
+                            <label style="display: flex; align-items: flex-start; justify-content: space-between; cursor: pointer; gap: 0.75rem;">
+                                <div style="display: flex; align-items: flex-start; gap: 0.85rem;">
+                                    <input type="radio" name="payment_method" value="PhonePe (UPI / Cards / NetBanking)" checked onchange="togglePaymentMethod('phonepe')" style="accent-color: #6739B7; transform: scale(1.3); margin-top: 0.25rem;">
                                     <div>
-                                        <strong style="font-size: 1rem; color: #0F172A; display: block;">📱 UPI (Scan QR / GPay / PhonePe / Paytm)</strong>
-                                        <span style="font-size: 0.76rem; color: #64748B;">Instant online payment with zero processing fee</span>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                                            <strong style="font-size: 1.05rem; color: #0F172A; display: inline-flex; align-items: center; gap: 0.35rem;">
+                                                <span style="color: #6739B7;">🟣 PhonePe</span> Online Payment
+                                            </strong>
+                                            <?php if ($phonePeConfig['mode'] === 'sandbox'): ?>
+                                                <span style="font-size: 0.65rem; background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 800;">TEST / SANDBOX</span>
+                                            <?php endif; ?>
+                                        </div>
+                                        <span style="font-size: 0.78rem; color: #64748B; display: block; margin-top: 0.2rem;">
+                                            Pay instantly via UPI (PhonePe, GPay, Paytm, BHIM), Credit/Debit Cards & NetBanking
+                                        </span>
                                     </div>
                                 </div>
-                                <span style="background: #2563EB; color: #fff; font-size: 0.72rem; font-weight: 900; padding: 0.25rem 0.6rem; border-radius: 6px; letter-spacing: 0.4px;">FAST DISPATCH ⚡</span>
+                                <span style="background: #6739B7; color: #fff; font-size: 0.72rem; font-weight: 900; padding: 0.3rem 0.65rem; border-radius: 6px; letter-spacing: 0.4px; white-space: nowrap;">
+                                    FASTEST DISPATCH ⚡
+                                </span>
                             </label>
 
-                            <!-- QR Code & UPI Deep Links Box (Shown when UPI is active) -->
-                            <div id="upi-details-container" style="margin-top: 1.2rem; padding-top: 1.2rem; border-top: 1px dashed #CBD5E1;">
-                                <div class="qr-box-container" style="text-align: center; background: #FFFFFF; border: 1.5px solid #E2E8F0; border-radius: 12px; padding: 1.4rem;">
-                                    <div style="font-size: 0.8rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.8rem;">
-                                        Scan QR & Pay Exact Amount: <strong style="color: #0F172A; font-size: 1.1rem;"><?= format_price($totalPrice) ?></strong>
+                            <!-- PhonePe Info & Badges Box (Shown when PhonePe is active) -->
+                            <div id="phonepe-details-container" style="margin-top: 1.2rem; padding-top: 1.2rem; border-top: 1px dashed #DDD6FE;">
+                                <div style="background: #FFFFFF; border: 1.5px solid #E9D5FF; border-radius: 10px; padding: 1.2rem;">
+                                    <div style="font-size: 0.78rem; font-weight: 800; color: #6B21A8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.8rem;">
+                                        Supported Payment Channels:
                                     </div>
                                     
-                                    <div class="qr-image-frame" style="width: 190px; height: 190px; margin: 0 auto 1rem; border-radius: 12px; overflow: hidden; border: 2px solid #E2E8F0; padding: 0.5rem; background: #fff;">
-                                        <img src="<?= e($upiQrImageUrl) ?>" alt="UPI QR Code" style="width: 100%; height: 100%; object-fit: contain;">
+                                    <!-- Badges Grid -->
+                                    <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                                        <span style="background: #FAF5FF; border: 1px solid #D8B4FE; border-radius: 6px; padding: 0.4rem 0.75rem; font-size: 0.8rem; font-weight: 800; color: #581C87;">🟣 PhonePe App</span>
+                                        <span style="background: #F0FDF4; border: 1px solid #86EFAC; border-radius: 6px; padding: 0.4rem 0.75rem; font-size: 0.8rem; font-weight: 800; color: #166534;">🟢 Google Pay</span>
+                                        <span style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 6px; padding: 0.4rem 0.75rem; font-size: 0.8rem; font-weight: 800; color: #1E40AF;">🔵 Paytm / BHIM</span>
+                                        <span style="background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 6px; padding: 0.4rem 0.75rem; font-size: 0.8rem; font-weight: 800; color: #334155;">💳 Debit / Credit Cards</span>
+                                        <span style="background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 6px; padding: 0.4rem 0.75rem; font-size: 0.8rem; font-weight: 800; color: #334155;">🏦 Net Banking</span>
                                     </div>
 
-                                    <div style="font-weight: 800; font-size: 0.95rem; color: #0F172A;">
-                                        UPI ID: <span style="color: #2563EB; user-select: all; font-family: monospace; background: #EFF6FF; padding: 0.25rem 0.6rem; border-radius: 4px; border: 1px solid #BFDBFE;"><?= e($upiMerchantId) ?></span>
-                                    </div>
-                                    <div style="font-size: 0.78rem; color: #64748B; margin-top: 0.4rem;">
-                                        Verified Merchant: <strong><?= e($upiMerchantName) ?></strong>
-                                    </div>
-
-                                    <!-- Mobile UPI Deep Link Apps -->
-                                    <div style="margin-top: 1.2rem; border-top: 1px dashed #E2E8F0; padding-top: 1rem;">
-                                        <div style="font-size: 0.75rem; font-weight: 800; color: #64748B; margin-bottom: 0.6rem; text-transform: uppercase;">OR CLICK TO PAY VIA UPI APPS:</div>
-                                        <div class="upi-intent-buttons" style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
-                                            <a href="<?= $upiIntentUrl ?>" class="upi-app-btn" target="_blank" style="padding: 0.45rem 0.85rem; background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 6px; font-weight: 800; font-size: 0.78rem; text-decoration: none; color: #1E293B;">🟢 Google Pay</a>
-                                            <a href="<?= $upiIntentUrl ?>" class="upi-app-btn" target="_blank" style="padding: 0.45rem 0.85rem; background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 6px; font-weight: 800; font-size: 0.78rem; text-decoration: none; color: #1E293B;">🟣 PhonePe</a>
-                                            <a href="<?= $upiIntentUrl ?>" class="upi-app-btn" target="_blank" style="padding: 0.45rem 0.85rem; background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 6px; font-weight: 800; font-size: 0.78rem; text-decoration: none; color: #1E293B;">🔵 Paytm</a>
-                                            <a href="<?= $upiIntentUrl ?>" class="upi-app-btn" target="_blank" style="padding: 0.45rem 0.85rem; background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 6px; font-weight: 800; font-size: 0.78rem; text-decoration: none; color: #1E293B;">🟠 Any UPI App</a>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Optional UTR and Proof Attachment -->
-                                <div style="margin-top: 1.2rem; background: #FFFFFF; border: 1.5px solid #E2E8F0; border-radius: 12px; padding: 1.2rem;">
-                                    <h4 style="font-size: 0.88rem; font-weight: 800; margin-bottom: 0.8rem; color: #0F172A;">
-                                        📝 Enter Payment Reference (Optional)
-                                    </h4>
-                                    <div style="display: flex; flex-direction: column; gap: 1rem;">
-                                        <div>
-                                            <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.3rem;">UPI Reference / UTR Number</label>
-                                            <input type="text" name="utr_number" placeholder="e.g. 324156789012 (Optional)" style="width: 100%; padding: 0.7rem 0.9rem; border: 1.5px solid #CBD5E1; border-radius: 6px; font-size: 0.9rem; font-weight: 700; letter-spacing: 0.5px;">
-                                            <span style="font-size: 0.72rem; color: #64748B; margin-top: 0.2rem; display: block;">You can also share your payment receipt via WhatsApp after placing the order.</span>
-                                        </div>
-                                        <div>
-                                            <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.3rem;">Upload Payment Screenshot (Optional)</label>
-                                            <input type="file" name="payment_proof" accept="image/*" style="width: 100%; font-size: 0.82rem;">
-                                        </div>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem; color: #475569; background: #F3E8FF; padding: 0.6rem 0.9rem; border-radius: 6px;">
+                                        <span style="font-size: 1.1rem;">🔒</span>
+                                        <span>Clicking the button below will securely redirect you to <strong>PhonePe Checkout</strong> to finalize your payment. Zero manual screenshot or UTR entry needed!</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Option 2: Cash on Delivery (COD) -->
-                        <div id="payment-card-cod" style="border: 1.5px solid #CBD5E1; background: #FFFFFF; border-radius: 12px; padding: 1.2rem; transition: all 0.25s ease;">
-                            <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
-                                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                    <input type="radio" name="payment_method" value="Cash on Delivery (COD)" onchange="togglePaymentMethod('cod')" style="accent-color: #16A34A; transform: scale(1.2);">
+                        <div id="payment-card-cod" style="border: 1.5px solid #CBD5E1; background: #FFFFFF; border-radius: 12px; padding: 1.4rem; transition: all 0.25s ease;">
+                            <label style="display: flex; align-items: flex-start; justify-content: space-between; cursor: pointer; gap: 0.75rem;">
+                                <div style="display: flex; align-items: flex-start; gap: 0.85rem;">
+                                    <input type="radio" name="payment_method" value="Cash on Delivery (COD)" onchange="togglePaymentMethod('cod')" style="accent-color: #16A34A; transform: scale(1.3); margin-top: 0.25rem;">
                                     <div>
-                                        <strong style="font-size: 1rem; color: #0F172A; display: block;">💵 Cash on Delivery (COD)</strong>
-                                        <span style="font-size: 0.76rem; color: #64748B;">Pay via Cash or UPI at your doorstep upon parcel arrival</span>
+                                        <strong style="font-size: 1.05rem; color: #0F172A; display: block;">💵 Cash on Delivery (COD)</strong>
+                                        <span style="font-size: 0.78rem; color: #64748B; display: block; margin-top: 0.2rem;">
+                                            Pay via Cash or UPI at your doorstep upon parcel arrival
+                                        </span>
                                     </div>
                                 </div>
-                                <span style="background: #ECFDF5; border: 1px solid #10B981; color: #059669; font-size: 0.72rem; font-weight: 900; padding: 0.25rem 0.6rem; border-radius: 6px;">PAY AT DOORSTEP 🚚</span>
+                                <span style="background: #ECFDF5; border: 1px solid #10B981; color: #059669; font-size: 0.72rem; font-weight: 900; padding: 0.3rem 0.65rem; border-radius: 6px; white-space: nowrap;">
+                                    PAY AT DOORSTEP 🚚
+                                </span>
                             </label>
 
                             <!-- COD Instructions Box (Shown when COD is active) -->
@@ -364,16 +457,16 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
 
                 <!-- Confirm & Place Order CTA Button -->
-                <button type="submit" name="place_order" id="btn-submit-order" style="width: 100%; padding: 1.2rem; background: #16A34A; color: #FFFFFF; font-family: var(--font-heading); font-size: 1.05rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; border: none; border-radius: var(--radius-md); cursor: pointer; box-shadow: 0 4px 20px rgba(22, 163, 74, 0.35); transition: var(--transition);">
-                    CONFIRM & PAY VIA UPI (<?= format_price($totalPrice) ?>) 🔒
+                <button type="submit" name="place_order" id="btn-submit-order" style="width: 100%; padding: 1.2rem; background: #6739B7; color: #FFFFFF; font-family: var(--font-heading); font-size: 1.05rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; border: none; border-radius: var(--radius-md); cursor: pointer; box-shadow: 0 4px 20px rgba(103, 57, 183, 0.35); transition: var(--transition);">
+                    PAY VIA PHONEPE (<?= format_price($totalPrice) ?>) 🔒
                 </button>
             </div>
 
             <script>
             function togglePaymentMethod(method) {
-                const cardUpi = document.getElementById('payment-card-upi');
+                const cardPhonepe = document.getElementById('payment-card-phonepe');
                 const cardCod = document.getElementById('payment-card-cod');
-                const upiContainer = document.getElementById('upi-details-container');
+                const phonepeContainer = document.getElementById('phonepe-details-container');
                 const codContainer = document.getElementById('cod-details-container');
                 const submitBtn = document.getElementById('btn-submit-order');
                 const formattedTotal = '<?= format_price($totalPrice) ?>';
@@ -381,27 +474,27 @@ require_once __DIR__ . '/includes/header.php';
                 if (method === 'cod') {
                     cardCod.style.borderColor = '#16A34A';
                     cardCod.style.backgroundColor = '#F0FDF4';
-                    cardUpi.style.borderColor = '#CBD5E1';
-                    cardUpi.style.backgroundColor = '#FFFFFF';
+                    cardPhonepe.style.borderColor = '#CBD5E1';
+                    cardPhonepe.style.backgroundColor = '#FFFFFF';
                     
-                    upiContainer.style.display = 'none';
+                    phonepeContainer.style.display = 'none';
                     codContainer.style.display = 'block';
 
                     submitBtn.textContent = 'PLACE CASH ON DELIVERY ORDER (' + formattedTotal + ') 🚚';
                     submitBtn.style.backgroundColor = '#0F172A';
                     submitBtn.style.boxShadow = '0 4px 20px rgba(15, 23, 42, 0.35)';
                 } else {
-                    cardUpi.style.borderColor = '#2563EB';
-                    cardUpi.style.backgroundColor = '#F8FAFC';
+                    cardPhonepe.style.borderColor = '#6739B7';
+                    cardPhonepe.style.backgroundColor = '#FAF5FF';
                     cardCod.style.borderColor = '#CBD5E1';
                     cardCod.style.backgroundColor = '#FFFFFF';
                     
-                    upiContainer.style.display = 'block';
+                    phonepeContainer.style.display = 'block';
                     codContainer.style.display = 'none';
 
-                    submitBtn.textContent = 'CONFIRM & PAY VIA UPI (' + formattedTotal + ') 🔒';
-                    submitBtn.style.backgroundColor = '#16A34A';
-                    submitBtn.style.boxShadow = '0 4px 20px rgba(22, 163, 74, 0.35)';
+                    submitBtn.textContent = 'PAY VIA PHONEPE (' + formattedTotal + ') 🔒';
+                    submitBtn.style.backgroundColor = '#6739B7';
+                    submitBtn.style.boxShadow = '0 4px 20px rgba(103, 57, 183, 0.35)';
                 }
             }
             </script>

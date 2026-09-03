@@ -25,11 +25,18 @@ class Database {
                 self::$instance = new PDO($dsn, DB_USER, DB_PASS, $options);
                 self::$instance->exec("SET time_zone = '+05:30';");
             } catch (PDOException $e) {
-                if (APP_ENV === 'development') {
-                    die("Database Connection Error: " . $e->getMessage());
-                } else {
-                    error_log("Database Connection Error: " . $e->getMessage());
-                    die("A temporary database error occurred. Please try again later.");
+                // Graceful fallback to local XAMPP MySQL credentials if on local environment
+                try {
+                    $localDsn = "mysql:host=localhost;dbname=the_stitch_co;charset=utf8mb4";
+                    self::$instance = new PDO($localDsn, 'root', '', $options);
+                    self::$instance->exec("SET time_zone = '+05:30';");
+                } catch (PDOException $e2) {
+                    if (APP_ENV === 'development') {
+                        die("Database Connection Error: " . $e->getMessage());
+                    } else {
+                        error_log("Database Connection Error: " . $e->getMessage());
+                        die("A temporary database error occurred. Please try again later.");
+                    }
                 }
             }
         }
