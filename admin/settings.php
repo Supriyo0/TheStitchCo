@@ -149,8 +149,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_settings'])) {
                     </select>
                 </div>
                 <div>
-                    <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem;">Merchant ID / Client ID *</label>
-                    <input type="text" name="settings[phonepe_merchant_id]" value="<?= e(get_setting('phonepe_merchant_id', 'SU2508281240185820112176')) ?>" placeholder="e.g. SU2508281240185820112176" style="width: 100%; padding: 0.7rem; border: 1.5px solid var(--admin-border); border-radius: 6px; font-family: monospace; font-weight: 700; color: #1E3A8A;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem;">Merchant ID (MID) *</label>
+                    <input type="text" name="settings[phonepe_merchant_id]" value="<?= e(get_setting('phonepe_merchant_id', 'M233ZC8H054U7')) ?>" placeholder="e.g. M233ZC8H054U7" style="width: 100%; padding: 0.7rem; border: 1.5px solid var(--admin-border); border-radius: 6px; font-family: monospace; font-weight: 700; color: #1E3A8A;">
                 </div>
 
                 <div>

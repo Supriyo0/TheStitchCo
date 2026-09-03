@@ -19,7 +19,7 @@ function phonepe_get_config(): array {
     $enabled = (int)get_setting('phonepe_enabled', '1');
 
     if ($mode === 'production') {
-        $merchantId = get_setting('phonepe_merchant_id', 'SU2508281240185820112176');
+        $merchantId = get_setting('phonepe_merchant_id', 'M233ZC8H054U7');
         $saltKey = get_setting('phonepe_salt_key', 'a987a9bc-cf7e-417b-a627-21105e2de2d7');
         $saltIndex = get_setting('phonepe_salt_index', '1');
         $baseUrl = 'https://api.phonepe.com/apis/hermes';

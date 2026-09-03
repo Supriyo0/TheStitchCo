@@ -3,7 +3,7 @@
  * Step 2: Payment & Order Final Confirmation
  * The Stitch Co.
  *
- * Supports PhonePe Payment Gateway & Direct UPI (PhonePe, GPay, Paytm, BHIM) + Cash on Delivery
+ * Official PhonePe Payment Gateway Integration
  */
 
 require_once __DIR__ . '/config/config.php';
@@ -59,19 +59,12 @@ $totalPrice = max(0, $subtotal - $discountAmount + $shippingFee);
 $errorMessage = $_SESSION['checkout_error'] ?? '';
 unset($_SESSION['checkout_error']);
 
-// PhonePe & UPI Settings
+// PhonePe Gateway Config
 $phonePeConfig = phonepe_get_config();
-$merchantUpiId = get_setting('upi_id', '7063179581@ybl');
-$merchantName = get_setting('upi_merchant_name', 'The Stitch Co.');
 
-$tempOrderNum = 'TSC-' . date('ymd') . '-' . strtoupper(substr(bin2hex(random_bytes(3)), 0, 4));
-$upiIntentUrl = generate_upi_intent_link($merchantUpiId, $merchantName, $totalPrice, $tempOrderNum);
-$dynamicQrUrl = generate_dynamic_upi_qr_url($merchantUpiId, $merchantName, $totalPrice, $tempOrderNum);
-
-// Handle Final Order Placement
+// Handle Order Placement & Gateway Redirection
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
-    $paymentMethod = trim($_POST['payment_method'] ?? 'PhonePe / UPI');
-    $utrNumber = trim($_POST['utr_number'] ?? '');
+    $paymentMethod = trim($_POST['payment_method'] ?? 'PhonePe Gateway');
     $customerNote = trim($_POST['customer_note'] ?? '');
 
     $orderNumber = 'TSC-' . date('ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
@@ -191,22 +184,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
 
     } else {
         // ============================================
-        // 2. PHONEPE / DIRECT UPI ONLINE PAYMENT FLOW
+        // 2. PHONEPE PAYMENT GATEWAY HOSTED FLOW
         // ============================================
         
-        // Check if customer provided UTR from PhonePe / UPI App
-        if (!empty($utrNumber)) {
-            // Direct UPI / PhonePe App payment confirmation with UTR
+        $tempOrderId = rand(10000, 99999);
+        $redirectUrl = BASE_URL . 'phonepe-response.php';
+        $callbackUrl = BASE_URL . 'api/phonepe-webhook.php';
+
+        $orderPayload = [
+            'order_id'       => $tempOrderId,
+            'order_number'   => $orderNumber,
+            'amount'         => $totalPrice,
+            'customer_id'    => $customerId,
+            'customer_name'  => $fullName,
+            'customer_phone' => $phone,
+            'customer_email' => $email
+        ];
+
+        // Call PhonePe Initiation API
+        $phonePeRes = phonepe_initiate_payment($orderPayload, $redirectUrl, $callbackUrl);
+
+        if ($phonePeRes['success'] && !empty($phonePeRes['redirect_url'])) {
             try {
                 $db->beginTransaction();
 
+                // Create Order record with Pending Payment status
                 $orderStmt = $db->prepare("
                     INSERT INTO orders (
                         order_number, customer_id, customer_name, customer_email, customer_phone,
                         shipping_address, shipping_method, payment_method, subtotal,
                         discount_amount, coupon_code, shipping_fee, total_price,
                         status, payment_status, notes, created_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, 'PhonePe / UPI Online', ?, ?, ?, ?, ?, 'Order Placed', 'Pending', ?, ?)
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, 'PhonePe Payment Gateway', ?, ?, ?, ?, ?, 'Order Placed', 'Pending', ?, ?)
                 ");
                 $orderStmt->execute([
                     $orderNumber,
@@ -249,143 +258,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
 
                 $payStmt = $db->prepare("
                     INSERT INTO payments (order_id, customer_id, amount, payment_method, utr_number, customer_note, status)
-                    VALUES (?, ?, ?, 'PhonePe / UPI', ?, ?, 'Pending')
+                    VALUES (?, ?, ?, 'PhonePe Gateway', ?, ?, 'Pending')
                 ");
-                $payStmt->execute([$orderId, $customerId, $totalPrice, $utrNumber, $customerNote]);
-
-                if ($appliedCoupon) {
-                    $db->prepare("INSERT INTO coupon_usage (coupon_id, user_id, order_id, discount_amount) VALUES (?, ?, ?, ?)")
-                       ->execute([$appliedCoupon['id'], $customerId, $orderId, $discountAmount]);
-                    $db->prepare("UPDATE coupons SET used_count = used_count + 1 WHERE id = ?")->execute([$appliedCoupon['id']]);
-                }
-
-                log_order_status_transition($orderId, null, 'Order Placed', 'Payment submitted via PhonePe/UPI with Ref: ' . $utrNumber, $fullName);
-                create_notification(null, 'PhonePe/UPI Payment Submitted', 'Order #' . $orderNumber . ' submitted with UPI Ref ' . $utrNumber . ' (' . format_price($totalPrice) . ')', 'payment', 'orders.php');
-
-                clear_cart();
-                unset($_SESSION['applied_coupon']);
-                unset($_SESSION['checkout_shipping']);
+                $payStmt->execute([$orderId, $customerId, $totalPrice, $phonePeRes['merchant_txn_id'], $customerNote]);
 
                 $db->commit();
 
-                require_once __DIR__ . '/includes/mailer.php';
-                try {
-                    $orderData = [
-                        'order_number'     => $orderNumber,
-                        'customer_name'    => $fullName,
-                        'customer_email'   => $email,
-                        'total_price'      => $totalPrice,
-                        'subtotal'         => $subtotal,
-                        'shipping_fee'     => $shippingFee,
-                        'discount_amount'  => $discountAmount,
-                        'payment_method'   => 'PhonePe / UPI (' . $utrNumber . ')',
-                        'shipping_address' => $fullShippingText
-                    ];
-                    send_order_confirmation_email($orderData, $cartData['items']);
-                } catch (Exception $mailEx) {
-                    error_log("Order confirmation email error: " . $mailEx->getMessage());
-                }
+                $_SESSION['phonepe_order_id'] = $orderId;
+                $_SESSION['phonepe_merchant_txn_id'] = $phonePeRes['merchant_txn_id'];
 
-                header("Location: order-success.php?order_number=" . urlencode($orderNumber));
+                // Seamlessly redirect customer to the official PhonePe Payment Gateway page
+                header("Location: " . $phonePeRes['redirect_url']);
                 exit;
 
             } catch (Exception $e) {
                 $db->rollBack();
-                $errorMessage = 'Order placement failed: ' . $e->getMessage();
+                $errorMessage = 'Payment initiation database error: ' . $e->getMessage();
             }
 
         } else {
-            // Attempt PhonePe PG API Gateway Initiation
-            $redirectUrl = BASE_URL . 'phonepe-response.php';
-            $callbackUrl = BASE_URL . 'api/phonepe-webhook.php';
-
-            $orderPayload = [
-                'order_id'       => rand(10000, 99999),
-                'order_number'   => $orderNumber,
-                'amount'         => $totalPrice,
-                'customer_id'    => $customerId,
-                'customer_name'  => $fullName,
-                'customer_phone' => $phone,
-                'customer_email' => $email
-            ];
-
-            $phonePeRes = phonepe_initiate_payment($orderPayload, $redirectUrl, $callbackUrl);
-
-            if ($phonePeRes['success'] && !empty($phonePeRes['redirect_url'])) {
-                // PhonePe Gateway active -> Create pending order & redirect to PhonePe page
-                try {
-                    $db->beginTransaction();
-
-                    $orderStmt = $db->prepare("
-                        INSERT INTO orders (
-                            order_number, customer_id, customer_name, customer_email, customer_phone,
-                            shipping_address, shipping_method, payment_method, subtotal,
-                            discount_amount, coupon_code, shipping_fee, total_price,
-                            status, payment_status, notes, created_at
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, 'PhonePe Gateway', ?, ?, ?, ?, ?, 'Order Placed', 'Pending', ?, ?)
-                    ");
-                    $orderStmt->execute([
-                        $orderNumber,
-                        $customerId,
-                        $fullName,
-                        $email,
-                        $phone,
-                        $fullShippingText,
-                        $shippingMethod,
-                        $subtotal,
-                        $discountAmount,
-                        $appliedCoupon['code'] ?? null,
-                        $shippingFee,
-                        $totalPrice,
-                        $customerNote,
-                        $nowIst
-                    ]);
-                    $orderId = (int)$db->lastInsertId();
-
-                    $itemStmt = $db->prepare("
-                        INSERT INTO order_items (order_id, product_id, product_name, size, quantity, price, total, image)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                    ");
-                    $stockStmt = $db->prepare("UPDATE products SET stock = GREATEST(0, stock - ?) WHERE id = ?");
-
-                    foreach ($cartData['items'] as $item) {
-                        $itemTotal = $item['price'] * $item['quantity'];
-                        $itemStmt->execute([
-                            $orderId,
-                            $item['product_id'],
-                            $item['name'],
-                            $item['size'],
-                            $item['quantity'],
-                            $item['price'],
-                            $itemTotal,
-                            $item['thumbnail']
-                        ]);
-                        $stockStmt->execute([$item['quantity'], $item['product_id']]);
-                    }
-
-                    $payStmt = $db->prepare("
-                        INSERT INTO payments (order_id, customer_id, amount, payment_method, utr_number, customer_note, status)
-                        VALUES (?, ?, ?, 'PhonePe Gateway', ?, ?, 'Pending')
-                    ");
-                    $payStmt->execute([$orderId, $customerId, $totalPrice, $phonePeRes['merchant_txn_id'], $customerNote]);
-
-                    $db->commit();
-
-                    $_SESSION['phonepe_order_id'] = $orderId;
-                    $_SESSION['phonepe_merchant_txn_id'] = $phonePeRes['merchant_txn_id'];
-
-                    header("Location: " . $phonePeRes['redirect_url']);
-                    exit;
-
-                } catch (Exception $e) {
-                    $db->rollBack();
-                    $errorMessage = 'Payment initiation error: ' . $e->getMessage();
-                }
-
-            } else {
-                // If PhonePe PG returned error (e.g. 404/not active), prompt user to pay via live PhonePe UPI QR
-                $errorMessage = 'Please scan the PhonePe / UPI QR code below with your PhonePe / GPay app or click the payment button, then enter your 12-digit UPI UTR number to confirm your order.';
-            }
+            $rawMsg = $phonePeRes['message'] ?? 'Could not initialize gateway connection.';
+            $errorMessage = "PhonePe Gateway Error: {$rawMsg}. Please ensure your PhonePe Merchant ID (MID) and Salt Key are correctly configured in Admin Settings.";
         }
     }
 }
@@ -409,9 +302,9 @@ require_once __DIR__ . '/includes/header.php';
     </div>
 
     <?php if (!empty($errorMessage)): ?>
-        <div style="background: #EFF6FF; border: 1.5px solid #3B82F6; color: #1E40AF; padding: 1rem 1.5rem; border-radius: var(--radius-md); margin-bottom: 2rem; font-weight: 700; display: flex; align-items: center; gap: 0.8rem;">
-            <span style="font-size: 1.4rem;">📱</span>
-            <div><?= e($errorMessage) ?></div>
+        <div style="background: #FEF2F2; border: 1.5px solid #EF4444; color: #DC2626; padding: 1.2rem 1.5rem; border-radius: var(--radius-md); margin-bottom: 2rem; font-weight: 700; display: flex; align-items: flex-start; gap: 0.8rem; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1);">
+            <span style="font-size: 1.4rem;">⚠️</span>
+            <div style="line-height: 1.4;"><?= e($errorMessage) ?></div>
         </div>
     <?php endif; ?>
 
@@ -455,68 +348,46 @@ require_once __DIR__ . '/includes/header.php';
                     <!-- Payment Options Radio Stack -->
                     <div style="display: flex; flex-direction: column; gap: 1.2rem; margin-bottom: 1.5rem;">
                         
-                        <!-- Option 1: PhonePe / Real UPI Payment -->
+                        <!-- Option 1: Official PhonePe Payment Gateway -->
                         <div id="payment-card-phonepe" style="border: 2px solid #6739B7; background: #FAF5FF; border-radius: 12px; padding: 1.4rem; transition: all 0.25s ease;">
                             <label style="display: flex; align-items: flex-start; justify-content: space-between; cursor: pointer; gap: 0.75rem;">
                                 <div style="display: flex; align-items: flex-start; gap: 0.85rem;">
-                                    <input type="radio" name="payment_method" value="PhonePe / UPI" checked onchange="togglePaymentMethod('phonepe')" style="accent-color: #6739B7; transform: scale(1.3); margin-top: 0.25rem;">
+                                    <input type="radio" name="payment_method" value="PhonePe Gateway" checked onchange="togglePaymentMethod('phonepe')" style="accent-color: #6739B7; transform: scale(1.3); margin-top: 0.25rem;">
                                     <div>
                                         <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                                             <strong style="font-size: 1.05rem; color: #0F172A; display: inline-flex; align-items: center; gap: 0.35rem;">
-                                                <span style="color: #6739B7;">🟣 PhonePe</span> &amp; UPI (GPay / Paytm / BHIM)
+                                                <span style="color: #6739B7;">🟣 PhonePe</span> Payment Gateway
                                             </strong>
+                                            <?php if ($phonePeConfig['mode'] === 'sandbox'): ?>
+                                                <span style="font-size: 0.65rem; background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 800;">SANDBOX MODE</span>
+                                            <?php endif; ?>
                                         </div>
                                         <span style="font-size: 0.78rem; color: #64748B; display: block; margin-top: 0.2rem;">
-                                            Scan Dynamic UPI QR or click below to pay with PhonePe, Google Pay, Paytm, BHIM &amp; UPI Apps
+                                            Pay via PhonePe, Google Pay, Paytm, UPI, Credit / Debit Cards &amp; NetBanking
                                         </span>
                                     </div>
                                 </div>
                                 <span style="background: #6739B7; color: #fff; font-size: 0.72rem; font-weight: 900; padding: 0.3rem 0.65rem; border-radius: 6px; letter-spacing: 0.4px; white-space: nowrap;">
-                                    FASTEST DISPATCH ⚡
+                                    FAST DISPATCH ⚡
                                 </span>
                             </label>
 
-                            <!-- PhonePe Real Dynamic QR & 1-Click Pay Box -->
+                            <!-- Supported Channels Badge Row -->
                             <div id="phonepe-details-container" style="margin-top: 1.2rem; padding-top: 1.2rem; border-top: 1px dashed #DDD6FE;">
-                                <div style="background: #FFFFFF; border: 1.5px solid #E9D5FF; border-radius: 12px; padding: 1.5rem; text-align: center;">
-                                    
-                                    <div style="font-size: 0.82rem; font-weight: 800; color: #6B21A8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.8rem;">
-                                        SCAN WITH ANY UPI APP TO PAY: <strong style="color: #0F172A; font-size: 1.15rem;"><?= format_price($totalPrice) ?></strong>
+                                <div style="background: #FFFFFF; border: 1.5px solid #E9D5FF; border-radius: 10px; padding: 1.2rem;">
+                                    <div style="font-size: 0.75rem; font-weight: 800; color: #6B21A8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.8rem;">
+                                        Supported Payment Channels (On PhonePe Secure Checkout):
                                     </div>
-
-                                    <!-- Real Dynamic QR Image -->
-                                    <div style="width: 200px; height: 200px; margin: 0 auto 1rem; border-radius: 12px; overflow: hidden; border: 2.5px solid #6739B7; padding: 0.5rem; background: #fff; box-shadow: 0 4px 15px rgba(103, 57, 183, 0.15);">
-                                        <img src="<?= e($dynamicQrUrl) ?>" alt="Real PhonePe UPI QR" style="width: 100%; height: 100%; object-fit: contain;">
+                                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.8rem;">
+                                        <span style="background: #FAF5FF; border: 1px solid #D8B4FE; border-radius: 6px; padding: 0.35rem 0.7rem; font-size: 0.8rem; font-weight: 800; color: #581C87;">🟣 PhonePe App / UPI</span>
+                                        <span style="background: #F0FDF4; border: 1px solid #86EFAC; border-radius: 6px; padding: 0.35rem 0.7rem; font-size: 0.8rem; font-weight: 800; color: #166534;">🟢 Google Pay</span>
+                                        <span style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 6px; padding: 0.35rem 0.7rem; font-size: 0.8rem; font-weight: 800; color: #1E40AF;">🔵 Paytm / BHIM UPI</span>
+                                        <span style="background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 6px; padding: 0.35rem 0.7rem; font-size: 0.8rem; font-weight: 800; color: #334155;">💳 Credit &amp; Debit Cards</span>
+                                        <span style="background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 6px; padding: 0.35rem 0.7rem; font-size: 0.8rem; font-weight: 800; color: #334155;">🏦 Net Banking</span>
                                     </div>
-
-                                    <div style="font-weight: 800; font-size: 0.95rem; color: #0F172A; margin-bottom: 0.3rem;">
-                                        UPI ID: <span style="color: #6739B7; user-select: all; font-family: monospace; background: #F3E8FF; padding: 0.25rem 0.65rem; border-radius: 4px; border: 1px solid #D8B4FE;"><?= e($merchantUpiId) ?></span>
-                                    </div>
-                                    <div style="font-size: 0.78rem; color: #64748B;">
-                                        Verified Merchant: <strong><?= e($merchantName) ?></strong>
-                                    </div>
-
-                                    <!-- 1-Click Mobile UPI Apps -->
-                                    <div style="margin-top: 1.2rem; border-top: 1px dashed #E2E8F0; padding-top: 1rem;">
-                                        <div style="font-size: 0.75rem; font-weight: 800; color: #64748B; margin-bottom: 0.6rem; text-transform: uppercase;">
-                                            OR TAP TO PAY ON MOBILE:
-                                        </div>
-                                        <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
-                                            <a href="<?= $upiIntentUrl ?>" class="upi-app-btn" style="padding: 0.55rem 1rem; background: #FAF5FF; border: 1.5px solid #6739B7; border-radius: 6px; font-weight: 800; font-size: 0.82rem; text-decoration: none; color: #581C87;">🟣 Open PhonePe App</a>
-                                            <a href="<?= $upiIntentUrl ?>" class="upi-app-btn" style="padding: 0.55rem 1rem; background: #F0FDF4; border: 1.5px solid #16A34A; border-radius: 6px; font-weight: 800; font-size: 0.82rem; text-decoration: none; color: #166534;">🟢 Google Pay</a>
-                                            <a href="<?= $upiIntentUrl ?>" class="upi-app-btn" style="padding: 0.55rem 1rem; background: #EFF6FF; border: 1.5px solid #2563EB; border-radius: 6px; font-weight: 800; font-size: 0.82rem; text-decoration: none; color: #1E40AF;">🔵 Paytm / Any UPI</a>
-                                        </div>
-                                    </div>
-
-                                    <!-- UTR Confirmation Input Box -->
-                                    <div style="margin-top: 1.4rem; background: #FAF5FF; border: 1.5px solid #DDD6FE; border-radius: 10px; padding: 1.2rem; text-align: left;">
-                                        <label style="display: block; font-size: 0.85rem; font-weight: 800; margin-bottom: 0.4rem; color: #4C1D95;">
-                                            📝 Enter UPI Reference / UTR Number (Optional / Recommended):
-                                        </label>
-                                        <input type="text" name="utr_number" placeholder="e.g. 324156789012 (12-digit UTR from your UPI app receipt)" style="width: 100%; padding: 0.75rem 1rem; border: 1.5px solid #C4B5FD; border-radius: 6px; font-size: 0.92rem; font-weight: 700; letter-spacing: 0.5px; font-family: monospace;">
-                                        <span style="font-size: 0.74rem; color: #6B21A8; margin-top: 0.35rem; display: block;">
-                                            💡 You can also confirm your payment via WhatsApp immediately after placing your order.
-                                        </span>
+                                    <div style="font-size: 0.76rem; color: #475569; display: flex; align-items: center; gap: 0.4rem;">
+                                        <span>🔒</span>
+                                        <span>Clicking the button below will securely open the official <strong>PhonePe Hosted Payment Page</strong>.</span>
                                     </div>
                                 </div>
                             </div>
@@ -565,7 +436,7 @@ require_once __DIR__ . '/includes/header.php';
 
                 <!-- Confirm & Place Order CTA Button -->
                 <button type="submit" name="place_order" id="btn-submit-order" style="width: 100%; padding: 1.2rem; background: #6739B7; color: #FFFFFF; font-family: var(--font-heading); font-size: 1.05rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; border: none; border-radius: var(--radius-md); cursor: pointer; box-shadow: 0 4px 20px rgba(103, 57, 183, 0.35); transition: var(--transition);">
-                    CONFIRM &amp; PAY VIA PHONEPE (<?= format_price($totalPrice) ?>) 🔒
+                    PAY VIA PHONEPE (<?= format_price($totalPrice) ?>) 🔒
                 </button>
             </div>
 
@@ -599,7 +470,7 @@ require_once __DIR__ . '/includes/header.php';
                     phonepeContainer.style.display = 'block';
                     codContainer.style.display = 'none';
 
-                    submitBtn.textContent = 'CONFIRM & PAY VIA PHONEPE (' + formattedTotal + ') 🔒';
+                    submitBtn.textContent = 'PAY VIA PHONEPE (' + formattedTotal + ') 🔒';
                     submitBtn.style.backgroundColor = '#6739B7';
                     submitBtn.style.boxShadow = '0 4px 20px rgba(103, 57, 183, 0.35)';
                 }

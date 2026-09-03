@@ -308,7 +308,7 @@ INSERT INTO `settings` (`setting_key`, `setting_val`) VALUES
 ('gstin', '19GWPPD6451K1ZV'),
 ('phonepe_enabled', '1'),
 ('phonepe_mode', 'production'),
-('phonepe_merchant_id', 'SU2508281240185820112176'),
+('phonepe_merchant_id', 'M233ZC8H054U7'),
 ('phonepe_salt_key', 'a987a9bc-cf7e-417b-a627-21105e2de2d7'),
 ('phonepe_salt_index', '1'),
 ('upi_id', '7063179581@ybl'),
