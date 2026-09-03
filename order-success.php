@@ -76,27 +76,53 @@ $waLines[] = "⚡ *Please confirm my order for fast dispatch!* 🚚✨";
 $waDraftText = implode("\n", $waLines);
 $waUrl = "https://wa.me/" . $cleanPhone . "?text=" . urlencode($waDraftText);
 
-$pageTitle = 'Order Confirmed #' . $orderNumber . ' | ' . STORE_NAME;
+$isPaid = ($order['payment_status'] === 'Paid');
+$isCod = (stripos($order['payment_method'], 'Cash') !== false || stripos($order['payment_method'], 'COD') !== false);
+$isFailed = ($order['payment_status'] === 'Failed');
+
+$pageTitle = ($isFailed ? 'Payment Incomplete' : 'Order Confirmed') . ' #' . $orderNumber . ' | ' . STORE_NAME;
 require_once __DIR__ . '/includes/header.php';
 ?>
 
 <div class="container" style="padding: 3.5rem 1.25rem 6rem; max-width: 620px; text-align: center;">
-    <div style="width: 76px; height: 76px; background: #ECFDF5; border: 2.5px solid #10B981; border-radius: 50%; color: #10B981; font-size: 2.4rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);">
-        ✓
-    </div>
-
-    <h1 style="font-family: var(--font-heading); font-size: 2.1rem; font-weight: 900; margin-bottom: 0.4rem; color: var(--text-main);">
-        Order Placed Successfully!
-    </h1>
-    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.8rem;">
-        Thank you for shopping with The Stitch Co. Your order details have been recorded.
-    </p>
+    
+    <?php if ($isFailed): ?>
+        <div style="width: 76px; height: 76px; background: #FEF2F2; border: 2.5px solid #EF4444; border-radius: 50%; color: #EF4444; font-size: 2.4rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; box-shadow: 0 8px 20px rgba(239, 68, 68, 0.2);">
+            ✕
+        </div>
+        <h1 style="font-family: var(--font-heading); font-size: 2rem; font-weight: 900; margin-bottom: 0.4rem; color: #DC2626;">
+            Payment Not Completed
+        </h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.8rem;">
+            Your transaction could not be verified. You can retry paying to confirm your order.
+        </p>
+    <?php elseif ($isPaid || $isCod): ?>
+        <div style="width: 76px; height: 76px; background: #ECFDF5; border: 2.5px solid #10B981; border-radius: 50%; color: #10B981; font-size: 2.4rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);">
+            ✓
+        </div>
+        <h1 style="font-family: var(--font-heading); font-size: 2.1rem; font-weight: 900; margin-bottom: 0.4rem; color: var(--text-main);">
+            Order Confirmed Successfully!
+        </h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.8rem;">
+            Thank you for shopping with The Stitch Co. Your order has been placed and is being processed for dispatch.
+        </p>
+    <?php else: ?>
+        <div style="width: 76px; height: 76px; background: #FFFBEB; border: 2.5px solid #F59E0B; border-radius: 50%; color: #F59E0B; font-size: 2.4rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.2);">
+            ⏳
+        </div>
+        <h1 style="font-family: var(--font-heading); font-size: 2.1rem; font-weight: 900; margin-bottom: 0.4rem; color: var(--text-main);">
+            Order Received - Awaiting Payment Verification
+        </h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.8rem;">
+            Your order details have been recorded. Send your payment screenshot or UTR to WhatsApp for instant verification!
+        </p>
+    <?php endif; ?>
 
     <!-- WhatsApp Instant Dispatch Action Card -->
     <div style="background: #F0FDF4; border: 2px solid #86EFAC; border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 2rem; text-align: center; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.15);">
         <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.4rem;">
             <span style="font-size: 1.3rem;">⚡</span>
-            <strong style="font-size: 1rem; color: #166534; font-weight: 900; text-transform: uppercase;">Instant Verification & Faster Processing</strong>
+            <strong style="font-size: 1rem; color: #166534; font-weight: 900; text-transform: uppercase;">Instant WhatsApp Verification & Priority Packing</strong>
         </div>
         <p style="font-size: 0.84rem; color: #15803D; margin-bottom: 1.1rem; line-height: 1.4;">
             Send your pre-formatted order draft & payment confirmation directly to our WhatsApp support for priority packing & dispatch!

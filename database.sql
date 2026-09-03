@@ -311,7 +311,7 @@ INSERT INTO `settings` (`setting_key`, `setting_val`) VALUES
 ('phonepe_merchant_id', 'SU2508281240185820112176'),
 ('phonepe_salt_key', 'a987a9bc-cf7e-417b-a627-21105e2de2d7'),
 ('phonepe_salt_index', '1'),
-('upi_id', 'thestitchco@upi'),
+('upi_id', '7063179581@ybl'),
 ('upi_merchant_name', 'The Stitch Co.'),
 ('upi_qr_image', 'assets/images/upi_qr.svg'),
 ('standard_shipping_fee', '0.00'),

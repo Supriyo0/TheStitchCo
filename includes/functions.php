@@ -194,14 +194,20 @@ function handle_image_upload($fileArray, $targetSubfolder = 'products', $prefix 
 
 // Generate UPI Deep Link for Intent Payments
 function generate_upi_intent_link(string $upiId, string $merchantName, float $amount, string $orderNumber): string {
-    $pa = urlencode($upiId);
-    $pn = urlencode($merchantName);
+    $pa = urlencode(trim($upiId));
+    $pn = urlencode(trim($merchantName));
     $am = number_format($amount, 2, '.', '');
-    $tr = urlencode($orderNumber);
-    $tn = urlencode("Payment for Order " . $orderNumber);
+    $tr = urlencode(trim($orderNumber));
+    $tn = urlencode("Order " . trim($orderNumber) . " The Stitch Co");
     $cu = 'INR';
 
     return "upi://pay?pa={$pa}&pn={$pn}&tr={$tr}&tn={$tn}&am={$am}&cu={$cu}";
+}
+
+// Generate Dynamic Real-Time NPCI UPI QR Code Image URL
+function generate_dynamic_upi_qr_url(string $upiId, string $merchantName, float $amount, string $orderNumber): string {
+    $upiIntent = generate_upi_intent_link($upiId, $merchantName, $amount, $orderNumber);
+    return "https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=" . urlencode($upiIntent);
 }
 
 // Flash Messages

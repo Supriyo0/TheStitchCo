@@ -162,6 +162,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_settings'])) {
                     <input type="text" name="settings[phonepe_salt_index]" value="<?= e(get_setting('phonepe_salt_index', '1')) ?>" placeholder="e.g. 1" style="width: 100%; padding: 0.7rem; border: 1.5px solid var(--admin-border); border-radius: 6px; font-family: monospace; font-weight: 700;">
                 </div>
 
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem;">Merchant PhonePe / UPI VPA (for Instant QR &amp; Deep Link) *</label>
+                    <input type="text" name="settings[upi_id]" value="<?= e(get_setting('upi_id', '7063179581@ybl')) ?>" placeholder="e.g. 7063179581@ybl or yourbusiness@okhdfcbank" style="width: 100%; padding: 0.7rem; border: 1.5px solid var(--admin-border); border-radius: 6px; font-weight: 800; color: #6739B7;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem;">Merchant Display Name *</label>
+                    <input type="text" name="settings[upi_merchant_name]" value="<?= e(get_setting('upi_merchant_name', 'The Stitch Co.')) ?>" placeholder="e.g. The Stitch Co." style="width: 100%; padding: 0.7rem; border: 1.5px solid var(--admin-border); border-radius: 6px; font-weight: 700;">
+                </div>
+
                 <div style="grid-column: span 2; background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 1rem 1.2rem;">
                     <div style="font-size: 0.82rem; font-weight: 800; color: #334155; margin-bottom: 0.5rem; text-transform: uppercase;">
                         🔗 PhonePe Webhook & Callback URLs (Copy for PhonePe Merchant Dashboard):
