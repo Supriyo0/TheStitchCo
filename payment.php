@@ -278,7 +278,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
 
         } else {
             $rawMsg = $phonePeRes['message'] ?? 'Could not initialize gateway connection.';
-            $errorMessage = "PhonePe Gateway Error: {$rawMsg}. Please ensure your PhonePe Merchant ID (MID) and Salt Key are correctly configured in Admin Settings.";
+            if (strpos($rawMsg, '404') !== false) {
+                $errorMessage = 'PhonePe Live Gateway (MID: ' . htmlspecialchars($phonePeConfig['merchant_id']) . ') is pending live activation on PhonePe\'s network (HTTP 404). Once PhonePe activates your merchant routing, live checkout will connect automatically. To test the gateway now, switch to Sandbox Mode in Admin Settings, or select Cash on Delivery.';
+            } else {
+                $errorMessage = "PhonePe Gateway Error: {$rawMsg}. Please ensure your PhonePe Merchant ID and Salt Key are active in Admin Settings.";
+            }
         }
     }
 }
